@@ -1,44 +1,51 @@
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsparser from "@typescript-eslint/parser";
-import prettierPlugin from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import unusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 
-export default [
+export default tseslint.config(
   {
-    files: ["**/*.ts"],
-
+    ignores: ["node_modules/**", "cdk.out/**", "dist/**", "eslint.config.mjs"]
+  },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintPluginPrettierRecommended,
+  {
     languageOptions: {
-      ecmaVersion: 2024,
-      parser: tsparser,
-      sourceType: "module",
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: "module",
+        ecmaFeatures: {
+          impliedStrict: true
+        },
+        project: "./tsconfig.json"
+      },
       globals: {
         ...globals.node,
-        ...globals.es2024
+        ...globals.es2021
       }
     },
-
     plugins: {
-      "@typescript-eslint": tseslint,
-      prettier: prettierPlugin,
       "unused-imports": unusedImports,
       "simple-import-sort": simpleImportSort
     },
-
     rules: {
-      ...tseslint.configs.recommended.rules,
-      ...prettierConfig.rules,
-      "@typescript-eslint/no-unused-vars": "warn",
-      "no-console": "warn",
-      semi: ["error", "always"],
-      quotes: ["error", "double"],
-      "prettier/prettier": "error",
+      "no-console": 0,
+      "no-prototype-builtins": 0,
+      "no-case-declarations": 0,
+      "no-empty-pattern": 0,
+      camelcase: 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/await-thenable": 1,
+      "@typescript-eslint/no-explicit-any": 0,
+      "@typescript-eslint/ban-ts-comment": 0,
+      "@typescript-eslint/no-non-null-assertion": 0,
       "unused-imports/no-unused-imports": 2,
       "simple-import-sort/imports": 2,
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-empty-object-type": 0
     }
   }
-];
+);

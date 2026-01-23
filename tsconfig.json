@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2024",
+    "target": "ESNext",
     "module": "ES2022",
     "lib": [
-      "ES2024",
+      "ESNext"
     ],
     "moduleResolution": "bundler",
     "declaration": true,
@@ -24,8 +24,13 @@
       "./node_modules/@types"
     ]
   },
+  "include": [
+    "src/**/*",
+    "cdk/**/*",
+  ],
   "exclude": [
     "node_modules",
+    "dist",
     "cdk.out"
   ]
 }
