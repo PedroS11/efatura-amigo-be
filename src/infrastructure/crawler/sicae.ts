@@ -1,4 +1,5 @@
 import chromium from "@sparticuz/chromium";
+import type { Page } from "playwright-core";
 import { chromium as playwrightChromium } from "playwright-core";
 
 import type { Categories } from "../nifCategoryTable/types";
@@ -9,7 +10,31 @@ interface SiCAEData {
   cae2: string[];
 }
 
-const parseRowData = (): SiCAEData => {};
+const parseRow = async (page: Page): Promise<SiCAEData | undefined> => {
+  return await page.evaluate((): SiCAEData | undefined => {
+    // This code runs inside the browser so document will always be defined
+    const table = document.querySelector("#ctl00_MainContent_ConsultaDataGrid");
+    if (!table) {
+      return;
+    }
+
+    const firstRow = table.querySelector("tr:nth-child(2)");
+    if (!firstRow) {
+      return;
+    }
+
+    const cells = firstRow.querySelectorAll("td");
+
+    return {
+      cae: cells[2]?.textContent?.trim(),
+      cae2:
+        cells[3]?.textContent
+          ?.trim()
+          .replace(/\n*\s*/g, "")
+          .split(",") ?? []
+    };
+  });
+};
 
 export const findCategory = async (nif: string): Promise<Categories | undefined> => {
   const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
@@ -37,45 +62,22 @@ export const findCategory = async (nif: string): Promise<Categories | undefined>
   await page.click("#ctl00_MainContent_btnPesquisa");
 
   // wait for CAE text to appear
-  const validNifResults = page.waitForSelector('td:has-text("CAE Principal")', {
+  const validNif = page.waitForSelector('td:has-text("CAE Principal")', {
     timeout: 2000
   });
-
   const invalidNif = page.waitForSelector("#ctl00_MainContent_lblError", { timeout: 2000 });
 
-  const element = await Promise.race([validNifResults, invalidNif]);
+  const element = await Promise.race([validNif, invalidNif]);
 
   const elementText = await element.textContent();
 
   let cae: string | undefined = undefined;
 
   if (elementText?.includes("CAE Principal")) {
-    const result = await page.evaluate((): SiCAEData | undefined => {
-      // This code runs inside the browser so document will always be defined
-      const table = document.querySelector("#ctl00_MainContent_ConsultaDataGrid");
-      if (!table) {
-        return;
-      }
-
-      const firstRow = table.querySelector("tr:nth-child(2)");
-      if (!firstRow) {
-        return;
-      }
-
-      const cells = firstRow.querySelectorAll("td");
-
-      return {
-        cae: cells[2]?.textContent?.trim(),
-        cae2:
-          cells[3]?.textContent
-            ?.trim()
-            .replace(/\n*\s*/g, "")
-            .split(",") ?? []
-      };
-    });
-
+    const result = await parseRow(page);
     cae = result!.cae;
   }
+
   await browser.close();
 
   if (cae) {
