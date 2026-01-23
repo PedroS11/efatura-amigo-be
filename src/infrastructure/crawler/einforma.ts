@@ -14,6 +14,7 @@ export const findCategory = async (nif: string): Promise<Categories | undefined>
   );
 
   const $ = load(response.data);
+
   const caeText: string = $(
     "#presentacion > div:nth-child(1) > div.col-one > div.mod-datos > div.vcard > table > tbody > tr:nth-child(6) > td:nth-child(2) > span > a"
   )?.text();
