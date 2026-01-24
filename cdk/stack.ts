@@ -40,8 +40,7 @@ export class Stack extends cdk.Stack {
       code: Code.fromAsset("dist/getCategory", {
         bundling: undefined // disable any docker bundling
       }),
-      memorySize: 128,
-      reservedConcurrentExecutions: 2
+      memorySize: 128
     });
 
     table.grantReadData(getCategoryLambda);
@@ -57,7 +56,6 @@ export class Stack extends cdk.Stack {
         bundling: undefined // disable any docker bundling
       }),
       memorySize: 128,
-      reservedConcurrentExecutions: 1,
       timeout: Duration.seconds(10)
     });
 
