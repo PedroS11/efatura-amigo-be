@@ -30,9 +30,7 @@ jobs:
           cache: 'yarn' # Caches dependencies for faster runs
 
       - name: Install dependencies
-        run: |
-          yarn set version stable   # Ensure stable Yarn version
-          yarn install --immutable  # Uses PnP caching for faster installs
+        run:  yarn install --immutable  # Uses PnP caching for faster installs
 
       - name: Build project
         run: yarn build
