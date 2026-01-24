@@ -1,8 +1,8 @@
 import axios from "axios";
 import { load } from "cheerio";
 
-import type { Categories } from "../nifCategoryTable/types";
-import { mapCaeToCategory } from "./caeMapper";
+import type { Categories } from "../../nifCategoryTable/types";
+import { mapCaeToCategory } from "../caeMapper";
 
 export const findCategory = async (nif: string): Promise<Categories | undefined> => {
   const response = await axios.get(
@@ -24,5 +24,5 @@ export const findCategory = async (nif: string): Promise<Categories | undefined>
     return undefined;
   }
 
-  return mapCaeToCategory(cae);
+  return mapCaeToCategory(Number(cae));
 };

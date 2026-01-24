@@ -16,7 +16,7 @@ export enum Categories {
 }
 
 export interface NifCategory {
-  nif: string;
+  nif: number;
   name: string;
   category: Categories;
 }

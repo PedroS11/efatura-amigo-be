@@ -1,6 +1,6 @@
 export interface SiCAEData {
-  nif: string;
+  nif: number;
   name: string;
-  cae: string;
-  cae2: string[];
+  cae: number;
+  cae2: number[];
 }

@@ -4,7 +4,7 @@ import { INVALID_NIF_MESSAGE_ID, NIF_INPUT_ID, SEARCH_BUTTON_ID, SICAE_URL, VALI
 import { getLaunchOptions, parseResultsTable } from "./helpers";
 import type { SiCAEData } from "./types";
 
-export const findCompany = async (nif: string): Promise<SiCAEData | undefined> => {
+export const findCompany = async (nif: number): Promise<SiCAEData | undefined> => {
   const launchOptions = await getLaunchOptions();
 
   const browser = await playwrightChromium.launch(launchOptions);
@@ -16,7 +16,7 @@ export const findCompany = async (nif: string): Promise<SiCAEData | undefined> =
 
   await page.goto(SICAE_URL);
 
-  await page.fill(NIF_INPUT_ID, nif);
+  await page.fill(NIF_INPUT_ID, nif.toString());
   await page.click(SEARCH_BUTTON_ID);
 
   const validNifSelector = page.waitForSelector(VALID_NIF_TABLE_ID, {
@@ -39,5 +39,5 @@ export const findCompany = async (nif: string): Promise<SiCAEData | undefined> =
 };
 
 (async () => {
-  console.log(await findCompany("515198374"));
+  console.log(await findCompany(515198374));
 })();

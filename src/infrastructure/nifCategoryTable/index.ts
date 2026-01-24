@@ -1,20 +1,18 @@
 import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
-import { getDynamoInstance } from "./nifCategoryTableService";
+import { getDynamoInstance } from "./service";
 import type { Categories, NifCategory } from "./types";
-
-const TABLE_NAME = "NifCategoryTable";
 
 /**
  * Get category by NIF
- * @param {string} nif - Nif
+ * @param {number} nif - Nif
  */
-export const getCategory = async (nif: string): Promise<Categories | undefined> => {
+export const getCategory = async (nif: number): Promise<Categories | undefined> => {
   const db = getDynamoInstance();
 
   const result = await db.send(
     new GetCommand({
-      TableName: TABLE_NAME,
+      TableName: process.env.NIF_CATEGORY_TABLE_NAME,
       Key: {
         nif
       }
@@ -26,12 +24,12 @@ export const getCategory = async (nif: string): Promise<Categories | undefined> 
   return row?.category;
 };
 
-export const saveCompany = async (nif: string, name: string, category: Categories): Promise<void> => {
+export const saveCompany = async (nif: number, name: string, category: Categories): Promise<void> => {
   const db = getDynamoInstance();
 
   await db.send(
     new PutCommand({
-      TableName: TABLE_NAME,
+      TableName: process.env.NIF_CATEGORY_TABLE_NAME,
       Item: {
         category,
         name,

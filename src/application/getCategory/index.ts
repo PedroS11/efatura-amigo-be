@@ -1,23 +1,25 @@
 import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 
-import { getCategory } from "../../infrastructure/nifCategoryTable/nifCategoryTableRepository";
+import { getCategory } from "../../infrastructure/nifCategoryTable";
 import { sendMessage } from "../../infrastructure/sqs/sqsService";
 import type { ProcessNifMessage } from "../processNif";
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-  const nif = event.pathParameters?.nif;
+  const nifPath = event.pathParameters?.nif;
 
-  if (!nif) {
+  if (!nifPath) {
     return {
       body: "",
       statusCode: 400
     };
   }
 
+  const nif = Number(nifPath);
+
   const category = await getCategory(nif);
 
   if (category === undefined) {
-    await sendMessage({ nif } as ProcessNifMessage, "");
+    await sendMessage({ nif } as ProcessNifMessage, process.env.PROCESS_NIF_SQS!);
   }
 
   return {

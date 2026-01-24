@@ -3,13 +3,13 @@ import { mapCaeToCategory } from "./caeMapper";
 import { findCompany } from "./sicae";
 
 export interface CrawledData {
-  nif: string;
+  nif: number;
   name: string;
-  cae: string;
+  cae: number;
   category: Categories | undefined;
 }
 
-export const crawlCompany = async (nif: string): Promise<CrawledData | undefined> => {
+export const crawlCompany = async (nif: number): Promise<CrawledData | undefined> => {
   const company = await findCompany(nif);
   if (company) {
     const { nif, name, cae } = company;
@@ -26,5 +26,5 @@ export const crawlCompany = async (nif: string): Promise<CrawledData | undefined
 };
 
 (async () => {
-  console.log(await crawlCompany("515198374"));
+  console.log(await crawlCompany(515198374));
 })();
