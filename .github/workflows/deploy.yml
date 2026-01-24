@@ -36,4 +36,4 @@ jobs:
         run: yarn build
 
       - name: Deploy CDK Stack
-        run: yarn dlx cdk deploy --require-approval never
+        run: npx cdk deploy --require-approval never
