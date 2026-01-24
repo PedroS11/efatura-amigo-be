@@ -3,6 +3,6 @@
     "yarn lint:fix"
   ],
   "cdk/**/*.ts": [
-      "yarn lint:fix"
-    ],
+    "yarn lint:fix"
+  ],
 }

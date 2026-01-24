@@ -1,5 +1,3 @@
-import * as path from "node:path";
-
 import * as cdk from "aws-cdk-lib";
 import { AttributeType, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
@@ -10,15 +8,15 @@ export class Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const processNifDLQ = new Queue(scope, "ProcessNifDLQ");
-    const processNifSQS = new Queue(scope, "ProcessNifSQS", {
+    const processNifDLQ = new Queue(this, "ProcessNifDLQ");
+    const processNifSQS = new Queue(this, "ProcessNifSQS", {
       deadLetterQueue: {
         queue: processNifDLQ,
         maxReceiveCount: 2
       }
     });
 
-    const table = new TableV2(scope, "NifCategoryTable", {
+    const table = new TableV2(this, "NifCategoryTable", {
       partitionKey: {
         type: AttributeType.NUMBER,
         name: "nif"
@@ -29,10 +27,10 @@ export class Stack extends cdk.Stack {
       }
     });
 
-    const getCategoryLambda = new Function(scope, "GetCategory", {
+    const getCategoryLambda = new Function(this, "GetCategory", {
       runtime: Runtime.NODEJS_22_X,
       handler: "index.handler",
-      code: Code.fromAsset(path.join(__dirname, "lambda-handler"))
+      code: Code.fromAsset("dist/getCategory")
     });
 
     table.grantReadData(getCategoryLambda);
@@ -41,10 +39,10 @@ export class Stack extends cdk.Stack {
     processNifSQS.grantSendMessages(getCategoryLambda);
     getCategoryLambda.addEnvironment("PROCESS_NIF_SQS", processNifSQS.queueName);
 
-    const processNifLambda = new Function(scope, "ProcessNif", {
+    const processNifLambda = new Function(this, "ProcessNif", {
       runtime: Runtime.NODEJS_22_X,
       handler: "index.handler",
-      code: Code.fromAsset(path.join(__dirname, "lambda-handler"))
+      code: Code.fromAsset("dist/processNif")
     });
 
     table.grantWriteData(processNifLambda);

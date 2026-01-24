@@ -5,7 +5,7 @@
     "efatura-amigo-be": "cdk/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node esbuild.config.mjs",
     "watch": "tsc -w",
     "cdk": "cdk synth",
     "lint": "eslint 'src/**/*.ts' 'cdk/**/*.ts'",
@@ -19,6 +19,7 @@
     "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.53.1",
     "aws-cdk": "2.1007.0",
+    "esbuild": "^0.27.2",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.5",
