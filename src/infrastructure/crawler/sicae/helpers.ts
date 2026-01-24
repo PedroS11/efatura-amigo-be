@@ -1,0 +1,45 @@
+import chromium from "@sparticuz/chromium";
+import type { LaunchOptions, Page } from "playwright-core";
+
+import type { SiCAEData } from "./types";
+
+export const parseResultsTable = async (page: Page): Promise<SiCAEData | undefined> =>
+  await page.evaluate((): SiCAEData | undefined => {
+    // This code runs inside the browser so document will always be defined
+    const table = document.querySelector("#ctl00_MainContent_ConsultaDataGrid");
+    if (!table) {
+      return;
+    }
+
+    const firstRow = table.querySelector("tr:nth-child(2)");
+    if (!firstRow) {
+      return;
+    }
+
+    const cells = firstRow.querySelectorAll("td");
+
+    return {
+      nif: cells[0]?.textContent?.trim(),
+      name: cells[1]?.textContent?.trim(),
+      cae: cells[2]?.textContent?.trim(),
+      cae2:
+        cells[3]?.textContent
+          ?.trim()
+          .replace(/\n*\s*/g, "")
+          .split(",") ?? []
+    };
+  });
+
+export const getLaunchOptions = async (): Promise<LaunchOptions> => {
+  const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+  return isLambda
+    ? {
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+        headless: true
+      }
+    : {
+        headless: true
+      };
+};

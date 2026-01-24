@@ -1,14 +1,30 @@
 import type { Categories } from "../nifCategoryTable/types";
-import { findCategory } from "./einforma";
+import { mapCaeToCategory } from "./caeMapper";
+import { findCompany } from "./sicae";
 
-export const crawlCategory = async (nif: string): Promise<Categories | undefined> => {
-  const category = await findCategory(nif);
-  console.log(category);
-  console.log(category);
+export interface CrawledData {
+  nif: string;
+  name: string;
+  cae: string;
+  category: Categories | undefined;
+}
 
-  return category;
+export const crawlCompany = async (nif: string): Promise<CrawledData | undefined> => {
+  const company = await findCompany(nif);
+  if (company) {
+    const { nif, name, cae } = company;
+
+    return {
+      name,
+      category: mapCaeToCategory(cae),
+      nif,
+      cae
+    };
+  }
+
+  return;
 };
 
 (async () => {
-  await crawlCategory("515198374");
+  console.log(await crawlCompany("515198374"));
 })();

@@ -26,7 +26,7 @@ export const getCategory = async (nif: string): Promise<Categories | undefined> 
   return row?.category;
 };
 
-export const saveCategory = async (nif: string, category: Categories): Promise<void> => {
+export const saveCompany = async (nif: string, name: string, category: Categories): Promise<void> => {
   const db = getDynamoInstance();
 
   await db.send(
@@ -34,6 +34,7 @@ export const saveCategory = async (nif: string, category: Categories): Promise<v
       TableName: TABLE_NAME,
       Item: {
         category,
+        name,
         nif
       } as NifCategory
     })
