@@ -6,8 +6,8 @@ on:
       - main
 
 permissions:
-  id-token: write      # Needed to request OIDC token
-  contents: read       # For checkout
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
@@ -15,21 +15,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Updated to v4
 
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4 # Updated to v4
         with:
           role-to-assume: arn:aws:iam::566348719618:role/Github-Actions
           aws-region: us-west-2
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # Updated to v4
         with:
           node-version: '22'
-
-      - name: Install CDK
-        run: npm install -g aws-cdk@3
+          cache: 'npm' # Caches dependencies for faster runs
 
       - name: Install dependencies
         run: npm install
@@ -37,8 +35,5 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Boostrap the stakc
-        run: cdk bootstrap
-
       - name: Deploy CDK Stack
-        run: cdk deploy --require-approval never
+        run: npx cdk deploy --require-approval never
