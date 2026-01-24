@@ -22,19 +22,20 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::566348719618:role/Github-Actions
           aws-region: eu-west-2
-          unset-current-credentials: true
 
       - name: Install Node.js
         uses: actions/setup-node@v4 # Updated to v4
         with:
           node-version: '22'
-          cache: 'npm' # Caches dependencies for faster runs
+          cache: 'yarn' # Caches dependencies for faster runs
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          yarn set version stable   # Ensure stable Yarn version
+          yarn install --immutable  # Uses PnP caching for faster installs
 
       - name: Build project
-        run: npm run build
+        run: yarn build
 
       - name: Deploy CDK Stack
-        run: npx cdk deploy --require-approval never
+        run: yarn dlx cdk deploy --require-approval never
