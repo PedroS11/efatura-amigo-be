@@ -22,6 +22,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::566348719618:role/Github-Actions
           aws-region: eu-west-2
+          unset-current-credentials: true
 
       - name: Install Node.js
         uses: actions/setup-node@v4 # Updated to v4
