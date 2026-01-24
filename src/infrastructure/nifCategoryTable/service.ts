@@ -7,7 +7,7 @@ let instance: DynamoDBDocumentClient;
 export const getDynamoInstance = (): DynamoDBDocumentClient => {
   if (!instance) {
     const options: DynamoDBClientConfig = {
-      region: "eu-west-1"
+      region: "eu-west-2"
     };
 
     instance = DynamoDBDocumentClient.from(new DynamoDBClient(options), {
