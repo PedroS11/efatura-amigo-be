@@ -27,10 +27,6 @@ export class Stack extends cdk.Stack {
         type: AttributeType.NUMBER,
         name: "nif"
       },
-      sortKey: {
-        type: AttributeType.NUMBER,
-        name: "category"
-      },
       billing: Billing.onDemand()
     });
 
@@ -71,7 +67,7 @@ export class Stack extends cdk.Stack {
     });
 
     httpApi.addRoutes({
-      path: "/category/:nif",
+      path: "/category/{nif}",
       methods: [HttpMethod.GET],
       integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
     });
