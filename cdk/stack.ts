@@ -46,13 +46,12 @@ export class Stack extends cdk.Stack {
     processNifSQS.grantSendMessages(getCategoryLambda);
     getCategoryLambda.addEnvironment("PROCESS_NIF_SQS", processNifSQS.queueName);
 
-    // @sparticuz/chromium Lambda Layer - provides Chromium binary for Lambda
-    // See: https://github.com/Sparticuz/chromium/releases for layer versions
-    const chromiumLayer = LayerVersion.fromLayerVersionArn(
-      this,
-      "ChromiumLayer",
-      `arn:aws:lambda:${this.region}:764866452798:layer:chromium:143`
-    );
+    // Chromium layer - built by scripts/build-chromium-layer.mjs
+    const chromiumLayer = new LayerVersion(this, "ChromiumLayer", {
+      code: Code.fromAsset("layers/chromium"),
+      compatibleRuntimes: [Runtime.NODEJS_22_X],
+      description: "Chromium binary for Lambda (@sparticuz/chromium)"
+    });
 
     const processNifLambda = new Function(this, "ProcessNif", {
       runtime: Runtime.NODEJS_22_X,

@@ -5,7 +5,7 @@
     "efatura-amigo-be": "cdk/index.js"
   },
   "scripts": {
-    "build": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs && node scripts/build-chromium-layer.mjs",
     "watch": "tsc -w",
     "cdk": "cdk synth",
     "lint": "eslint 'src/**/*.ts' 'cdk/**/*.ts'",
