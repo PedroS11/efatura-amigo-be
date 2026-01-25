@@ -1,14 +1,13 @@
 import * as cdk from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
-import type { CfnStage } from "aws-cdk-lib/aws-apigatewayv2";
-import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
-import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Code, Function, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
+
+import { createHttpApi } from "./httpApi";
 
 export class Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -42,6 +41,7 @@ export class Stack extends cdk.Stack {
       code: Code.fromAsset("dist/getCategory"),
       memorySize: 128,
       logRetention: RetentionDays.THREE_DAYS
+      // architecture: Architecture.ARM_64
     });
 
     table.grantReadData(getCategoryLambda);
@@ -64,6 +64,7 @@ export class Stack extends cdk.Stack {
       timeout: Duration.seconds(30),
       layers: [playwrightLayer],
       logRetention: RetentionDays.THREE_DAYS
+      // architecture: Architecture.ARM_64
     });
 
     table.grantWriteData(processNifLambda);
@@ -78,41 +79,6 @@ export class Stack extends cdk.Stack {
       })
     );
 
-    const apiAccessLogs = new LogGroup(this, "ApiAccessLogs", {
-      retention: RetentionDays.THREE_DAYS, // Aggressive cleanup to save Storage
-      removalPolicy: cdk.RemovalPolicy.DESTROY
-    });
-
-    const httpApi = new HttpApi(this, "EfaturaAmigoApi", {
-      apiName: "EfaturaAmigoApi",
-      createDefaultStage: true
-    });
-
-    // We check if defaultStage exists (it does, because we set true above)
-    if (httpApi.defaultStage?.node?.defaultChild) {
-      const cfnStage = httpApi.defaultStage.node.defaultChild as CfnStage;
-
-      cfnStage.accessLogSettings = {
-        destinationArn: apiAccessLogs.logGroupArn,
-        format: JSON.stringify({
-          requestId: "$context.requestId",
-          ip: "$context.identity.sourceIp",
-          requestTime: "$context.requestTime",
-          httpMethod: "$context.httpMethod",
-          routeKey: "$context.routeKey",
-          status: "$context.status"
-        })
-      };
-    }
-
-    httpApi.addRoutes({
-      path: "/category/{nif}",
-      methods: [HttpMethod.GET],
-      integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
-    });
-
-    new cdk.CfnOutput(this, "ApiUrl", {
-      value: httpApi.url!
-    });
+    createHttpApi(this, getCategoryLambda);
   }
 }

@@ -45,7 +45,9 @@ export const getLaunchOptions = async (): Promise<LaunchOptions> => {
       "--no-sandbox",
       "--disable-setuid-sandbox",
       "--single-process", // Highly recommended for ETXTBSY issues
-      "--no-zygote"
+      "--no-zygote",
+      "--disable-dev-shm-usage", // Uses /tmp instead of shared memory
+      "--disable-gpu" // No need for GPU in headless Lambda
     ],
     executablePath: await chromium_lambda.executablePath(),
     headless: true
