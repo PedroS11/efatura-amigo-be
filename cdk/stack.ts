@@ -122,7 +122,7 @@ export class Stack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, "ApiUrl", {
-      value: httpApi.url!
+      value: stage.url!
     });
   }
 }
