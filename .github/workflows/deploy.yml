@@ -32,19 +32,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable --prefer-offline
 
-      - name: Build project
+      - name: Build Project
+        run: yarn build # Just runs your esbuild
+
+      - name: Prepare Layer
         run: |
-          # 1. Run your custom build script
-          yarn build 
-          
-          # 2. Stage dependencies for processNif
-          cd dist/processNif
+          mkdir -p layers/playwright/nodejs
+          cd layers/playwright/nodejs
           npm init -y
           npm install playwright-core @sparticuz/chromium --omit=dev
-          
-          # 3. Stage dependencies for getCategory (if it needs any)
-          cd ../getCategory
-          npm init -y
 
 #      - name: Build project
 #        run: yarn build

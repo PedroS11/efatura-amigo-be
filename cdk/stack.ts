@@ -3,7 +3,7 @@ import { Duration } from "aws-cdk-lib";
 import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
-import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Code, Function, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
@@ -15,6 +15,7 @@ export class Stack extends cdk.Stack {
     const processNifDLQ = new Queue(this, "ProcessNifDLQ", {
       retentionPeriod: cdk.Duration.days(1)
     });
+    // TODO: FIFO to prevent duplicates + 2mins delay
     const processNifSQS = new Queue(this, "ProcessNifSQS", {
       deadLetterQueue: {
         queue: processNifDLQ,
@@ -53,6 +54,12 @@ export class Stack extends cdk.Stack {
     //   description: "Chromium binary for Lambda (@sparticuz/chromium)"
     // });
 
+    const playwrightLayer = new LayerVersion(this, "PlaywrightLayer", {
+      code: Code.fromAsset("layers/playwright"), // We will create this folder
+      compatibleRuntimes: [Runtime.NODEJS_22_X],
+      description: "Layer containing playwright-core and sparticuz-chromium"
+    });
+
     const processNifLambda = new Function(this, "ProcessNif", {
       runtime: Runtime.NODEJS_22_X,
       handler: "index.handler", // Note: handler is in index.mjs
@@ -60,7 +67,8 @@ export class Stack extends cdk.Stack {
         bundling: undefined // disable any docker bundling
       }),
       memorySize: 1024,
-      timeout: Duration.seconds(30)
+      timeout: Duration.seconds(30),
+      layers: [playwrightLayer]
     });
 
     table.grantWriteData(processNifLambda);
