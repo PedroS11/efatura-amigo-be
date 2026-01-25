@@ -13,7 +13,8 @@ export class Stack extends cdk.Stack {
     super(scope, id, props);
 
     const processNifDLQ = new Queue(this, "ProcessNifDLQ", {
-      retentionPeriod: cdk.Duration.days(1)
+      retentionPeriod: cdk.Duration.days(1),
+      fifo: true
     });
     // TODO: FIFO to prevent duplicates + 2mins delay
     const processNifSQS = new Queue(this, "ProcessNifSQS", {
@@ -47,15 +48,8 @@ export class Stack extends cdk.Stack {
     processNifSQS.grantSendMessages(getCategoryLambda);
     getCategoryLambda.addEnvironment("PROCESS_NIF_SQS", processNifSQS.queueName);
 
-    // // Chromium layer - built by scripts/build-chromium-layer.mjs
-    // const chromiumLayer = new LayerVersion(this, "ChromiumLayer", {
-    //   code: Code.fromAsset("layers/chromium"),
-    //   compatibleRuntimes: [Runtime.NODEJS_22_X],
-    //   description: "Chromium binary for Lambda (@sparticuz/chromium)"
-    // });
-
     const playwrightLayer = new LayerVersion(this, "PlaywrightLayer", {
-      code: Code.fromAsset("layers/playwright"), // We will create this folder
+      code: Code.fromAsset("layers/playwright"), // Github Action creates this folder
       compatibleRuntimes: [Runtime.NODEJS_22_X],
       description: "Layer containing playwright-core and sparticuz-chromium"
     });
@@ -64,6 +58,7 @@ export class Stack extends cdk.Stack {
       runtime: Runtime.NODEJS_22_X,
       handler: "index.handler", // Note: handler is in index.mjs
       code: Code.fromAsset("dist/processNif", {
+        // TODO Test remove this bundling
         bundling: undefined // disable any docker bundling
       }),
       memorySize: 1024,

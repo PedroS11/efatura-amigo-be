@@ -26,15 +26,16 @@ export const getCategory = async (nif: number): Promise<Categories | undefined> 
 
 export const saveCompany = async (nif: number, name: string, category: Categories): Promise<void> => {
   const db = getDynamoInstance();
+  const item: NifCategory = {
+    category,
+    name,
+    nif
+  };
 
   await db.send(
     new PutCommand({
       TableName: process.env.NIF_CATEGORY_TABLE_NAME,
-      Item: {
-        category,
-        name,
-        nif
-      } as NifCategory
+      Item: item
     })
   );
 };
