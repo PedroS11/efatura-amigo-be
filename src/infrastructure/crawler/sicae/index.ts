@@ -1,15 +1,14 @@
-import { chromium as playwrightChromium } from "playwright-core";
+import { launchChromium } from "playwright-aws-lambda";
 
 import { INVALID_NIF_MESSAGE_ID, NIF_INPUT_ID, SEARCH_BUTTON_ID, SICAE_URL, VALID_NIF_TABLE_ID } from "./constants";
-import { getLaunchOptions, parseResultsTable } from "./helpers";
+import { parseResultsTable } from "./helpers";
 import type { SiCAEData } from "./types";
 
 export const findCompany = async (nif: number): Promise<SiCAEData | undefined> => {
-  const launchOptions = await getLaunchOptions();
+  const browser = await launchChromium();
+  const context = await browser.newContext();
 
-  const browser = await playwrightChromium.launch(launchOptions);
-
-  const page = await browser.newPage();
+  const page = await context.newPage();
   page.on("console", msg => {
     console.log("BROWSER LOG:", msg.text());
   });

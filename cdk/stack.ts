@@ -3,7 +3,7 @@ import { Duration } from "aws-cdk-lib";
 import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
-import { Code, Function, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
@@ -46,12 +46,12 @@ export class Stack extends cdk.Stack {
     processNifSQS.grantSendMessages(getCategoryLambda);
     getCategoryLambda.addEnvironment("PROCESS_NIF_SQS", processNifSQS.queueName);
 
-    // Chromium layer - built by scripts/build-chromium-layer.mjs
-    const chromiumLayer = new LayerVersion(this, "ChromiumLayer", {
-      code: Code.fromAsset("layers/chromium"),
-      compatibleRuntimes: [Runtime.NODEJS_22_X],
-      description: "Chromium binary for Lambda (@sparticuz/chromium)"
-    });
+    // // Chromium layer - built by scripts/build-chromium-layer.mjs
+    // const chromiumLayer = new LayerVersion(this, "ChromiumLayer", {
+    //   code: Code.fromAsset("layers/chromium"),
+    //   compatibleRuntimes: [Runtime.NODEJS_22_X],
+    //   description: "Chromium binary for Lambda (@sparticuz/chromium)"
+    // });
 
     const processNifLambda = new Function(this, "ProcessNif", {
       runtime: Runtime.NODEJS_22_X,
@@ -60,8 +60,8 @@ export class Stack extends cdk.Stack {
         bundling: undefined // disable any docker bundling
       }),
       memorySize: 1024, // Chromium needs more memory
-      timeout: Duration.seconds(30), // Browser automation needs more time
-      layers: [chromiumLayer]
+      timeout: Duration.seconds(30) // Browser automation needs more time
+      // layers: [chromiumLayer]
     });
 
     table.grantWriteData(processNifLambda);

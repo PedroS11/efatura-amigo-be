@@ -5,7 +5,7 @@
     "efatura-amigo-be": "cdk/index.js"
   },
   "scripts": {
-    "build": "node esbuild.config.mjs && node scripts/build-chromium-layer.mjs",
+    "build": "node esbuild.config.mjs",
     "watch": "tsc -w",
     "cdk": "cdk synth",
     "lint": "eslint 'src/**/*.ts' 'cdk/**/*.ts'",
@@ -44,6 +44,7 @@
     "cheerio": "^1.2.0",
     "constructs": "^10.0.0",
     "playwright": "^1.58.0",
+    "playwright-aws-lambda": "^0.11.0",
     "playwright-core": "^1.58.0"
   }
 }
