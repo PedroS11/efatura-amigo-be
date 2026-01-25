@@ -1,7 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
 import type { CfnStage } from "aws-cdk-lib/aws-apigatewayv2";
-import { HttpApi, HttpMethod, HttpStage } from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Code, Function, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
@@ -90,30 +90,25 @@ export class Stack extends cdk.Stack {
 
     const httpApi = new HttpApi(this, "EfaturaAmigoApi", {
       apiName: "EfaturaAmigoApi",
-      createDefaultStage: false
+      createDefaultStage: true
     });
 
-    // Create the stage (L2 Construct)
-    const stage = new HttpStage(this, "DefaultStage", {
-      httpApi,
-      stageName: "$default",
-      autoDeploy: true
-    });
+    // We check if defaultStage exists (it does, because we set true above)
+    if (httpApi.defaultStage?.node?.defaultChild) {
+      const cfnStage = httpApi.defaultStage.node.defaultChild as CfnStage;
 
-    // We access the underlying CloudFormation resource (L1) to set the logs
-    const cfnStage = stage.node.defaultChild as CfnStage;
-
-    cfnStage.accessLogSettings = {
-      destinationArn: apiAccessLogs.logGroupArn,
-      format: JSON.stringify({
-        requestId: "$context.requestId",
-        ip: "$context.identity.sourceIp",
-        requestTime: "$context.requestTime",
-        httpMethod: "$context.httpMethod",
-        routeKey: "$context.routeKey",
-        status: "$context.status"
-      })
-    };
+      cfnStage.accessLogSettings = {
+        destinationArn: apiAccessLogs.logGroupArn,
+        format: JSON.stringify({
+          requestId: "$context.requestId",
+          ip: "$context.identity.sourceIp",
+          requestTime: "$context.requestTime",
+          httpMethod: "$context.httpMethod",
+          routeKey: "$context.routeKey",
+          status: "$context.status"
+        })
+      };
+    }
 
     httpApi.addRoutes({
       path: "/category/{nif}",
@@ -122,7 +117,7 @@ export class Stack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, "ApiUrl", {
-      value: stage.url!
+      value: httpApi.url!
     });
   }
 }
