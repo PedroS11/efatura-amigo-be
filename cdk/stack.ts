@@ -3,7 +3,7 @@ import { Duration } from "aws-cdk-lib";
 import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
-import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Queue } from "aws-cdk-lib/aws-sqs";
@@ -32,15 +32,17 @@ export class Stack extends cdk.Stack {
       billing: Billing.onDemand()
     });
 
-    const getCategoryLambda = new Function(this, "GetCategory", {
+    const getCategoryLambda = new NodejsFunction(this, "GetCategory", {
+      entry: "src/application/getCategory/index.ts", // Point to .ts source
       runtime: Runtime.NODEJS_22_X,
-      handler: "index.handler",
-      code: Code.fromAsset("dist/getCategory", {
-        bundling: undefined // disable any docker bundling
-      }),
-      memorySize: 128
+      handler: "handler", // Just 'handler', no 'index.' prefix needed
+      memorySize: 128,
+      bundling: {
+        format: OutputFormat.ESM,
+        mainFields: ["module", "main"],
+        banner: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+      }
     });
-
     table.grantReadData(getCategoryLambda);
     getCategoryLambda.addEnvironment("NIF_CATEGORY_TABLE_NAME", table.tableName);
 
@@ -56,17 +58,19 @@ export class Stack extends cdk.Stack {
 
     const processNifLambda = new NodejsFunction(this, "ProcessNif", {
       runtime: Runtime.NODEJS_22_X,
-      handler: "index.handler",
-      code: Code.fromAsset("dist/processNif"),
+      entry: "src/application/processNif/index.ts",
+      handler: "handler",
       bundling: {
         format: OutputFormat.ESM,
         mainFields: ["module", "main"],
-        externalModules: ["playwright-core", "@sparticuz/chromium", "chromium-bidi"],
-        nodeModules: ["playwright-core", "@sparticuz/chromium"], // Force these into the zip
-        banner: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+        externalModules: ["chromium-bidi"], // playwright and sparticuz will be handled by nodeModules
+        nodeModules: ["playwright-core", "@sparticuz/chromium"],
+        banner: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
+        // Ensure esbuild target matches runtime
+        target: "node22"
       },
-      memorySize: 1024, // Chromium needs more memory
-      timeout: Duration.seconds(30) // Browser automation needs more time
+      memorySize: 1024, // Upgrading to 2GB is safer for Playwright + Node 22
+      timeout: Duration.seconds(30)
     });
 
     table.grantWriteData(processNifLambda);
