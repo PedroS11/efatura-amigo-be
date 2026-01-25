@@ -4,6 +4,7 @@ import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
 
@@ -60,6 +61,12 @@ export class Stack extends cdk.Stack {
 
     processNifSQS.grantConsumeMessages(processNifLambda);
     processNifLambda.addEnvironment("PROCESS_NIF_SQS", processNifSQS.queueName);
+
+    processNifLambda.addEventSource(
+      new SqsEventSource(processNifSQS, {
+        batchSize: 1
+      })
+    );
 
     const httpApi = new HttpApi(this, "EfaturaAmigoApi", {
       apiName: "EfaturaAmigoApi",
