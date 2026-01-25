@@ -5,6 +5,7 @@ import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
 
@@ -53,15 +54,19 @@ export class Stack extends cdk.Stack {
     //   description: "Chromium binary for Lambda (@sparticuz/chromium)"
     // });
 
-    const processNifLambda = new Function(this, "ProcessNif", {
+    const processNifLambda = new NodejsFunction(this, "ProcessNif", {
       runtime: Runtime.NODEJS_22_X,
       handler: "index.handler",
-      code: Code.fromAsset("dist/processNif", {
-        bundling: undefined // disable any docker bundling
-      }),
+      code: Code.fromAsset("dist/processNif"),
+      bundling: {
+        format: OutputFormat.ESM,
+        mainFields: ["module", "main"],
+        externalModules: ["playwright-core", "@sparticuz/chromium", "chromium-bidi"],
+        nodeModules: ["playwright-core", "@sparticuz/chromium"], // Force these into the zip
+        banner: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+      },
       memorySize: 1024, // Chromium needs more memory
       timeout: Duration.seconds(30) // Browser automation needs more time
-      // layers: [chromiumLayer]
     });
 
     table.grantWriteData(processNifLambda);

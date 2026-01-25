@@ -1,4 +1,5 @@
-import type { Page } from "playwright-core";
+import chromium_lambda from "@sparticuz/chromium";
+import type { LaunchOptions, Page } from "playwright-core";
 
 import type { SiCAEData } from "./types";
 
@@ -30,3 +31,17 @@ export const parseResultsTable = async (page: Page): Promise<SiCAEData | undefin
         .filter(Boolean)
     };
   });
+
+export const getLaunchOptions = async (): Promise<LaunchOptions> => {
+  const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+  if (!isLambda) {
+    return { headless: true };
+  }
+
+  return {
+    args: chromium_lambda.args,
+    executablePath: await chromium_lambda.executablePath(),
+    headless: true
+  };
+};

@@ -13,7 +13,7 @@ esbuild
     target: "node22",
     platform: "node",
     // Externalize: AWS SDK (provided by Lambda), @sparticuz/chromium & playwright-core (via Layer)
-    external: ["@aws-sdk/*", "chromium-bidi", "chromium-bidi/*"],
+    external: ["playwright-core", "@sparticuz/chromium", "@aws-sdk/*", "chromium-bidi", "chromium-bidi/*"],
     banner: {
       js: `
         import { createRequire } from 'node:module';
