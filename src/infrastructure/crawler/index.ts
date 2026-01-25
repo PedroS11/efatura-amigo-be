@@ -24,7 +24,3 @@ export const crawlCompany = async (nif: number): Promise<CrawledData | undefined
 
   return;
 };
-
-(async () => {
-  console.log(await crawlCompany(515198374));
-})();

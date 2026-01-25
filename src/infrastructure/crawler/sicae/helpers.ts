@@ -40,7 +40,13 @@ export const getLaunchOptions = async (): Promise<LaunchOptions> => {
   }
 
   return {
-    args: chromium_lambda.args,
+    args: [
+      ...chromium_lambda.args,
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--single-process", // Highly recommended for ETXTBSY issues
+      "--no-zygote"
+    ],
     executablePath: await chromium_lambda.executablePath(),
     headless: true
   };

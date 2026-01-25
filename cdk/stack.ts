@@ -63,7 +63,7 @@ export class Stack extends cdk.Stack {
       bundling: {
         format: OutputFormat.ESM,
         mainFields: ["module", "main"],
-        externalModules: ["chromium-bidi"], // playwright and sparticuz will be handled by nodeModules
+        externalModules: ["chromium-bidi", "@sparticuz/chromium"], // playwright and sparticuz will be handled by nodeModules
         nodeModules: ["playwright-core", "@sparticuz/chromium"],
         banner: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
         // Ensure esbuild target matches runtime
