@@ -1,38 +1,37 @@
-import { cpSync, mkdirSync, rmSync } from "fs";
+import { execSync } from "child_process";
+import { mkdirSync, rmSync, writeFileSync } from "fs";
 
 const LAYER_DIR = "layers/chromium";
-const NODE_MODULES = `${LAYER_DIR}/nodejs/node_modules`;
+const NODEJS_DIR = `${LAYER_DIR}/nodejs`;
 
 // Clean and create layer directory structure
 rmSync(LAYER_DIR, { recursive: true, force: true });
-mkdirSync(NODE_MODULES, { recursive: true });
+mkdirSync(NODEJS_DIR, { recursive: true });
 
-// Packages to include in the layer
-// @sparticuz/chromium and its dependencies
-const packages = [
-  "@sparticuz/chromium",
-  "follow-redirects",
-  "tar-fs",
-  "tar-stream",
-  "streamx",
-  "fast-fifo",
-  "queue-tick",
-  "text-decoder",
-  "b4a",
-  "bare-events"
-];
-
-for (const pkg of packages) {
-  const src = `node_modules/${pkg}`;
-  const dest = `${NODE_MODULES}/${pkg}`;
-  try {
-    cpSync(src, dest, { recursive: true });
-    console.log(`Copied ${pkg}`);
-  } catch (e) {
-    // Some packages might not exist (optional deps)
-    console.log(`Skipped ${pkg} (not found)`);
+// Create a minimal package.json for the layer
+const layerPackageJson = {
+  name: "chromium-layer",
+  version: "1.0.0",
+  dependencies: {
+    "@sparticuz/chromium": "^143.0.4"
   }
-}
+};
+
+writeFileSync(
+  `${NODEJS_DIR}/package.json`,
+  JSON.stringify(layerPackageJson, null, 2)
+);
+
+// Install dependencies using npm (resolves all transitive deps)
+console.log("Installing @sparticuz/chromium and dependencies...");
+execSync("npm install --omit=dev --ignore-scripts", {
+  cwd: NODEJS_DIR,
+  stdio: "inherit"
+});
+
+// Clean up package files (not needed in layer)
+rmSync(`${NODEJS_DIR}/package.json`);
+rmSync(`${NODEJS_DIR}/package-lock.json`, { force: true });
 
 console.log("\nChromium layer built successfully!");
 
