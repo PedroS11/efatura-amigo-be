@@ -39,9 +39,7 @@ export class Stack extends cdk.Stack {
     const getCategoryLambda = new Function(this, "GetCategory", {
       runtime: Runtime.NODEJS_22_X,
       handler: "index.handler",
-      code: Code.fromAsset("dist/getCategory", {
-        bundling: undefined // disable any docker bundling
-      }),
+      code: Code.fromAsset("dist/getCategory"),
       memorySize: 128,
       logRetention: RetentionDays.THREE_DAYS
     });
@@ -61,10 +59,7 @@ export class Stack extends cdk.Stack {
     const processNifLambda = new Function(this, "ProcessNif", {
       runtime: Runtime.NODEJS_22_X,
       handler: "index.handler", // Note: handler is in index.mjs
-      code: Code.fromAsset("dist/processNif", {
-        // TODO Test remove this bundling
-        bundling: undefined // disable any docker bundling
-      }),
+      code: Code.fromAsset("dist/processNif"),
       memorySize: 1024,
       timeout: Duration.seconds(30),
       layers: [playwrightLayer],
