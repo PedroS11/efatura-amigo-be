@@ -11,7 +11,7 @@ export interface CrawledData {
 
 export const crawlCompany = async (nif: number): Promise<CrawledData | undefined> => {
   const company = await findCompany(nif);
-  if (company) {
+  if (company?.cae !== undefined) {
     const { nif, name, cae } = company;
 
     return {

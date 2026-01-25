@@ -1,10 +1,12 @@
 import * as cdk from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
-import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
+import type { CfnStage } from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpApi, HttpMethod, HttpStage } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Code, Function, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
 
@@ -39,7 +41,8 @@ export class Stack extends cdk.Stack {
       code: Code.fromAsset("dist/getCategory", {
         bundling: undefined // disable any docker bundling
       }),
-      memorySize: 128
+      memorySize: 128,
+      logRetention: RetentionDays.THREE_DAYS
     });
 
     table.grantReadData(getCategoryLambda);
@@ -63,7 +66,8 @@ export class Stack extends cdk.Stack {
       }),
       memorySize: 1024,
       timeout: Duration.seconds(30),
-      layers: [playwrightLayer]
+      layers: [playwrightLayer],
+      logRetention: RetentionDays.THREE_DAYS
     });
 
     table.grantWriteData(processNifLambda);
@@ -78,10 +82,37 @@ export class Stack extends cdk.Stack {
       })
     );
 
+    const apiAccessLogs = new LogGroup(this, "ApiAccessLogs", {
+      retention: RetentionDays.THREE_DAYS, // Aggressive cleanup to save Storage
+      removalPolicy: cdk.RemovalPolicy.DESTROY
+    });
+
     const httpApi = new HttpApi(this, "EfaturaAmigoApi", {
       apiName: "EfaturaAmigoApi",
-      createDefaultStage: true
+      createDefaultStage: false
     });
+
+    // Create the stage (L2 Construct)
+    const stage = new HttpStage(this, "DefaultStage", {
+      httpApi,
+      stageName: "$default",
+      autoDeploy: true
+    });
+
+    // We access the underlying CloudFormation resource (L1) to set the logs
+    const cfnStage = stage.node.defaultChild as CfnStage;
+
+    cfnStage.accessLogSettings = {
+      destinationArn: apiAccessLogs.logGroupArn,
+      format: JSON.stringify({
+        requestId: "$context.requestId",
+        ip: "$context.identity.sourceIp",
+        requestTime: "$context.requestTime",
+        httpMethod: "$context.httpMethod",
+        routeKey: "$context.routeKey",
+        status: "$context.status"
+      })
+    };
 
     httpApi.addRoutes({
       path: "/category/{nif}",
