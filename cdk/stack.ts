@@ -24,6 +24,7 @@ export class Stack extends cdk.Stack {
         queue: processNifDLQ,
         maxReceiveCount: 2
       },
+      fifo: true,
       retentionPeriod: cdk.Duration.days(1)
     });
 
