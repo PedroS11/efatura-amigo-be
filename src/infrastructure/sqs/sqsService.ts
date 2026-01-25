@@ -7,12 +7,12 @@ export const getClient = (): SQSClient => {
   return client;
 };
 
-export const sendMessage = async (message: unknown, queue: string, messageGroupId?: string): Promise<void> => {
+export const sendMessage = async (message: unknown, queue: string, messageDeduplicationId?: string): Promise<void> => {
   await getClient().send(
     new SendMessageCommand({
       MessageBody: JSON.stringify(message),
       QueueUrl: queue,
-      ...(messageGroupId && { MessageGroupId: messageGroupId })
+      ...(messageDeduplicationId && { MessageDeduplicationId: messageDeduplicationId })
     })
   );
 };
