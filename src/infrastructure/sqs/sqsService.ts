@@ -12,7 +12,10 @@ export const sendMessage = async (message: unknown, queue: string, messageDedupl
     new SendMessageCommand({
       MessageBody: JSON.stringify(message),
       QueueUrl: queue,
-      ...(messageDeduplicationId && { MessageDeduplicationId: messageDeduplicationId })
+      ...(messageDeduplicationId && {
+        MessageDeduplicationId: messageDeduplicationId,
+        MessageGroupId: messageDeduplicationId
+      })
     })
   );
 };
