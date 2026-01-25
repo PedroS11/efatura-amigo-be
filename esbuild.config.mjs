@@ -12,6 +12,12 @@ esbuild
     outExtension: { ".js": ".mjs" },
     target: "node22",
     platform: "node",
-    external: ["chromium-bidi", "chromium-bidi/*"]
+    external: ["chromium-bidi", "chromium-bidi/*"],
+    banner: {
+      js: `
+        import { createRequire } from 'module';
+        const require = createRequire(import.meta.url);
+      `
+    }
   })
   .catch(() => process.exit(1)); // Exit on error
