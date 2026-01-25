@@ -3,17 +3,22 @@ import esbuild from "esbuild";
 // Create the esbuild build configuration
 esbuild
   .build({
-    entryPoints: ["src/application/**/*.ts"], // Main entry point (change as needed)
-    bundle: true, // Enable bundling
+    entryPoints: ["src/application/**/*.ts"],
+    bundle: true,
     format: "esm",
-    outdir: "dist", // Output file
-    sourcemap: true, // Generate sourcemaps
-    minify: true, // Minify the output for production
+    outdir: "dist",
+    sourcemap: true,
+    minify: true,
     outExtension: { ".js": ".mjs" },
     target: "node22",
     platform: "node",
-    packages: "external",
-    external: ["chromium-bidi", "chromium-bidi/*"],
+    // Only externalize AWS SDK (provided by Lambda) and @sparticuz/chromium (via Layer)
+    external: [
+      "@aws-sdk/*",
+      "@sparticuz/chromium",
+      "chromium-bidi",
+      "chromium-bidi/*"
+    ],
     banner: {
       js: `
         import { createRequire } from 'node:module';
@@ -26,4 +31,4 @@ esbuild
       `
     }
   })
-  .catch(() => process.exit(1)); // Exit on error
+  .catch(() => process.exit(1));
