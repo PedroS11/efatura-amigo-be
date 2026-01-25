@@ -12,10 +12,11 @@ esbuild
     outExtension: { ".js": ".mjs" },
     target: "node22",
     platform: "node",
-    // Only externalize AWS SDK (provided by Lambda) and @sparticuz/chromium (via Layer)
+    // Externalize: AWS SDK (provided by Lambda), @sparticuz/chromium & playwright-core (via Layer)
     external: [
       "@aws-sdk/*",
       "@sparticuz/chromium",
+      "playwright-core",
       "chromium-bidi",
       "chromium-bidi/*"
     ],

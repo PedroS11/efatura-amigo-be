@@ -13,7 +13,8 @@ const layerPackageJson = {
   name: "chromium-layer",
   version: "1.0.0",
   dependencies: {
-    "@sparticuz/chromium": "^143.0.4"
+    "@sparticuz/chromium": "^143.0.4",
+    "playwright-core": "^1.58.0"
   }
 };
 
