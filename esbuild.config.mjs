@@ -12,7 +12,7 @@ esbuild
     outExtension: { ".js": ".mjs" },
     target: "node22",
     platform: "node",
-    mainFields: ["module", "main"],
+    packages: "external",
     external: ["chromium-bidi", "chromium-bidi/*"],
     banner: {
       js: `
