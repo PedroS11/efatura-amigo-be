@@ -2,14 +2,11 @@ import { saveCompany } from "../../infrastructure/companiesTable";
 import { searchNif } from "../../infrastructure/nif-pt";
 import { mapCaeToCategory } from "../../infrastructure/utils/caeMapper";
 import { logMessage } from "../../infrastructure/utils/logger";
-import { wait } from "../../infrastructure/utils/wait";
 
 export const processNif = async (nif: number): Promise<boolean> => {
   logMessage("Processing NIF", nif);
 
   const company = await searchNif(nif);
-  // Only 1 call per minute
-  await wait(60_000);
 
   if (!company) {
     logMessage("No company found", nif);
