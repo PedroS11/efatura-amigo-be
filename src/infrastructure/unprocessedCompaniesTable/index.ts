@@ -1,7 +1,10 @@
 import { BatchWriteCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
+import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import { getDynamoInstance } from "./service";
 import type { UnprocessedCompany } from "./types";
+
+const UNPROCESSED_COMPANIES_TABLE = getEnvironmentVariable("UNPROCESSED_COMPANIES_TABLE");
 
 /**
  * Get category by NIF
@@ -12,7 +15,7 @@ export const getUnprocessedCompany = async (limit: number): Promise<UnprocessedC
 
   const result = await db.send(
     new QueryCommand({
-      TableName: process.env.UNPROCESSED_COMPANIES_TABLE,
+      TableName: UNPROCESSED_COMPANIES_TABLE,
       Limit: limit
     })
   );
@@ -22,8 +25,6 @@ export const getUnprocessedCompany = async (limit: number): Promise<UnprocessedC
 
 export const deleteBatch = async (nifs: number[]) => {
   const db = getDynamoInstance();
-
-  const tableName = process.env.UNPROCESSED_COMPANIES_TABLE!;
 
   const deleteRequests = nifs.map(nif => ({
     DeleteRequest: {
@@ -36,7 +37,7 @@ export const deleteBatch = async (nifs: number[]) => {
   await db.send(
     new BatchWriteCommand({
       RequestItems: {
-        [tableName]: deleteRequests
+        [UNPROCESSED_COMPANIES_TABLE]: deleteRequests
       }
     })
   );
@@ -52,7 +53,7 @@ export const addCompany = async (nif: number) => {
 
   await db.send(
     new PutCommand({
-      TableName: process.env.UNPROCESSED_COMPANIES_TABLE,
+      TableName: UNPROCESSED_COMPANIES_TABLE,
       Item: item
     })
   );

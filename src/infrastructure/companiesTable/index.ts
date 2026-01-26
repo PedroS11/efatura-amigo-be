@@ -1,8 +1,10 @@
 import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
+import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import { getDynamoInstance } from "./service";
 import type { Categories, Company } from "./types";
 
+const COMPANIES_TABLE = getEnvironmentVariable("COMPANIES_TABLE");
 /**
  * Get category by NIF
  * @param {number} nif - Nif
@@ -12,7 +14,7 @@ export const getCategory = async (nif: number): Promise<Categories | undefined> 
 
   const result = await db.send(
     new GetCommand({
-      TableName: process.env.COMPANIES_TABLE,
+      TableName: COMPANIES_TABLE,
       Key: {
         nif
       }
@@ -34,7 +36,7 @@ export const saveCompany = async (nif: number, name: string, category: Categorie
 
   await db.send(
     new PutCommand({
-      TableName: process.env.COMPANIES_TABLE,
+      TableName: COMPANIES_TABLE,
       Item: item
     })
   );

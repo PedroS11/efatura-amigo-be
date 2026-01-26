@@ -41,7 +41,7 @@ export class Stack extends cdk.Stack {
     companiesTable.grantReadData(getCategoryLambda);
     getCategoryLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
-    unprocessedCompaniesTable.grantReadData(getCategoryLambda);
+    unprocessedCompaniesTable.grantWriteData(getCategoryLambda);
     getCategoryLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
     /**
      * processNifs lambda
@@ -51,7 +51,7 @@ export class Stack extends cdk.Stack {
     companiesTable.grantWriteData(processNifsLambda);
     processNifsLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
-    unprocessedCompaniesTable.grantReadData(processNifsLambda);
+    unprocessedCompaniesTable.grantReadWriteData(processNifsLambda);
     processNifsLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
     const processNifsRule = new Rule(this, "ProcessNifsRule", {
