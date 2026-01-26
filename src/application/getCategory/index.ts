@@ -8,7 +8,7 @@ import type { GetCategoryResponse } from "./types";
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   const nifPath = event.pathParameters?.nif;
 
-  if (!nifPath || !Number.isInteger(nifPath) || nifPath.length !== 9) {
+  if (!nifPath || !Number.isInteger(Number.parseInt(nifPath)) || nifPath.length !== 9) {
     return {
       body: "Nif is missing or invalid number",
       statusCode: 400
@@ -30,21 +30,9 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
   return {
     body: JSON.stringify({
-      category: {
-        id: categoryId,
-        name: Categories[categoryId]
-      }
+      id: categoryId,
+      name: Categories[categoryId]
     } as GetCategoryResponse),
     statusCode: 200
   };
 };
-
-// (async () => {
-//   // @ts-ignore
-//   const x = await handler({
-//     pathParameters: {
-//       nif: "515198374"
-//     }
-//   });
-//   console.log(x);
-// })();
