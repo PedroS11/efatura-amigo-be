@@ -1,4 +1,5 @@
-import { BatchWriteCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import type { ScanCommandOutput } from "@aws-sdk/lib-dynamodb";
+import { BatchWriteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import { getDynamoInstance } from "./service";
@@ -13,14 +14,29 @@ const UNPROCESSED_COMPANIES_TABLE = getEnvironmentVariable("UNPROCESSED_COMPANIE
 export const getUnprocessedCompany = async (limit: number): Promise<UnprocessedCompany[]> => {
   const db = getDynamoInstance();
 
-  const result = await db.send(
-    new QueryCommand({
-      TableName: UNPROCESSED_COMPANIES_TABLE,
-      Limit: limit
-    })
-  );
+  const companies: UnprocessedCompany[] = [];
+  let outputResult: ScanCommandOutput;
 
-  return result.Items as UnprocessedCompany[];
+  let exclusiveStartKey: ScanCommandOutput["LastEvaluatedKey"] = undefined;
+
+  do {
+    outputResult = await db.send(
+      new ScanCommand({
+        TableName: UNPROCESSED_COMPANIES_TABLE,
+        Limit: limit - companies.length,
+        ExclusiveStartKey: exclusiveStartKey
+      })
+    );
+
+    const items = outputResult.Items as UnprocessedCompany[];
+    if (items?.length) {
+      items.forEach(item => companies.push(item));
+
+      exclusiveStartKey = outputResult.LastEvaluatedKey;
+    }
+  } while (outputResult.LastEvaluatedKey && companies.length < limit);
+
+  return companies;
 };
 
 export const deleteBatch = async (nifs: number[]) => {
