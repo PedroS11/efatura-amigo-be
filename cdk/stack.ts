@@ -58,7 +58,7 @@ export class Stack extends cdk.Stack {
 
     const processNifsRule = new Rule(this, "ProcessNifsRule", {
       schedule: Schedule.rate(Duration.minutes(2)),
-      enabled: true
+      enabled: false
     });
     processNifsRule.addTarget(new LambdaFunction(processNifsLambda));
 

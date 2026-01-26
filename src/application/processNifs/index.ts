@@ -7,10 +7,16 @@ import { processNif } from "./service";
 
 export const handler = async (): Promise<void> => {
   const rows = await getUnprocessedCompanies(MAX_REQUESTS_PER_MINUTE);
+  if (rows.length === 0) {
+    logMessage("No rows to process");
+    return;
+  }
+
   let nifs = rows.map(({ nif }) => nif);
   logMessage("Nifs", nifs);
 
   const credits = await getCredits();
+  console.log("Credits", JSON.stringify(credits));
   if (credits.minute === 0) {
     logMessage("Nif.pt minute limits exceeded", credits);
     return;
