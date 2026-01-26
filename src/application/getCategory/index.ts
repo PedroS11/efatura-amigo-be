@@ -3,6 +3,7 @@ import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getCategory } from "../../infrastructure/companiesTable";
 import { Categories } from "../../infrastructure/companiesTable/types";
 import { addCompany } from "../../infrastructure/unprocessedCompaniesTable";
+import type { GetCategoryResponse } from "./types";
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   const nifPath = event.pathParameters?.nif;
@@ -23,7 +24,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
     await addCompany(nif);
 
     return {
-      body: JSON.stringify({}),
+      body: JSON.stringify({} as GetCategoryResponse),
       statusCode: 200
     };
   }
@@ -34,7 +35,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
         id: categoryId,
         name: Categories[categoryId]
       }
-    }),
+    } as GetCategoryResponse),
     statusCode: 200
   };
 };

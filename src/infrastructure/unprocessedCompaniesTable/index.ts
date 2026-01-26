@@ -11,7 +11,7 @@ const UNPROCESSED_COMPANIES_TABLE = getEnvironmentVariable("UNPROCESSED_COMPANIE
  * Get category by NIF
  * @param {number} nif - Nif
  */
-export const getUnprocessedCompany = async (limit: number): Promise<UnprocessedCompany[]> => {
+export const getUnprocessedCompanies = async (limit: number): Promise<UnprocessedCompany[]> => {
   const db = getDynamoInstance();
 
   const companies: UnprocessedCompany[] = [];

@@ -1,17 +1,23 @@
+import { getExistingNifsFromList } from "../../infrastructure/companiesTable";
 import { MAX_REQUESTS_PER_DAY } from "../../infrastructure/nif-pt/constants";
-import { getUnprocessedCompany } from "../../infrastructure/unprocessedCompaniesTable";
+import { deleteBatch, getUnprocessedCompanies } from "../../infrastructure/unprocessedCompaniesTable";
 import { processNif } from "./service";
 
 export const handler = async (): Promise<void> => {
   // TODO Check if worth delete just the successful ones
-  const rows = await getUnprocessedCompany(MAX_REQUESTS_PER_DAY);
+  const rows = await getUnprocessedCompanies(MAX_REQUESTS_PER_DAY);
+  const nifs = rows.map(({ nif }) => nif);
 
-  await Promise.all(rows.map(({ nif }) => processNif(nif)));
+  const existingNifs = await getExistingNifsFromList(nifs);
 
-  // TODO Delete after processing
-  // while (nifs.length > 0) {
-  //   const batch = nifs.splice(0, 25);
-  //
-  //   await deleteBatch(batch);
-  // }
+  const unprocessedNifs = nifs.filter(nif => !existingNifs.includes(nif));
+
+  if (unprocessedNifs.length > 0) {
+    await Promise.all(unprocessedNifs.map(nif => processNif(nif)));
+  }
+  while (rows.length > 0) {
+    const batch = rows.splice(0, 25);
+
+    await deleteBatch(batch.map(({ nif }) => nif));
+  }
 };
