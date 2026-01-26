@@ -1,33 +1,20 @@
 import * as cdk from "aws-cdk-lib";
-import { Duration } from "aws-cdk-lib";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
-import { Code, Function, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { Queue } from "aws-cdk-lib/aws-sqs";
+import { Rule, Schedule } from "aws-cdk-lib/aws-events";
+import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import type { Construct } from "constructs";
 
 import { createHttpApi } from "./httpApi";
+import { createGetCategoryLambda, createProcessNifsLambda } from "./lambdas";
 
 export class Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const processNifDLQ = new Queue(this, "ProcessNifDLQ", {
-      retentionPeriod: cdk.Duration.days(1),
-      fifo: true
-    });
-    // TODO: FIFO to prevent duplicates + 2mins delay
-    const processNifSQS = new Queue(this, "ProcessNifSQS", {
-      deadLetterQueue: {
-        queue: processNifDLQ,
-        maxReceiveCount: 2
-      },
-      fifo: true,
-      retentionPeriod: cdk.Duration.days(1)
-    });
-
-    const table = new TableV2(this, "NifCategoryTable", {
+    /**
+     * Companies Table
+     */
+    const companiesTable = new TableV2(this, "CompaniesTable", {
       partitionKey: {
         type: AttributeType.NUMBER,
         name: "nif"
@@ -35,50 +22,45 @@ export class Stack extends cdk.Stack {
       billing: Billing.onDemand()
     });
 
-    const getCategoryLambda = new Function(this, "GetCategory", {
-      runtime: Runtime.NODEJS_22_X,
-      handler: "index.handler",
-      code: Code.fromAsset("dist/getCategory"),
-      memorySize: 128,
-      logRetention: RetentionDays.THREE_DAYS
-      // architecture: Architecture.ARM_64
+    /**
+     * UnprocessedCompanies Table
+     */
+    const unprocessedCompaniesTable = new TableV2(this, "UnprocessedCompaniesTable", {
+      partitionKey: {
+        type: AttributeType.NUMBER,
+        name: "nif"
+      },
+      billing: Billing.onDemand()
     });
 
-    table.grantReadData(getCategoryLambda);
-    getCategoryLambda.addEnvironment("NIF_CATEGORY_TABLE_NAME", table.tableName);
+    /**
+     * getCategory lambda
+     */
+    const getCategoryLambda = createGetCategoryLambda(this);
 
-    processNifSQS.grantSendMessages(getCategoryLambda);
-    getCategoryLambda.addEnvironment("PROCESS_NIF_SQS", processNifSQS.queueName);
+    companiesTable.grantReadData(getCategoryLambda);
+    getCategoryLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
-    const playwrightLayer = new LayerVersion(this, "PlaywrightLayer", {
-      code: Code.fromAsset("layers/playwright"), // Github Action creates this folder
-      compatibleRuntimes: [Runtime.NODEJS_22_X],
-      description: "Layer containing playwright-core and sparticuz-chromium"
+    /**
+     * processNifs lambda
+     */
+    const processNifsLambda = createProcessNifsLambda(this);
+
+    companiesTable.grantWriteData(processNifsLambda);
+    processNifsLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
+
+    unprocessedCompaniesTable.grantReadData(processNifsLambda);
+    processNifsLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
+
+    const processNifsRule = new Rule(this, "ProcessNifsRule", {
+      schedule: Schedule.cron({ minute: "0", hour: "24" }),
+      enabled: false
     });
+    processNifsRule.addTarget(new LambdaFunction(processNifsLambda));
 
-    const processNifLambda = new Function(this, "ProcessNif", {
-      runtime: Runtime.NODEJS_22_X,
-      handler: "index.handler", // Note: handler is in index.mjs
-      code: Code.fromAsset("dist/processNif"),
-      memorySize: 1024,
-      timeout: Duration.seconds(30),
-      layers: [playwrightLayer],
-      logRetention: RetentionDays.THREE_DAYS
-      // architecture: Architecture.ARM_64
-    });
-
-    table.grantWriteData(processNifLambda);
-    processNifLambda.addEnvironment("NIF_CATEGORY_TABLE_NAME", table.tableName);
-
-    processNifSQS.grantConsumeMessages(processNifLambda);
-    processNifLambda.addEnvironment("PROCESS_NIF_SQS", processNifSQS.queueName);
-
-    processNifLambda.addEventSource(
-      new SqsEventSource(processNifSQS, {
-        batchSize: 1
-      })
-    );
-
+    /**
+     * HTTP Api
+     */
     createHttpApi(this, getCategoryLambda);
   }
 }

@@ -1,4 +1,4 @@
-import { Categories } from "../nifCategoryTable/types";
+import { Categories } from "../companiesTable/types";
 
 export const mapCaeToCategory = (cae: number): Categories | undefined => {
   if (cae === 56303) {

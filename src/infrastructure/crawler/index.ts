@@ -1,4 +1,4 @@
-import type { Categories } from "../nifCategoryTable/types";
+import type { Categories } from "../companiesTable/types";
 import { mapCaeToCategory } from "./caeMapper";
 import { findCompany } from "./sicae";
 

@@ -1,7 +1,7 @@
 import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 import { getDynamoInstance } from "./service";
-import type { Categories, NifCategory } from "./types";
+import type { Categories, Company } from "./types";
 
 /**
  * Get category by NIF
@@ -12,21 +12,21 @@ export const getCategory = async (nif: number): Promise<Categories | undefined> 
 
   const result = await db.send(
     new GetCommand({
-      TableName: process.env.NIF_CATEGORY_TABLE_NAME,
+      TableName: process.env.COMPANIES_TABLE,
       Key: {
         nif
       }
     })
   );
 
-  const row = result.Item as NifCategory | undefined;
+  const row = result.Item as Company | undefined;
 
   return row?.category;
 };
 
 export const saveCompany = async (nif: number, name: string, category: Categories): Promise<void> => {
   const db = getDynamoInstance();
-  const item: NifCategory = {
+  const item: Company = {
     category,
     name,
     nif
@@ -34,8 +34,14 @@ export const saveCompany = async (nif: number, name: string, category: Categorie
 
   await db.send(
     new PutCommand({
-      TableName: process.env.NIF_CATEGORY_TABLE_NAME,
+      TableName: process.env.COMPANIES_TABLE,
       Item: item
     })
   );
+};
+
+export const checkIfCompanyAlreadyProcessed = async (nif: number): Promise<boolean> => {
+  const category = await getCategory(nif);
+
+  return category !== undefined;
 };

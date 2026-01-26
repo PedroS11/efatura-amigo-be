@@ -15,7 +15,7 @@ export enum Categories {
   "Jornais e Revista"
 }
 
-export interface NifCategory {
+export interface Company {
   nif: number;
   name: string;
   category: Categories;

@@ -1,9 +1,8 @@
 import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 
-import { getCategory } from "../../infrastructure/nifCategoryTable";
-import { Categories } from "../../infrastructure/nifCategoryTable/types";
-import { sendMessage } from "../../infrastructure/sqs/sqsService";
-import type { ProcessNifMessage } from "../processNif";
+import { getCategory } from "../../infrastructure/companiesTable";
+import { Categories } from "../../infrastructure/companiesTable/types";
+import { addCompany } from "../../infrastructure/unprocessedCompaniesTable";
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   const nifPath = event.pathParameters?.nif;
@@ -21,7 +20,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
   const categoryId = await getCategory(nif);
 
   if (categoryId === undefined) {
-    await sendMessage({ nif } as ProcessNifMessage, process.env.PROCESS_NIF_SQS!, nif.toString());
+    await addCompany(nif);
 
     return {
       body: JSON.stringify({}),
