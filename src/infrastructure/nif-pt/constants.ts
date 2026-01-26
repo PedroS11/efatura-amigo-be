@@ -1,1 +1,1 @@
-export const MAX_REQUESTS_PER_DAY = 20;
+export const MAX_REQUESTS_PER_HOUR = 10;
