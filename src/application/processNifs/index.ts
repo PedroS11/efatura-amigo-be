@@ -16,8 +16,7 @@ export const handler = async (): Promise<void> => {
   logMessage("Nifs", nifs);
 
   const credits = await getCredits();
-  console.log("Credits", JSON.stringify(credits));
-  if (credits.minute === 0) {
+  if (credits.minute === 0 || credits.hour === 0 || credits.day === 0 || credits.month === 0) {
     logMessage("Nif.pt minute limits exceeded", credits);
     return;
   }
