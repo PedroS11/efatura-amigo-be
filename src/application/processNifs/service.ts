@@ -33,7 +33,18 @@ export const processNif = async (nif: number): Promise<void> => {
     cae: company.cae
   });
 
-  const category = mapCaeToCategory(Number(company.cae));
+  const caeAsString: string = Array.isArray(company.cae) ? company.cae?.[0] : company.cae;
+
+  if (!caeAsString) {
+    console.log({
+      message: "No valid cae found",
+      nif,
+      caeAsString
+    });
+    return;
+  }
+
+  const category = mapCaeToCategory(Number(caeAsString));
   if (category !== undefined) {
     await saveCompany(company.nif, company.title, category);
   }

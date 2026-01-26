@@ -21,7 +21,7 @@ export interface NifPTCompany {
   city: string;
   activity: string;
   status: string;
-  cae: string;
+  cae: string | string[];
   contacts: Contacts;
   structure: Structure;
   geo: Geo;

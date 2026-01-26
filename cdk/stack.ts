@@ -53,7 +53,7 @@ export class Stack extends cdk.Stack {
     processNifsLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
     const processNifsRule = new Rule(this, "ProcessNifsRule", {
-      schedule: Schedule.cron({ minute: "0", hour: "24" }),
+      schedule: Schedule.cron({ minute: "0", hour: "4" }),
       enabled: false
     });
     processNifsRule.addTarget(new LambdaFunction(processNifsLambda));
