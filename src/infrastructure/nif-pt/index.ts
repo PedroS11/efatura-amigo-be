@@ -27,6 +27,12 @@ export const searchNif = async (nif: number): Promise<NifPTCompany | undefined> 
         response: JSON.stringify(axiosError.response?.data),
         request: JSON.stringify(axiosError.request)
       });
+    } else {
+      const unknownError: Error = error as Error;
+
+      logError("Unexpected error calling NIF.PT", {
+        errorMessage: unknownError.message
+      });
     }
 
     throw error;
