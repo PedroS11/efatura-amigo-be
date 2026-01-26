@@ -1,24 +1,18 @@
 import { saveCompany } from "../../infrastructure/companiesTable";
-import { mapCaeToCategory } from "../../infrastructure/crawler/caeMapper";
 import { searchNif } from "../../infrastructure/nif-pt";
+import { mapCaeToCategory } from "../../infrastructure/utils/caeMapper";
+import { logMessage } from "../../infrastructure/utils/logger";
 
 export const processNif = async (nif: number): Promise<void> => {
-  console.log({
-    message: "Processing NIF",
-    nif
-  });
+  logMessage("Processing NIF", nif);
 
   const company = await searchNif(nif);
   if (!company) {
-    console.log({
-      message: "No company found",
-      nif
-    });
+    logMessage("No company found", nif);
     return;
   }
 
-  console.log({
-    message: "NIF CAE",
+  logMessage("NIF CAE", {
     nif,
     cae: company.cae
   });
@@ -26,8 +20,7 @@ export const processNif = async (nif: number): Promise<void> => {
   const caeAsString: string = Array.isArray(company.cae) ? company.cae?.[0] : company.cae;
 
   if (!caeAsString) {
-    console.log({
-      message: "No valid cae found",
+    logMessage("No valid cae found", {
       nif,
       caeAsString
     });
@@ -39,10 +32,5 @@ export const processNif = async (nif: number): Promise<void> => {
     await saveCompany(company.nif, company.title, category);
   }
 
-  console.log({
-    message: "Finished processing NIF",
-    nif,
-    cae: company.cae,
-    category
-  });
+  logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 };

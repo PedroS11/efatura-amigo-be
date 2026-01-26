@@ -2,7 +2,7 @@ import axios from "axios";
 import { load } from "cheerio";
 
 import type { Categories } from "../../companiesTable/types";
-import { mapCaeToCategory } from "../caeMapper";
+import { mapCaeToCategory } from "../../utils/caeMapper";
 
 export const findCategory = async (nif: string): Promise<Categories | undefined> => {
   const response = await axios.get(

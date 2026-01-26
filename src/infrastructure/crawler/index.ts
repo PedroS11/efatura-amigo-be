@@ -1,5 +1,5 @@
 import type { Categories } from "../companiesTable/types";
-import { mapCaeToCategory } from "./caeMapper";
+import { mapCaeToCategory } from "../utils/caeMapper";
 import { findCompany } from "./sicae";
 
 export interface CrawledData {
