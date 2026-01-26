@@ -8,10 +8,9 @@ import type { GetCategoryResponse } from "./types";
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   const nifPath = event.pathParameters?.nif;
 
-  // TODO: Add a better validator
-  if (!nifPath) {
+  if (!nifPath || !Number.isInteger(nifPath) || nifPath.length !== 9) {
     return {
-      body: "Nif is missing",
+      body: "Nif is missing or invalid number",
       statusCode: 400
     };
   }
