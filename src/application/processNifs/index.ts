@@ -5,9 +5,8 @@ import { processNif } from "./service";
 export const handler = async (): Promise<void> => {
   // TODO Check if worth delete just the successful ones
   const rows = await getUnprocessedCompany(MAX_REQUESTS_PER_DAY);
-  const nifs = rows.map(row => row.nif);
 
-  await Promise.all(nifs.map(nif => processNif(nif)));
+  await Promise.all(rows.map(({ nif }) => processNif(nif)));
 
   // TODO Delete after processing
   // while (nifs.length > 0) {

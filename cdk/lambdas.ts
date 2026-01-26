@@ -1,6 +1,7 @@
 import type { Stack } from "aws-cdk-lib";
 import { Architecture, Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 export const createGetCategoryLambda = (stack: Stack): Function =>
   new Function(stack, "GetCategory", {
@@ -19,5 +20,8 @@ export const createProcessNifsLambda = (stack: Stack): Function =>
     code: Code.fromAsset("dist/processNifs"),
     memorySize: 128,
     logRetention: RetentionDays.THREE_DAYS,
-    architecture: Architecture.ARM_64
+    architecture: Architecture.ARM_64,
+    environment: {
+      NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
+    }
   });
