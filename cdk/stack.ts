@@ -41,6 +41,8 @@ export class Stack extends cdk.Stack {
     companiesTable.grantReadData(getCategoryLambda);
     getCategoryLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
+    unprocessedCompaniesTable.grantReadData(getCategoryLambda);
+    getCategoryLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
     /**
      * processNifs lambda
      */
