@@ -1,4 +1,5 @@
 import * as cdk from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -56,7 +57,7 @@ export class Stack extends cdk.Stack {
     processNifsLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
     const processNifsRule = new Rule(this, "ProcessNifsRule", {
-      schedule: Schedule.cron({ minute: "1" }),
+      schedule: Schedule.rate(Duration.minutes(1)),
       enabled: true
     });
     processNifsRule.addTarget(new LambdaFunction(processNifsLambda));
