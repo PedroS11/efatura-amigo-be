@@ -10,7 +10,7 @@ export const processNif = async (nif: number): Promise<void> => {
 
   const nifAlreadyProcessed = await checkIfCompanyAlreadyProcessed(nif);
 
-  if (!nifAlreadyProcessed) {
+  if (nifAlreadyProcessed) {
     console.log({
       message: "Nif already processed",
       nif
