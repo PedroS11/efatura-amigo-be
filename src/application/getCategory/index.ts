@@ -1,9 +1,15 @@
-import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayEvent, APIGatewayProxyEventHeaders, APIGatewayProxyResult } from "aws-lambda";
 
 import { getCategory } from "../../infrastructure/companiesTable";
 import { Categories } from "../../infrastructure/companiesTable/types";
 import { addCompany } from "../../infrastructure/unprocessedCompaniesTable";
 import type { GetCategoryResponse } from "./types";
+
+const corsHeaders: APIGatewayProxyEventHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "OPTIONS,GET"
+};
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   const nifPath = event.pathParameters?.nif;
@@ -33,6 +39,10 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
       id: categoryId,
       name: Categories[categoryId]
     } as GetCategoryResponse),
+    headers: {
+      "Content-Type": "application/json",
+      ...corsHeaders
+    },
     statusCode: 200
   };
 };
