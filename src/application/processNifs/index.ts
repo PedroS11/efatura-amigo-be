@@ -1,13 +1,24 @@
 import { getExistingNifsFromList } from "../../infrastructure/companiesTable";
-import { MAX_REQUESTS_PER_HOUR } from "../../infrastructure/nif-pt/constants";
+import { getCredits } from "../../infrastructure/nif-pt";
+import { MAX_REQUESTS_PER_MINUTE } from "../../infrastructure/nif-pt/constants";
 import { deleteBatch, getUnprocessedCompanies } from "../../infrastructure/unprocessedCompaniesTable";
 import { logMessage } from "../../infrastructure/utils/logger";
 import { processNif } from "./service";
 
 export const handler = async (): Promise<void> => {
-  const rows = await getUnprocessedCompanies(MAX_REQUESTS_PER_HOUR);
-  const nifs = rows.map(({ nif }) => nif);
+  const rows = await getUnprocessedCompanies(MAX_REQUESTS_PER_MINUTE);
+  let nifs = rows.map(({ nif }) => nif);
   logMessage("Nifs", nifs);
+
+  const credits = await getCredits();
+  if (credits.minute === 0) {
+    logMessage("Nif.pt minute limits exceeded", credits);
+    return;
+  }
+
+  if (nifs.length > credits.minute) {
+    nifs = nifs.slice(0, credits.minute);
+  }
 
   const existingNifs = await getExistingNifsFromList(nifs);
   logMessage("existingNifs", existingNifs);

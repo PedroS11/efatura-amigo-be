@@ -69,6 +69,10 @@ export interface Credits {
   left: Credit;
 }
 
+export interface GetCreditsResponse {
+  credits: Credit;
+}
+
 /**
  * {
  *     "result": "error",

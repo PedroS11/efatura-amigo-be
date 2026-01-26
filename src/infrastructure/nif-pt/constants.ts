@@ -1,1 +1,1 @@
-export const MAX_REQUESTS_PER_HOUR = 10;
+export const MAX_REQUESTS_PER_MINUTE = 1;

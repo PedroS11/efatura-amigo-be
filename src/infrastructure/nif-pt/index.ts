@@ -2,7 +2,7 @@ import type { AxiosError, AxiosResponse } from "axios";
 import axios from "axios";
 
 import { logError, logMessage } from "../utils/logger";
-import type { NifPTCompany, NifPtResponse } from "./types";
+import type { Credit, GetCreditsResponse, NifPTCompany, NifPtResponse } from "./types";
 
 export const searchNif = async (nif: number): Promise<NifPTCompany | undefined> => {
   try {
@@ -37,4 +37,12 @@ export const searchNif = async (nif: number): Promise<NifPTCompany | undefined> 
 
     throw error;
   }
+};
+
+export const getCredits = async (): Promise<Credit> => {
+  const response: AxiosResponse<GetCreditsResponse> = await axios.get(
+    `http://www.nif.pt/?json=1&credits=1&key=${process.env.NIF_PT_API_KEY}`
+  );
+
+  return response.data.credits;
 };
