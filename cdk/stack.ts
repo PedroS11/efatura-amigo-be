@@ -43,12 +43,13 @@ export class Stack extends cdk.Stack {
 
     unprocessedCompaniesTable.grantWriteData(getCategoryLambda);
     getCategoryLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
+
     /**
      * processNifs lambda
      */
     const processNifsLambda = createProcessNifsLambda(this);
 
-    companiesTable.grantWriteData(processNifsLambda);
+    companiesTable.grantReadWriteData(processNifsLambda);
     processNifsLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
     unprocessedCompaniesTable.grantReadWriteData(processNifsLambda);
