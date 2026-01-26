@@ -8,9 +8,13 @@ export const handler = async (): Promise<void> => {
   const rows = await getUnprocessedCompanies(MAX_REQUESTS_PER_DAY);
   const nifs = rows.map(({ nif }) => nif);
 
+  console.log("Nifs", JSON.stringify(nifs));
+
   const existingNifs = await getExistingNifsFromList(nifs);
+  console.log("existingNifs", JSON.stringify(existingNifs));
 
   const unprocessedNifs = nifs.filter(nif => !existingNifs.includes(nif));
+  console.log("unprocessedNifs", JSON.stringify(unprocessedNifs));
 
   if (unprocessedNifs.length > 0) {
     await Promise.all(unprocessedNifs.map(nif => processNif(nif)));
