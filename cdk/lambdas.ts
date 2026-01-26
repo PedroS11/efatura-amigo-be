@@ -22,7 +22,7 @@ export const createProcessNifsLambda = (stack: Stack): Function =>
     memorySize: 128,
     logRetention: RetentionDays.THREE_DAYS,
     architecture: Architecture.ARM_64,
-    timeout: Duration.minutes(11),
+    timeout: Duration.minutes(2),
     environment: {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
     }
