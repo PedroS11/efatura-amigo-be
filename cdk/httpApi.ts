@@ -1,6 +1,6 @@
 import type { Stack } from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
-import { type CfnStage, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
+import { type CfnStage, CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import type { Function } from "aws-cdk-lib/aws-lambda";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
@@ -13,7 +13,12 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: Function) => {
 
   const httpApi = new HttpApi(stack, "EfaturaAmigoApi", {
     apiName: "EfaturaAmigoApi",
-    createDefaultStage: true
+    createDefaultStage: true,
+    corsPreflight: {
+      allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS],
+      allowOrigins: ["*"],
+      allowHeaders: ["Content-Type"]
+    }
   });
 
   // We check if defaultStage exists (it does, because we set true above)
