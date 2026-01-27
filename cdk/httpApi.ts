@@ -3,13 +3,16 @@ import * as cdk from "aws-cdk-lib";
 import { type CfnStage, CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import type { Function } from "aws-cdk-lib/aws-lambda";
-import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
+import { LogGroup } from "aws-cdk-lib/aws-logs";
 
 export const createHttpApi = (stack: Stack, getCategoryLambda: Function) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
-    retention: RetentionDays.THREE_DAYS, // Aggressive cleanup to save Storage
     removalPolicy: cdk.RemovalPolicy.DESTROY
   });
+
+  // To avoid creating a lambda just for log retention that used node 20 (soon to stop being supported)
+  const cfnLogGroup = apiAccessLogs.node.defaultChild as cdk.aws_logs.CfnLogGroup;
+  cfnLogGroup.retentionInDays = 3;
 
   const httpApi = new HttpApi(stack, "EfaturaAmigoApi", {
     apiName: "EfaturaAmigoApi",
