@@ -2,7 +2,8 @@ import { BatchGetCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import { getDynamoInstance } from "./service";
-import type { Categories, Company } from "./types";
+import type { Company } from "./types";
+import { Categories } from "./types";
 
 const COMPANIES_TABLE = getEnvironmentVariable("COMPANIES_TABLE");
 /**
@@ -29,9 +30,10 @@ export const getCategory = async (nif: number): Promise<Categories | undefined> 
 export const saveCompany = async (nif: number, name: string, category: Categories): Promise<void> => {
   const db = getDynamoInstance();
   const item: Company = {
-    category,
+    nif,
     name,
-    nif
+    category,
+    categoryName: Categories[category]
   };
 
   await db.send(

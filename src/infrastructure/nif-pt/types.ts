@@ -1,4 +1,4 @@
-export interface NifPtResponse {
+export interface QueryNifPtResponse {
   result: "success" | "error";
   records?: Records;
   message: string;
@@ -64,6 +64,7 @@ export interface Credit {
   minute: number;
   paid: number;
 }
+
 export interface Credits {
   used: string;
   left: Credit;

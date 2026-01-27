@@ -1,17 +1,52 @@
 import { saveCompany } from "../../infrastructure/companiesTable";
 import { searchNif } from "../../infrastructure/nif-pt";
+import type { Credit, QueryNifPtResponse } from "../../infrastructure/nif-pt/types";
 import { mapCaeToCategory } from "../../infrastructure/utils/caeMapper";
 import { logMessage } from "../../infrastructure/utils/logger";
 
-export const processNif = async (nif: number): Promise<boolean> => {
+export interface ProcessNifResponse {
+  error: boolean;
+  credits: Credit;
+  message: string;
+}
+
+const processError = (response: QueryNifPtResponse): ProcessNifResponse => {
+  if (response.message.includes("Please, try again later or buy credits")) {
+    return {
+      error: true,
+      credits: response.credits.left,
+      message: response.message
+    };
+  } else if (response.message.includes("Record not found")) {
+    return {
+      error: false,
+      credits: response.credits.left,
+      message: response.message
+    };
+  } else {
+    return {
+      error: true,
+      credits: response.credits.left,
+      message: response.message
+    };
+  }
+};
+
+export const processNif = async (nif: number): Promise<ProcessNifResponse> => {
   logMessage("Processing NIF", nif);
 
-  const company = await searchNif(nif);
+  const response = await searchNif(nif);
 
-  if (!company) {
-    logMessage("No company found", nif);
-    return false;
+  if (response.result === "error") {
+    logMessage("Error searching company", {
+      nif,
+      response
+    });
+
+    return processError(response);
   }
+
+  const company = response.records![nif]!;
 
   logMessage("NIF CAE", {
     nif,
@@ -25,7 +60,12 @@ export const processNif = async (nif: number): Promise<boolean> => {
       nif,
       caeAsString
     });
-    return true;
+
+    return {
+      error: false,
+      credits: response.credits.left,
+      message: "No valid cae found"
+    };
   }
 
   const category = mapCaeToCategory(Number(caeAsString));
@@ -35,5 +75,9 @@ export const processNif = async (nif: number): Promise<boolean> => {
 
   logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 
-  return true;
+  return {
+    error: false,
+    credits: response.credits.left,
+    message: "Finished processing NIF"
+  };
 };

@@ -19,4 +19,5 @@ export interface Company {
   nif: number;
   name: string;
   category: Categories;
+  categoryName: string;
 }

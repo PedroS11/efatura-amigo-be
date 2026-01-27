@@ -2,22 +2,17 @@ import type { AxiosError, AxiosResponse } from "axios";
 import axios from "axios";
 
 import { logError, logMessage } from "../utils/logger";
-import type { Credit, GetCreditsResponse, NifPTCompany, NifPtResponse } from "./types";
+import type { Credit, GetCreditsResponse, QueryNifPtResponse } from "./types";
 
-export const searchNif = async (nif: number): Promise<NifPTCompany | undefined> => {
+export const searchNif = async (nif: number): Promise<QueryNifPtResponse> => {
   try {
-    const response: AxiosResponse<NifPtResponse> = await axios.get(
+    const response: AxiosResponse<QueryNifPtResponse> = await axios.get(
       `http://www.nif.pt/?json=1&q=${nif}&key=${process.env.NIF_PT_API_KEY}`
     );
 
     logMessage("NIF.PT response", response.data);
 
-    if (response.data.result === "success" && response.data?.records?.[nif]) {
-      return response.data.records[nif];
-    }
-
-    logError("Error from NIF.PT response", response.data.message);
-    return;
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const axiosError: AxiosError = error;
@@ -45,4 +40,8 @@ export const getCredits = async (): Promise<Credit> => {
   );
 
   return response.data.credits;
+};
+
+export const hasRunOutOfCredits = (credits: Credit): boolean => {
+  return Object.values(credits).some(credit => credit === 0);
 };
