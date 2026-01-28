@@ -9,9 +9,13 @@ const isCreditsExceededError = (response: NifPtResponse) => response.message.inc
 
 export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
   try {
-    const response: AxiosResponse<NifPtResponse> = await axios.get(
-      `http://www.nif.pt/?json=1&q=${nif}&key=${process.env.NIF_PT_API_KEY}`
-    );
+    const response: AxiosResponse<NifPtResponse> = await axios.get(`http://www.nif.pt/`, {
+      params: {
+        json: "1",
+        q: `${nif}`,
+        key: process.env.NIF_PT_API_KEY
+      }
+    });
 
     logMessage("NIF.PT response", response.data);
 
