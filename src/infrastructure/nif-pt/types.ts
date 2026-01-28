@@ -91,3 +91,9 @@ export interface GetCreditsResponse {
  *     }
  * }
  */
+
+export interface SearchNifResponse {
+  error: boolean;
+  company?: NifPTCompany;
+  message?: string;
+}

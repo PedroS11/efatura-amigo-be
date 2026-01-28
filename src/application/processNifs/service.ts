@@ -1,18 +1,22 @@
 import { saveCompany } from "../../infrastructure/companiesTable";
 import { searchNif } from "../../infrastructure/nif-pt";
 import { mapCaeToCategory } from "../../infrastructure/utils/caeMapper";
-import { logMessage } from "../../infrastructure/utils/logger";
+import { logError, logMessage } from "../../infrastructure/utils/logger";
 
 export const processNif = async (nif: number): Promise<boolean> => {
   logMessage("Processing NIF", nif);
 
-  const company = await searchNif(nif);
+  const response = await searchNif(nif);
 
-  if (!company) {
-    logMessage("No company found", nif);
+  if (response.error) {
+    logError(`Error searching NIF: ${nif}`, response);
     return false;
+  } else if (response.company === undefined) {
+    logMessage(`Company ${nif} not found`, response);
+    return true;
   }
 
+  const company = response.company;
   logMessage("NIF CAE", {
     nif,
     cae: company.cae
