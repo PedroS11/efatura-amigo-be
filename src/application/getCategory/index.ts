@@ -3,12 +3,14 @@ import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getCategory } from "../../infrastructure/companiesTable";
 import { Categories } from "../../infrastructure/companiesTable/types";
 import { addCompany } from "../../infrastructure/unprocessedCompaniesTable";
+import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
+import { isNifValid } from "../../infrastructure/utils/nifValidator";
 import type { GetCategoryResponse } from "./types";
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   const nifPath = event.pathParameters?.nif;
 
-  if (!nifPath || !Number.isInteger(Number.parseInt(nifPath)) || nifPath.length !== 9) {
+  if (!isNifValid(nifPath)) {
     return {
       body: "Nif is missing or invalid number",
       statusCode: 400
@@ -19,26 +21,16 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
   const categoryId = await getCategory(nif);
 
+  let body: GetCategoryResponse = {};
+
   if (categoryId === undefined) {
     await addCompany(nif);
-
-    return {
-      body: JSON.stringify({} as GetCategoryResponse),
-      statusCode: 200
+  } else {
+    body = {
+      id: categoryId,
+      name: Categories[categoryId]
     };
   }
 
-  return {
-    body: JSON.stringify({
-      id: categoryId,
-      name: Categories[categoryId]
-    } as GetCategoryResponse),
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "OPTIONS,GET"
-    },
-    statusCode: 200
-  };
+  return createHttpResponse(200, JSON.stringify(body));
 };

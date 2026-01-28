@@ -5,17 +5,6 @@ import { deleteBatch, getUnprocessedCompanies } from "../../infrastructure/unpro
 import { logMessage } from "../../infrastructure/utils/logger";
 import { processNif } from "./service";
 
-// const getNextRun = (credits: Credit) => {
-//   const current = new Date();
-//   if (credits.day === 0) {
-//     current.setDate(current.getDate() + 1);
-//   } else if (credits.hour === 0) {
-//     current.setHours(current.getHours() + 1);
-//   } else if (credits.minute === 0) {
-//     current.setMinutes(current.getMinutes() + 1);
-//   }
-// };
-
 export const handler = async (): Promise<void> => {
   const credits = await getCredits();
   if (credits.minute === 0 || credits.hour === 0 || credits.day === 0 || credits.month === 0) {
