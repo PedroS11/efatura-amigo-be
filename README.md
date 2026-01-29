@@ -1,14 +1,20 @@
-# Welcome to your CDK TypeScript project
+# Efatura-amigo backend
 
-This is a blank project for CDK development with TypeScript.
+An AWS-based stack that stores NIFs from Portuguese companies along with their corresponding e-Fatura category.  
+This service is used by my [Efatura Amigo browser extension](https://github.com/PedroS11/efatura-amigo) to help
+automatically select the most appropriate category when validating invoices on the e-Fatura portal.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Stack
 
-## Useful commands
+![img.png](architecture.png)
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+The stack provides two main functionalities:
+
+- **Category lookup by NIF**
+    - Returns the category associated with a given NIF
+    - If the NIF is not found, it is added to the database for later processing
+
+- **Scheduled processing (cron Lambda)**
+    - Runs every minute and calls NIF.pt to retrieve the company’s CAE
+    - Maps the CAE to the corresponding e-Fatura category
+    - Due to NIF.pt’s free usage limits, only one NIF can be processed per minute
