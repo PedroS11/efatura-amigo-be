@@ -1,14 +1,14 @@
-export interface NifPtResponse {
+export interface SearchNifPtResponse {
   result: "success" | "error";
   records?: Records;
-  message: string;
+  message?: string;
   nif_validation: boolean;
   is_nif: boolean;
   credits: Credits;
 }
 
 export interface Records {
-  [nif: number]: NifPTCompany;
+  [nif: string]: NifPTCompany;
 }
 
 export interface NifPTCompany {
@@ -25,17 +25,18 @@ export interface NifPTCompany {
   contacts: Contacts;
   structure: Structure;
   geo: Geo;
+  start_date: string;
   place: Place;
   racius: string;
-  alias: string;
-  portugalio: string;
+  alias?: string;
+  portugalio?: string;
 }
 
 export interface Contacts {
-  email: string;
-  phone: string;
-  website: string;
-  fax: string;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  fax: string | null;
 }
 
 export interface Structure {
@@ -72,25 +73,6 @@ export interface Credits {
 export interface GetCreditsResponse {
   credits: Credit;
 }
-
-/**
- * {
- *     "result": "error",
- *     "message": "No records found",
- *     "nif_validation": false,
- *     "is_nif": false,
- *     "credits": {
- *         "used": "free",
- *         "left": {
- *             "month": 995,
- *             "day": 95,
- *             "hour": 5,
- *             "minute": 0,
- *             "paid": 0
- *         }
- *     }
- * }
- */
 
 export interface SearchNifResponse {
   error: boolean;

@@ -1,16 +1,17 @@
 import type { AxiosError, AxiosResponse } from "axios";
 import axios from "axios";
+import { isAxiosError } from "axios";
 
 import { logError, logMessage } from "../utils/logger";
-import type { Credit, GetCreditsResponse, NifPtResponse, SearchNifResponse } from "./types";
+import type { Credit, GetCreditsResponse, SearchNifPtResponse, SearchNifResponse } from "./types";
 
-const isNoRecordFoundError = (response: NifPtResponse) => response.message.includes("record found");
+const isNoRecordFoundError = (response: SearchNifPtResponse) => response?.message?.includes("records found");
 
-const isCreditsExceededError = (response: NifPtResponse) => response.message.includes("credits");
+const isCreditsExceededError = (response: SearchNifPtResponse) => response?.message?.includes("credits");
 
 export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
   try {
-    const response: AxiosResponse<NifPtResponse> = await axios.get(`http://www.nif.pt/`, {
+    const response: AxiosResponse<SearchNifPtResponse> = await axios.get(`http://www.nif.pt/`, {
       params: {
         json: "1",
         q: `${nif}`,
@@ -18,7 +19,7 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
       }
     });
 
-    const nifPtResponse: NifPtResponse = response.data;
+    const nifPtResponse: SearchNifPtResponse = response.data;
 
     logMessage("NIF.PT response", nifPtResponse);
 
@@ -43,7 +44,7 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
 
     throw new Error(`NIF.pt returned unexpected error ${JSON.stringify(response.data)}`);
   } catch (error) {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       const axiosError: AxiosError = error;
 
       logError("NIF.PT request error", {

@@ -5,7 +5,7 @@ export const logMessage = (message: string, data: unknown = {}) =>
   });
 
 export const logError = (message: string, data: unknown = {}) =>
-  console.log({
+  console.error({
     message,
     data: JSON.stringify(data)
   });

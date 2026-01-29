@@ -1,7 +1,7 @@
 import { BatchGetCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
+import { getDynamoInstance } from "../utils/aws/dynamo";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
-import { getDynamoInstance } from "./service";
 import type { Categories, Company } from "./types";
 
 const COMPANIES_TABLE = getEnvironmentVariable("COMPANIES_TABLE");
