@@ -5,6 +5,7 @@ import { logError, logMessage } from "../utils/logger";
 import type { Credit, GetCreditsResponse, NifPtResponse, SearchNifResponse } from "./types";
 
 const isNoRecordFoundError = (response: NifPtResponse) => response.message.includes("record found");
+
 const isCreditsExceededError = (response: NifPtResponse) => response.message.includes("credits");
 
 export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
@@ -17,21 +18,22 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
       }
     });
 
-    logMessage("NIF.PT response", response.data);
+    const nifPtResponse: NifPtResponse = response.data;
 
-    if (response.data.result === "success") {
+    logMessage("NIF.PT response", nifPtResponse);
+
+    if (nifPtResponse.result === "success") {
       return {
         error: false,
-        company: response?.data?.records?.[nif]
+        company: nifPtResponse?.records?.[nif]
       };
-    }
-    if (isNoRecordFoundError(response.data)) {
+    } else if (isNoRecordFoundError(nifPtResponse)) {
       return {
         error: false,
         company: undefined,
         message: `Could not find any record for nif ${nif}`
       };
-    } else if (isCreditsExceededError(response.data)) {
+    } else if (isCreditsExceededError(nifPtResponse)) {
       return {
         error: true,
         company: undefined,

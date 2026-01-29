@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
+    "module": "ES2022",
     "lib": [
-      "ESNext"
+      "ES2022"
     ],
     "outDir": "dist",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Bundler",
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -23,7 +23,8 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "types": ["vitest/globals"]
   },
   "include": [
     "src/**/*",
@@ -33,5 +34,8 @@
     "node_modules",
     "dist",
     "cdk.out"
+  ],
+  "typesRoot": [
+    "node_modules/@types"
   ]
 }
