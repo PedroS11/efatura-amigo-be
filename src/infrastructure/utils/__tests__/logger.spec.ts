@@ -1,8 +1,4 @@
 import type { MockInstance } from "vitest";
-import { expect } from "vitest";
-import { afterEach } from "vitest";
-import { beforeEach } from "vitest";
-import { describe } from "vitest";
 
 import { logError, logMessage } from "../logger";
 

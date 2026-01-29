@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-
 import { Categories } from "../../../companiesTable/types";
 import { mapCaeToCategory } from "../index";
 

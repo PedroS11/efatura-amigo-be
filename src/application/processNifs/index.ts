@@ -19,17 +19,14 @@ export const handler = async (): Promise<void> => {
   }
 
   let nifs = rows.map(({ nif }) => nif);
-  logMessage("Nifs", nifs);
 
   if (nifs.length > credits.minute) {
     nifs = nifs.slice(0, credits.minute);
   }
 
   const existingNifs = await getExistingNifsFromList(nifs);
-  logMessage("existingNifs", existingNifs);
 
   const unprocessedNifs = nifs.filter(nif => !existingNifs.includes(nif));
-  logMessage("unprocessedNifs", unprocessedNifs);
 
   const nifsToDelete = [...existingNifs];
 

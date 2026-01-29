@@ -17,10 +17,6 @@ export const processNif = async (nif: number): Promise<boolean> => {
   }
 
   const company = response.company;
-  logMessage("NIF CAE", {
-    nif,
-    cae: company.cae
-  });
 
   const caeAsString: string = Array.isArray(company.cae) ? company.cae?.[0] : company.cae;
 
