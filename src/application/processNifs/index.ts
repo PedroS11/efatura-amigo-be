@@ -3,6 +3,7 @@ import { getCredits } from "../../infrastructure/nif-pt";
 import { MAX_REQUESTS_PER_MINUTE } from "../../infrastructure/nif-pt/constants";
 import { sendMessage } from "../../infrastructure/telegramBot";
 import { deleteBatch, getUnprocessedCompanies } from "../../infrastructure/unprocessedCompaniesTable";
+import { MAX_ITEMS_PER_BATCH } from "../../infrastructure/utils/aws/dynamo";
 import { logMessage } from "../../infrastructure/utils/logger";
 import { processNif } from "./service";
 
@@ -45,7 +46,7 @@ export const handler = async (): Promise<void> => {
   }
 
   while (nifsToDelete.length > 0) {
-    const batch = nifsToDelete.splice(0, 25);
+    const batch = nifsToDelete.splice(0, MAX_ITEMS_PER_BATCH);
 
     await deleteBatch(batch.map(nif => nif));
   }
