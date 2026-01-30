@@ -19,10 +19,11 @@ export const createProcessNifsLambda = (stack: Stack): Function =>
     runtime: Runtime.NODEJS_22_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/processNifs"),
+    reservedConcurrentExecutions: 1,
     memorySize: 128,
     logRetention: RetentionDays.THREE_DAYS,
     architecture: Architecture.ARM_64,
-    timeout: Duration.minutes(2),
+    timeout: Duration.minutes(1),
     environment: {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey"),
       TELEGRAM_CHAT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramChatId"),
