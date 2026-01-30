@@ -19,7 +19,6 @@ export const createProcessNifsLambda = (stack: Stack): Function =>
     runtime: Runtime.NODEJS_22_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/processNifs"),
-    reservedConcurrentExecutions: 1,
     memorySize: 128,
     logRetention: RetentionDays.THREE_DAYS,
     architecture: Architecture.ARM_64,
