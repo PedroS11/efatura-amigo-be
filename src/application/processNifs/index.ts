@@ -7,15 +7,15 @@ import { logMessage } from "../../infrastructure/utils/logger";
 import { processNif } from "./service";
 
 export const handler = async (): Promise<void> => {
-  const credits = await getCredits();
-  if (credits.minute === 0 || credits.hour === 0 || credits.day === 0 || credits.month === 0) {
-    logMessage("Nif.pt minute limits exceeded", credits);
-    return;
-  }
-
   const rows = await getUnprocessedCompanies(MAX_REQUESTS_PER_MINUTE);
   if (rows.length === 0) {
     logMessage("No rows to process");
+    return;
+  }
+
+  const credits = await getCredits();
+  if (credits.minute === 0 || credits.hour === 0 || credits.day === 0 || credits.month === 0) {
+    logMessage("Nif.pt minute limits exceeded", credits);
     return;
   }
 

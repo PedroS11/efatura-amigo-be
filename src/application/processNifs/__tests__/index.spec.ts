@@ -42,7 +42,31 @@ describe("handler", () => {
 
   afterEach(vi.resetAllMocks);
 
+  it("should return if no nifs to process", async () => {
+    getCreditsMock.mockResolvedValue({
+      month: 963,
+      day: 96,
+      hour: 6,
+      minute: 1,
+      paid: 0
+    } as Credit);
+    getUnprocessedCompaniesMock.mockResolvedValue([]);
+
+    const response = await handler();
+
+    expect(response).toEqual(undefined);
+    expect(logMessageMock).toHaveBeenCalledWith("No rows to process");
+    expect(getUnprocessedCompaniesMock).toHaveBeenCalledWith(1);
+  });
+
   it("should return if no credits left", async () => {
+    getUnprocessedCompaniesMock.mockResolvedValue([
+      {
+        nif: 123456789,
+        timestamp: 1769720041556
+      }
+    ] as UnprocessedCompany[]);
+
     getCreditsMock.mockResolvedValue({
       month: 963,
       day: 96,
@@ -61,23 +85,6 @@ describe("handler", () => {
       minute: 0,
       paid: 0
     });
-  });
-
-  it("should return if no nifs to process", async () => {
-    getCreditsMock.mockResolvedValue({
-      month: 963,
-      day: 96,
-      hour: 6,
-      minute: 1,
-      paid: 0
-    } as Credit);
-    getUnprocessedCompaniesMock.mockResolvedValue([]);
-
-    const response = await handler();
-
-    expect(response).toEqual(undefined);
-    expect(logMessageMock).toHaveBeenCalledWith("No rows to process");
-    expect(getUnprocessedCompaniesMock).toHaveBeenCalledWith(1);
   });
 
   it("should handle an unprocessed nif", async () => {

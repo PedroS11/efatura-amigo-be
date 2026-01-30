@@ -27,7 +27,7 @@ describe("TelegramBot", () => {
     it("should send a message to the bot", async () => {
       await sendMessage("MESSAGE");
       expect(getBotInstanceMock).toHaveBeenCalled();
-      expect(sendMessageMock).toHaveBeenCalledWith("__CHAT_ID__", "MESSAGE");
+      expect(sendMessageMock).toHaveBeenCalledWith("__TELEGRAM_CHAT_ID__", "MESSAGE");
     });
   });
 });
