@@ -9,7 +9,7 @@ const COMPANIES_TABLE = getEnvironmentVariable("COMPANIES_TABLE");
  * Get category by NIF
  * @param {number} nif - Nif
  */
-export const getCategory = async (nif: number): Promise<Categories | undefined> => {
+export const getCompany = async (nif: number): Promise<Company | undefined> => {
   const db = getDynamoInstance();
 
   const result = await db.send(
@@ -21,9 +21,7 @@ export const getCategory = async (nif: number): Promise<Categories | undefined> 
     })
   );
 
-  const row = result.Item as Company | undefined;
-
-  return row?.category;
+  return result.Item as Company | undefined;
 };
 
 export const saveCompany = async (nif: number, name: string, category: Categories | undefined): Promise<void> => {

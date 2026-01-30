@@ -5,7 +5,7 @@ import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { MockInstance } from "vitest";
 
 import { getDynamoInstance } from "../../utils/aws/dynamo";
-import { getCategory, getExistingNifsFromList, saveCompany } from "../index";
+import { getCompany, getExistingNifsFromList, saveCompany } from "../index";
 import type { Company } from "../types";
 import { Categories } from "../types";
 
@@ -24,17 +24,23 @@ describe("companiesTable", () => {
 
   afterEach(vi.resetAllMocks);
 
-  describe("getCategory", () => {
-    it("should return category if company exists in the database", async () => {
+  describe("getCompany", () => {
+    it("should return company if it exists in the database", async () => {
       sendMock.mockResolvedValue({
         Item: {
-          category: Categories.Saude
-        }
+          category: Categories.Saude,
+          nif: 123456789,
+          name: "TEST COMPANY"
+        } as Company
       });
 
-      const category = await getCategory(123456789);
+      const company = await getCompany(123456789);
 
-      expect(category).toEqual(Categories.Saude);
+      expect(company).toEqual({
+        category: Categories.Saude,
+        nif: 123456789,
+        name: "TEST COMPANY"
+      });
       expect(sendMock.mock.calls[0][0]).instanceof(GetCommand);
       expect(sendMock.mock.calls[0][0].input).toEqual({
         Key: {
@@ -46,12 +52,12 @@ describe("companiesTable", () => {
 
     it("should return undefined if company doesn't exist in the database", async () => {
       sendMock.mockResolvedValue({
-        Item: {}
+        Item: undefined
       });
 
-      const category = await getCategory(123456789);
+      const company = await getCompany(123456789);
 
-      expect(category).toEqual(undefined);
+      expect(company).toEqual(undefined);
       expect(sendMock.mock.calls[0][0]).instanceof(GetCommand);
       expect(sendMock.mock.calls[0][0].input).toEqual({
         Key: {

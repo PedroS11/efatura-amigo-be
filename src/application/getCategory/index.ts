@@ -1,6 +1,6 @@
 import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 
-import { getCategory } from "../../infrastructure/companiesTable";
+import { getCompany } from "../../infrastructure/companiesTable";
 import { Categories } from "../../infrastructure/companiesTable/types";
 import { addCompany } from "../../infrastructure/unprocessedCompaniesTable";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
@@ -19,16 +19,18 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
   const nif = Number(nifPath);
 
-  const categoryId = await getCategory(nif);
+  const company = await getCompany(nif);
 
   let body: GetCategoryResponse = {};
 
-  if (categoryId === undefined) {
+  // Category not in the DB
+  if (company === undefined) {
     await addCompany(nif);
-  } else {
+    // Category in the database with a valid category
+  } else if (company.category !== undefined) {
     body = {
-      id: categoryId,
-      name: Categories[categoryId]
+      id: company.category,
+      name: Categories[company.category]
     };
   }
 
