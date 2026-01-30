@@ -48,5 +48,6 @@ export const PREFIX_CAE_MAP: Record<string, Categories> = {
   "55": Categories["Alimentacao/Hotelaria"],
   "51": Categories.Transportes,
   "50": Categories.Transportes,
-  "49": Categories.Transportes
+  "49": Categories.Transportes,
+  "10": Categories["Alimentacao/Hotelaria"] //  Indústrias alimentares
 };
