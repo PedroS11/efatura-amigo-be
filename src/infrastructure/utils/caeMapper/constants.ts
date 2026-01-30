@@ -33,7 +33,8 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   "35230": Categories.Outros, // Utilities (Electricity, Gas, Water)
   "36002": Categories.Outros, // Utilities (Electricity, Gas, Water)
   "61100": Categories.Outros, // Telecoms
-  "61200": Categories.Outros // Telecoms
+  "61200": Categories.Outros, // Telecoms
+  "52211": Categories.Outros //  Gestão de infraestruturas dos transportes terrestres
 };
 
 export const PREFIX_CAE_MAP: Record<string, Categories> = {
