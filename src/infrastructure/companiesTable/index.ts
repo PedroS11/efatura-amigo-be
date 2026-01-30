@@ -26,7 +26,7 @@ export const getCategory = async (nif: number): Promise<Categories | undefined> 
   return row?.category;
 };
 
-export const saveCompany = async (nif: number, name: string, category: Categories): Promise<void> => {
+export const saveCompany = async (nif: number, name: string, category: Categories | undefined): Promise<void> => {
   const db = getDynamoInstance();
   const item: Company = {
     category,

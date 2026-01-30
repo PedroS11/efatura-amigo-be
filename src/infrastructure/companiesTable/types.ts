@@ -18,5 +18,5 @@ export enum Categories {
 export interface Company {
   nif: number;
   name: string;
-  category: Categories;
+  category?: Categories;
 }

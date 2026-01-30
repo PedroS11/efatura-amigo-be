@@ -29,9 +29,8 @@ export const processNif = async (nif: number): Promise<boolean> => {
   }
 
   const category = mapCaeToCategory(Number(caeAsString));
-  if (category !== undefined) {
-    await saveCompany(company.nif, company.title, category);
-  }
+  // Even if no category was found, save it as undefined to avoid re processing the same item over again and waste credits
+  await saveCompany(company.nif, company.title, category);
 
   logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 

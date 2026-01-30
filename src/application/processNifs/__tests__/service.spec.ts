@@ -95,7 +95,7 @@ describe("service", () => {
       });
     });
 
-    it("should not save the company category but return true if cae has no category match", async () => {
+    it("should also save the company and return true despite cae not having a category match", async () => {
       const company = getSearchNifPtResponseFixture().records!["515198374"];
       company.cae = "11111";
 
@@ -106,7 +106,7 @@ describe("service", () => {
       const response = await processNif(nif);
 
       expect(response).toBeTruthy();
-      expect(saveCompanyMock).not.toHaveBeenCalled();
+      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", undefined);
       expect(logMessageMock).toHaveBeenNthCalledWith(2, "Finished processing NIF", {
         cae: "11111",
         nif: 1234556789

@@ -5,6 +5,7 @@ import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import type { Construct } from "constructs";
 
+import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
 import { createGetCategoryLambda, createProcessNifsLambda } from "./lambdas";
 
@@ -66,5 +67,10 @@ export class Stack extends cdk.Stack {
      * HTTP Api
      */
     createHttpApi(this, getCategoryLambda);
+
+    /**
+     * Set alerts to when hit free quotas
+     */
+    createNoCostsBudget(this);
   }
 }
