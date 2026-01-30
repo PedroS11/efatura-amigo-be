@@ -24,6 +24,8 @@ export const createProcessNifsLambda = (stack: Stack): Function =>
     architecture: Architecture.ARM_64,
     timeout: Duration.minutes(2),
     environment: {
-      NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
+      NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey"),
+      TELEGRAM_CHAT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramChatId"),
+      TELEGRAM_BOT_TOKEN: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramBotToken")
     }
   });

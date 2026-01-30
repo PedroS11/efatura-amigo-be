@@ -10,3 +10,4 @@ cdk.out
 dist
 layers
 coverage
+.env

@@ -7,6 +7,7 @@ import { beforeEach, describe } from "vitest";
 import { getExistingNifsFromList } from "../../../infrastructure/companiesTable";
 import { getCredits } from "../../../infrastructure/nif-pt";
 import type { Credit } from "../../../infrastructure/nif-pt/types";
+import { sendMessage } from "../../../infrastructure/telegramBot";
 import { deleteBatch, getUnprocessedCompanies } from "../../../infrastructure/unprocessedCompaniesTable";
 import type { UnprocessedCompany } from "../../../infrastructure/unprocessedCompaniesTable/types";
 import { logMessage } from "../../../infrastructure/utils/logger";
@@ -18,6 +19,7 @@ vi.mock("../../../infrastructure/unprocessedCompaniesTable");
 vi.mock("../../../infrastructure/companiesTable");
 vi.mock("../service");
 vi.mock("../../../infrastructure/utils/logger");
+vi.mock("../../../infrastructure/telegramBot");
 
 describe("handler", () => {
   let getCreditsMock: MockInstance;
@@ -26,6 +28,7 @@ describe("handler", () => {
   let getUnprocessedCompaniesMock: MockInstance;
   let deleteBatchMock: MockInstance;
   let logMessageMock: MockInstance;
+  let sendMessageMock: MockInstance;
 
   beforeEach(() => {
     getCreditsMock = vi.mocked(getCredits);
@@ -34,6 +37,7 @@ describe("handler", () => {
     getUnprocessedCompaniesMock = vi.mocked(getUnprocessedCompanies);
     deleteBatchMock = vi.mocked(deleteBatch);
     logMessageMock = vi.mocked(logMessage);
+    sendMessageMock = vi.mocked(sendMessage);
   });
 
   afterEach(vi.resetAllMocks);
@@ -131,7 +135,7 @@ describe("handler", () => {
     expect(deleteBatchMock).toHaveBeenCalledWith([987654321, 123456789]);
   });
 
-  it("should not remove nifs that failed the processing ", async () => {
+  it("should not remove nifs that failed the processing", async () => {
     getCreditsMock.mockResolvedValue({
       month: 963,
       day: 96,
@@ -157,5 +161,35 @@ describe("handler", () => {
     expect(response).toEqual(undefined);
     expect(processNifMock).toHaveBeenCalledWith(123456789);
     expect(deleteBatchMock).toHaveBeenCalledWith([987654321]);
+    expect(sendMessageMock).toHaveBeenCalledWith("Failed to process nif 123456789");
+  });
+
+  it("should not remove nifs that throw an error while processing", async () => {
+    getCreditsMock.mockResolvedValue({
+      month: 963,
+      day: 96,
+      hour: 6,
+      minute: 2,
+      paid: 0
+    } as Credit);
+    getUnprocessedCompaniesMock.mockResolvedValue([
+      {
+        nif: 123456789,
+        timestamp: 1769720041556
+      },
+      {
+        nif: 987654321,
+        timestamp: 1769720041556
+      }
+    ] as UnprocessedCompany[]);
+    getExistingNifsFromListMock.mockResolvedValue([987654321]);
+    processNifMock.mockRejectedValue(new Error("An error occurred."));
+
+    const response = await handler();
+
+    expect(response).toEqual(undefined);
+    expect(processNifMock).toHaveBeenCalledWith(123456789);
+    expect(deleteBatchMock).toHaveBeenCalledWith([987654321]);
+    expect(sendMessageMock).toHaveBeenCalledWith("Error thrown processing nif 123456789, error: An error occurred.");
   });
 });

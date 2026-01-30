@@ -1,6 +1,7 @@
 import { getExistingNifsFromList } from "../../infrastructure/companiesTable";
 import { getCredits } from "../../infrastructure/nif-pt";
 import { MAX_REQUESTS_PER_MINUTE } from "../../infrastructure/nif-pt/constants";
+import { sendMessage } from "../../infrastructure/telegramBot";
 import { deleteBatch, getUnprocessedCompanies } from "../../infrastructure/unprocessedCompaniesTable";
 import { logMessage } from "../../infrastructure/utils/logger";
 import { processNif } from "./service";
@@ -31,8 +32,15 @@ export const handler = async (): Promise<void> => {
   const nifsToDelete = [...existingNifs];
 
   for (const unprocessedNif of unprocessedNifs) {
-    if (await processNif(unprocessedNif)) {
-      nifsToDelete.push(unprocessedNif);
+    try {
+      const wasProcessed = await processNif(unprocessedNif);
+      if (wasProcessed) {
+        nifsToDelete.push(unprocessedNif);
+      } else {
+        await sendMessage(`Failed to process nif ${unprocessedNif}`);
+      }
+    } catch (error) {
+      await sendMessage(`Error thrown processing nif ${unprocessedNif}, error: ${(error as Error).message}`);
     }
   }
 
