@@ -45,7 +45,7 @@ describe("service", () => {
       });
     });
 
-    it("should return true if company not found", async () => {
+    it("should save a NOT_FOUND entry and return true if company not found", async () => {
       searchNifMock.mockResolvedValue({
         error: false,
         message: `Could not find any record for nif ${nif}`
@@ -58,6 +58,7 @@ describe("service", () => {
         error: false,
         message: "Could not find any record for nif 1234556789"
       });
+      expect(saveCompanyMock).toHaveBeenCalledWith(1234556789, "NOT_FOUND", undefined);
     });
 
     it("should return true if cae not found", async () => {

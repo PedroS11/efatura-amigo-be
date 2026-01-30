@@ -10,9 +10,12 @@ export const processNif = async (nif: number): Promise<boolean> => {
 
   if (response.error) {
     logError(`Error searching NIF: ${nif}`, response);
+
     return false;
   } else if (response.company === undefined) {
     logMessage(`Company ${nif} not found`, response);
+    await saveCompany(nif, "NOT_FOUND", undefined);
+
     return true;
   }
 
@@ -25,6 +28,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
       nif,
       caeAsString
     });
+
     return true;
   }
 
