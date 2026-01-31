@@ -23,6 +23,7 @@ export const createProcessNifsLambda = (stack: Stack): Function =>
     logRetention: RetentionDays.THREE_DAYS,
     architecture: Architecture.ARM_64,
     timeout: Duration.minutes(1),
+    reservedConcurrentExecutions: 1,
     environment: {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey"),
       TELEGRAM_CHAT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramChatId"),
