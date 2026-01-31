@@ -29,7 +29,8 @@ export const saveCompany = async (nif: number, name: string, category: Categorie
   const item: Company = {
     category,
     name,
-    nif
+    nif,
+    updatedAt: Date.now()
   };
 
   await db.send(

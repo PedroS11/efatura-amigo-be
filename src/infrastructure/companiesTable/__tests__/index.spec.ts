@@ -8,13 +8,20 @@ import { getDynamoInstance } from "../../utils/aws/dynamo";
 import { getCompany, getExistingNifsFromList, saveCompany } from "../index";
 import type { Company } from "../types";
 import { Categories } from "../types";
+import { getCompanyFixture } from "./__fixtures__/company";
 
 vi.mock("../../utils/aws/dynamo");
 
 describe("companiesTable", () => {
   let sendMock: MockInstance;
+  let companyFixture: Company;
 
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2000, 1, 1, 13));
+
+    companyFixture = getCompanyFixture();
+
     sendMock = vi.fn();
 
     vi.mocked(getDynamoInstance).mockReturnValue({
@@ -27,19 +34,16 @@ describe("companiesTable", () => {
   describe("getCompany", () => {
     it("should return company if it exists in the database", async () => {
       sendMock.mockResolvedValue({
-        Item: {
-          category: Categories.Saude,
-          nif: 123456789,
-          name: "TEST COMPANY"
-        } as Company
+        Item: companyFixture
       });
 
       const company = await getCompany(123456789);
 
       expect(company).toEqual({
-        category: Categories.Saude,
+        category: 2,
+        name: "Company name",
         nif: 123456789,
-        name: "TEST COMPANY"
+        updatedAt: 949410000000
       });
       expect(sendMock.mock.calls[0][0]).instanceof(GetCommand);
       expect(sendMock.mock.calls[0][0].input).toEqual({
@@ -77,7 +81,8 @@ describe("companiesTable", () => {
         Item: {
           nif: 123456789,
           name: "Company name",
-          category: Categories.Educacao
+          category: Categories.Educacao,
+          updatedAt: 949410000000
         },
         TableName: "__COMPANIES_TABLE__"
       });
@@ -88,13 +93,7 @@ describe("companiesTable", () => {
     it("should return existing nifs in the database from list", async () => {
       sendMock.mockResolvedValueOnce({
         Responses: {
-          __COMPANIES_TABLE__: [
-            {
-              nif: 123456789,
-              name: "Company name",
-              category: Categories.Educacao
-            } as Company
-          ]
+          __COMPANIES_TABLE__: [companyFixture]
         }
       });
 
