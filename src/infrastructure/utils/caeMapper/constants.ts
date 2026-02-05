@@ -13,6 +13,8 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   "93110": Categories.Ginasio,
   "93120": Categories.Ginasio,
   "93130": Categories.Ginasio,
+  // Oficina Automovies
+  "45320": Categories["Reparacao Automovel"],
   // Reparações
   "45402": Categories["Reparacao Motas"],
   // Imoveis
@@ -24,18 +26,26 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   // Outros
   "47711": Categories.Outros, // Clothing & Footwear
   "47721": Categories.Outros, // Clothing & Footwear
+  "47712": Categories.Outros, // Vestuário para bebés e crianças
   "47300": Categories.Outros, // Fuel
+  "19201": Categories.Outros, // Fabricação de produtos petrolíferos refinados
+  "46711": Categories.Outros, // Produtos petrolíferos
   "47521": Categories.Outros, // Hardware, Appliances, Furniture, Tech
   "47540": Categories.Outros, // Hardware, Appliances, Furniture, Tech
   "47591": Categories.Outros, // Hardware, Appliances, Furniture, Tech
   "47410": Categories.Outros, // Hardware, Appliances, Furniture, Tech
+  "82190": Categories.Outros, // Execução de fotocópias, preparação de documentos e outras actividades especializadas de apoio administrativo
   "35141": Categories.Outros, // Utilities (Electricity, Gas, Water)
   "35230": Categories.Outros, // Utilities (Electricity, Gas, Water)
   "36002": Categories.Outros, // Utilities (Electricity, Gas, Water)
   "61100": Categories.Outros, // Telecoms
   "61200": Categories.Outros, // Telecoms
   "52211": Categories.Outros, //  Gestão de infraestruturas dos transportes terrestres,
-  "47191": Categories.Outros // Comércio a retalho em grandes armazéns e similares
+  "47191": Categories.Outros, // Comércio a retalho em grandes armazéns e similares
+  "47750": Categories.Outros, // Comércio a retalho de produtos cosméticos e de higiene
+  "46900": Categories.Outros, // Comércio por grosso não especializado
+  "46390": Categories.Outros, // Comércio por grosso não especializado de produtos alimentares, bebidas e tabaco
+  "81100": Categories.Outros // Atividades combinadas de apoio aos edifícios
 };
 
 export const PREFIX_CAE_MAP: Record<string, Categories> = {
