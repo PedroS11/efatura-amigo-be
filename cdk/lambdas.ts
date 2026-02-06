@@ -1,11 +1,11 @@
 import type { Stack } from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
-import { Architecture, Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Architecture, Code, Function as LambdaFunction, Runtime } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
-export const createGetCategoryLambda = (stack: Stack): Function =>
-  new Function(stack, "GetCategory", {
+export const createGetCategoryLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "GetCategory", {
     runtime: Runtime.NODEJS_22_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/getCategory"),
@@ -14,8 +14,8 @@ export const createGetCategoryLambda = (stack: Stack): Function =>
     architecture: Architecture.ARM_64
   });
 
-export const createProcessNifsLambda = (stack: Stack): Function =>
-  new Function(stack, "ProcessNifs", {
+export const createProcessNifsLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "ProcessNifs", {
     runtime: Runtime.NODEJS_22_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/processNifs"),

@@ -1,6 +1,5 @@
-import type { InternalAxiosRequestConfig } from "axios";
 import axios, { AxiosError } from "axios";
-import type { MockInstance } from "vitest";
+import type { InternalAxiosRequestConfig } from "axios";
 
 import { logError } from "../../utils/logger";
 import { getCredits, searchNif } from "../index";
@@ -11,6 +10,8 @@ import {
   getSearchNifPtResponseFixture,
   getUnexpectedErrorResponseFixture
 } from "./__fixtures__/searchNifPtResponse";
+
+import type { MockInstance } from "vitest";
 
 vi.mock("axios", async importOriginal => {
   const actual = await importOriginal<typeof axios>();
@@ -135,7 +136,7 @@ describe("NifPt", () => {
           data: { msg: "Invalid token" },
           statusText: "Unauthorized",
           headers: {},
-          config: {} as any
+          config: {} as InternalAxiosRequestConfig
         }
       );
 

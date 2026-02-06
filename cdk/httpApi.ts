@@ -2,10 +2,10 @@ import type { Stack } from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
 import { type CfnStage, CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
-import type { Function } from "aws-cdk-lib/aws-lambda";
+import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
-export const createHttpApi = (stack: Stack, getCategoryLambda: Function) => {
+export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
   });
