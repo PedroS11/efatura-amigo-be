@@ -22,7 +22,7 @@ export const createNoCostsBudget = (stack: Stack) => {
         subscribers: [
           {
             subscriptionType: "EMAIL",
-            address: "pedrosilva1137work@gmail.com" // CHANGE THIS
+            address: "pedrosilva1137work@gmail.com"
           }
         ]
       }
