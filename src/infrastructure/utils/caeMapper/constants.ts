@@ -16,6 +16,7 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   // Oficina Automovies
   "45320": Categories["Reparacao Automovel"],
   // Reparações
+  "45401": Categories["Reparacao Motas"],
   "45402": Categories["Reparacao Motas"],
   // Imoveis
   "68200": Categories.Imoveis,
@@ -23,11 +24,14 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   "47620": Categories["Jornais e Revista"],
   "58130": Categories["Jornais e Revista"],
   "58140": Categories["Jornais e Revista"],
+  // Restauração
+  "47240": Categories["Alimentacao/Hotelaria"],
   // Outros
   "47711": Categories.Outros, // Clothing & Footwear
   "47721": Categories.Outros, // Clothing & Footwear
   "47712": Categories.Outros, // Vestuário para bebés e crianças
   "47300": Categories.Outros, // Fuel
+  "46811": Categories.Outros, // Fuel
   "19201": Categories.Outros, // Fabricação de produtos petrolíferos refinados
   "46711": Categories.Outros, // Produtos petrolíferos
   "47521": Categories.Outros, // Hardware, Appliances, Furniture, Tech
