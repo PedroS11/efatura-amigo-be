@@ -13,7 +13,8 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   "93110": Categories.Ginasio,
   "93120": Categories.Ginasio,
   "93130": Categories.Ginasio,
-  // Oficina Automovies
+  // Oficina Automoveis
+  "45310": Categories["Reparacao Automovel"],
   "45320": Categories["Reparacao Automovel"],
   // Reparações
   "45401": Categories["Reparacao Motas"],

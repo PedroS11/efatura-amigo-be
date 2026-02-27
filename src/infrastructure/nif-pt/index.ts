@@ -1,17 +1,13 @@
-import type { AxiosError, AxiosResponse } from "axios";
-import axios from "axios";
+import type { AxiosResponse } from "axios";
 import { isAxiosError } from "axios";
 
 import { logError, logMessage } from "../utils/logger";
+import { getAxiosInstance, parseSearchNifResponse } from "./service";
 import type { Credit, GetCreditsResponse, SearchNifPtResponse, SearchNifResponse } from "./types";
-
-const isNoRecordFoundError = (response: SearchNifPtResponse) => response?.message?.includes("records found");
-
-const isCreditsExceededError = (response: SearchNifPtResponse) => response?.message?.includes("credits");
 
 export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
   try {
-    const response: AxiosResponse<SearchNifPtResponse> = await axios.get(`http://www.nif.pt/`, {
+    const response: AxiosResponse<SearchNifPtResponse> = await getAxiosInstance().get("http://www.nif.pt/", {
       params: {
         json: "1",
         q: `${nif}`,
@@ -23,44 +19,15 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
 
     logMessage("NIF.PT response", nifPtResponse);
 
-    if (nifPtResponse.result === "success") {
-      return {
-        error: false,
-        company: nifPtResponse?.records?.[nif]
-      };
-    } else if (isNoRecordFoundError(nifPtResponse)) {
-      return {
-        error: false,
-        company: undefined,
-        message: `Could not find any record for nif ${nif}`
-      };
-    } else if (isCreditsExceededError(nifPtResponse)) {
-      return {
-        error: true,
-        company: undefined,
-        message: response.data.message
-      };
+    const parsedResponse: SearchNifResponse | undefined = parseSearchNifResponse(nifPtResponse, nif);
+
+    if (parsedResponse) {
+      return parsedResponse;
     }
 
     throw new Error(`NIF.pt returned unexpected error ${JSON.stringify(response.data)}`);
   } catch (error) {
-    if (isAxiosError(error)) {
-      const axiosError: AxiosError = error;
-
-      const requestData = typeof error.config?.data === "string" ? JSON.parse(error.config.data) : error.config?.data;
-
-      logError("NIF.PT request error", {
-        nif,
-        errorMessage: axiosError.message,
-        response: axiosError.response?.data,
-        request: {
-          method: axiosError.config?.method,
-          url: axiosError.config?.url,
-          headers: axiosError.config?.headers,
-          data: requestData
-        }
-      });
-    } else {
+    if (!isAxiosError(error)) {
       const unknownError: Error = error as Error;
 
       logError("Unexpected error calling NIF.PT", {
@@ -74,9 +41,13 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
 };
 
 export const getCredits = async (): Promise<Credit> => {
-  const response: AxiosResponse<GetCreditsResponse> = await axios.get(
-    `http://www.nif.pt/?json=1&credits=1&key=${process.env.NIF_PT_API_KEY}`
-  );
+  const response: AxiosResponse<GetCreditsResponse> = await getAxiosInstance().get("http://www.nif.pt/", {
+    params: {
+      json: "1",
+      credits: "1",
+      key: process.env.NIF_PT_API_KEY
+    }
+  });
 
   return response.data.credits;
 };

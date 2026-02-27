@@ -12,7 +12,7 @@ export const isNifValid = (nif: string | undefined): boolean => {
     return false;
   }
 
-  const nifNumbers = nif.split("").map(c => Number.parseInt(c));
+  const nifNumbers = nif.split("").map(c => Number.parseInt(c, 10));
 
   const total =
     nifNumbers[0] * 9 +
