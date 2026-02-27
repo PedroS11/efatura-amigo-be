@@ -14,7 +14,8 @@ export const axiosLoggerInterceptor = (axios: AxiosInstance): AxiosInstance => {
         status: error.response?.status,
         message: error.response?.data || error.message,
         code: error.code
-      }
+      },
+      message: `Error "${error.response?.data || error.message}" calling ${error!.config!.url}}`
     };
 
     logError(`Error "${error.response?.data || error.message}" calling ${error!.config!.url}}`, parsedError);
