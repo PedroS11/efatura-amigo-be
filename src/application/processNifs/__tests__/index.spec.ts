@@ -1,5 +1,4 @@
 import type { MockInstance } from "vitest";
-import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 
 import { getExistingNifsFromList } from "../../../infrastructure/companiesTable";
 import { getCredits } from "../../../infrastructure/nif-pt";
