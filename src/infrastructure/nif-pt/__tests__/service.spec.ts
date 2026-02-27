@@ -1,4 +1,7 @@
-import { parseSearchNifResponse } from "../service";
+import axios, { type AxiosInstance } from "axios";
+import type { MockInstance } from "vitest";
+import { axiosLoggerInterceptor } from "../../utils/axiosLoggerInterceptor";
+import { getAxiosInstance, parseSearchNifResponse } from "../service";
 import type { SearchNifPtResponse } from "../types";
 import {
   getNoCreditsResponseFixture,
@@ -7,7 +10,35 @@ import {
   getUnexpectedErrorResponseFixture
 } from "./__fixtures__/searchNifPtResponse";
 
+vi.mock("../../utils/axiosLoggerInterceptor");
+vi.mock("axios", () => ({
+  default: {
+    create: vi.fn(() => ({ some: "axios-instance" }))
+  }
+}));
+
 describe("service", () => {
+  describe("getAxiosInstance", () => {
+    let _axiosLoggerInterceptorMock: MockInstance;
+
+    beforeEach(() => {
+      _axiosLoggerInterceptorMock = vi
+        .mocked(axiosLoggerInterceptor)
+        .mockReturnValue(vi.fn() as unknown as AxiosInstance);
+    });
+
+    afterEach(vi.resetAllMocks);
+
+    it("should create a singleton of an axiosInstance with interceptor", () => {
+      const instance1 = getAxiosInstance();
+      const instance2 = getAxiosInstance();
+
+      expect(instance1).toBe(instance2);
+      expect(axios.create).toHaveBeenCalledTimes(1);
+      expect(_axiosLoggerInterceptorMock).toHaveBeenCalledWith({ some: "axios-instance" });
+    });
+  });
+
   describe("parseSearchNifResponse", () => {
     it("should parse a success response", () => {
       const searchNifResponse: SearchNifPtResponse = getSearchNifPtResponseFixture();
