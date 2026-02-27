@@ -41,6 +41,7 @@ export const handler = async (): Promise<void> => {
         await sendMessage(`Failed to process nif ${unprocessedNif}`);
       }
     } catch (error) {
+      logMessage(`Error thrown processing nif ${unprocessedNif}, error: ${(error as Error).message}`);
       await sendMessage(`Error thrown processing nif ${unprocessedNif}, error: ${(error as Error).message}`);
     }
   }

@@ -47,11 +47,18 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
     if (isAxiosError(error)) {
       const axiosError: AxiosError = error;
 
+      const requestData = typeof error.config?.data === "string" ? JSON.parse(error.config.data) : error.config?.data;
+
       logError("NIF.PT request error", {
         nif,
         errorMessage: axiosError.message,
-        response: JSON.stringify(axiosError.response?.data),
-        request: JSON.stringify(axiosError.request)
+        response: axiosError.response?.data,
+        request: {
+          method: axiosError.config?.method,
+          url: axiosError.config?.url,
+          headers: axiosError.config?.headers,
+          data: requestData
+        }
       });
     } else {
       const unknownError: Error = error as Error;

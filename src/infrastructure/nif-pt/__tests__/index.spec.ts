@@ -146,8 +146,13 @@ describe("NifPt", () => {
       expect(logErrorMock).toHaveBeenCalledWith("NIF.PT request error", {
         errorMessage: "Unauthorized",
         nif: 515198374,
-        request: "{}",
-        response: '{"msg":"Invalid token"}'
+        request: {
+          data: undefined,
+          headers: undefined,
+          method: undefined,
+          url: undefined
+        },
+        response: { msg: "Invalid token" }
       });
     });
 
