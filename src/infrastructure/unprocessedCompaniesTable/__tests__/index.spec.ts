@@ -1,7 +1,5 @@
 import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { BatchWriteCommand } from "@aws-sdk/lib-dynamodb";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { BatchWriteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from "vitest";
 
 import { getDynamoInstance } from "../../utils/aws/dynamo";

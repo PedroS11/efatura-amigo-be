@@ -17,7 +17,7 @@ export const getUnprocessedCompanies = async (limit: number): Promise<Unprocesse
   const companies: UnprocessedCompany[] = [];
   let outputResult: ScanCommandOutput;
 
-  let exclusiveStartKey: ScanCommandOutput["LastEvaluatedKey"] = undefined;
+  let exclusiveStartKey: ScanCommandOutput["LastEvaluatedKey"] | undefined = undefined;
 
   do {
     outputResult = await db.send(
@@ -30,7 +30,7 @@ export const getUnprocessedCompanies = async (limit: number): Promise<Unprocesse
 
     const items = outputResult.Items as UnprocessedCompany[];
     if (items?.length) {
-      items.forEach(item => companies.push(item));
+      companies.push(...items);
 
       exclusiveStartKey = outputResult.LastEvaluatedKey;
     }

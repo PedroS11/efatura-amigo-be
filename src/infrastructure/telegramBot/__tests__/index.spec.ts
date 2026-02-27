@@ -1,9 +1,6 @@
 import type { Telegram } from "telegraf";
 import type { MockInstance } from "vitest";
-import { expect } from "vitest";
-import { afterEach } from "vitest";
-import { beforeEach } from "vitest";
-import { describe } from "vitest";
+import { afterEach, beforeEach, describe, expect } from "vitest";
 
 import { sendMessage } from "../index";
 import { getBotInstance } from "../service";

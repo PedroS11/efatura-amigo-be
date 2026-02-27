@@ -1,6 +1,5 @@
 import type { MockInstance } from "vitest";
-import { expect } from "vitest";
-import { afterEach, beforeEach, describe } from "vitest";
+import { afterEach, beforeEach, describe, expect } from "vitest";
 
 import { saveCompany } from "../../../infrastructure/companiesTable";
 import { searchNif } from "../../../infrastructure/nif-pt";

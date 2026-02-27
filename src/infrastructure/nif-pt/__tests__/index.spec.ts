@@ -1,8 +1,9 @@
-import axios, { AxiosError } from "axios";
-import type { InternalAxiosRequestConfig } from "axios";
-
+import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import { AxiosError } from "axios";
+import type { MockInstance } from "vitest";
 import { logError } from "../../utils/logger";
 import { getCredits, searchNif } from "../index";
+import { getAxiosInstance, parseSearchNifResponse } from "../service";
 import type { Credit, SearchNifPtResponse } from "../types";
 import {
   getNoCreditsResponseFixture,
@@ -11,31 +12,22 @@ import {
   getUnexpectedErrorResponseFixture
 } from "./__fixtures__/searchNifPtResponse";
 
-import type { MockInstance } from "vitest";
-
-vi.mock("axios", async importOriginal => {
-  const actual = await importOriginal<typeof axios>();
-  return {
-    ...actual,
-    default: {
-      // @ts-ignore
-      ...actual.default,
-      get: vi.fn() // Only mock the get method
-    },
-    // If you import { isAxiosError } from 'axios', you might need this too:
-    isAxiosError: actual.isAxiosError
-  };
-});
+vi.mock("../service");
 
 vi.mock("../../utils/logger");
 
 describe("NifPt", () => {
   let axiosGetMock: MockInstance;
   let logErrorMock: MockInstance;
+  let parseSearchNifResponseMock: MockInstance;
 
   beforeEach(() => {
-    axiosGetMock = vi.mocked(axios.get);
+    axiosGetMock = vi.fn();
+    vi.mocked(getAxiosInstance).mockReturnValue({
+      get: axiosGetMock
+    } as unknown as AxiosInstance);
     logErrorMock = vi.mocked(logError);
+    parseSearchNifResponseMock = vi.mocked(parseSearchNifResponse);
   });
 
   afterEach(vi.resetAllMocks);
@@ -43,6 +35,12 @@ describe("NifPt", () => {
   describe("searchNif", () => {
     it("should return a valid company if it exists", async () => {
       const searchNifResponse: SearchNifPtResponse = getSearchNifPtResponseFixture();
+
+      parseSearchNifResponseMock.mockReturnValue({
+        error: false,
+        company: searchNifResponse?.records?.["515198374"]
+      });
+
       axiosGetMock.mockResolvedValue({
         data: searchNifResponse
       });
@@ -64,6 +62,13 @@ describe("NifPt", () => {
 
     it("should return undefined if the company doesn't exist", async () => {
       const searchNifResponse: SearchNifPtResponse = getNoRecordFoundResponseFixture();
+
+      parseSearchNifResponseMock.mockReturnValue({
+        company: undefined,
+        error: false,
+        message: "Could not find any record for nif 515198374"
+      });
+
       axiosGetMock.mockResolvedValue({
         data: searchNifResponse
       });
@@ -86,6 +91,13 @@ describe("NifPt", () => {
 
     it("should return an error if the credits were exceeded", async () => {
       const searchNifResponse: SearchNifPtResponse = getNoCreditsResponseFixture();
+
+      parseSearchNifResponseMock.mockReturnValue({
+        company: undefined,
+        error: true,
+        message: "Limit per minute reached. Please, try again later or buy credits."
+      });
+
       axiosGetMock.mockResolvedValue({
         data: searchNifResponse
       });
@@ -108,6 +120,7 @@ describe("NifPt", () => {
 
     it("should throw if nif returns an expected error", async () => {
       const searchNifResponse: SearchNifPtResponse = getUnexpectedErrorResponseFixture();
+
       axiosGetMock.mockResolvedValue({
         data: searchNifResponse
       });
@@ -143,17 +156,7 @@ describe("NifPt", () => {
       axiosGetMock.mockRejectedValue(error);
 
       await expect(searchNif(515198374)).rejects.toThrow(error.message);
-      expect(logErrorMock).toHaveBeenCalledWith("NIF.PT request error", {
-        errorMessage: "Unauthorized",
-        nif: 515198374,
-        request: {
-          data: undefined,
-          headers: undefined,
-          method: undefined,
-          url: undefined
-        },
-        response: { msg: "Invalid token" }
-      });
+      expect(logErrorMock).not.toHaveBeenCalled();
     });
 
     it("should throw when an unexpected error occurs", async () => {
@@ -187,7 +190,13 @@ describe("NifPt", () => {
       const credits = await getCredits();
 
       expect(credits).toEqual(creditsResponse);
-      expect(axiosGetMock).toHaveBeenCalledWith("http://www.nif.pt/?json=1&credits=1&key=__API_KEY__");
+      expect(axiosGetMock).toHaveBeenCalledWith("http://www.nif.pt/", {
+        params: {
+          credits: "1",
+          json: "1",
+          key: "__API_KEY__"
+        }
+      });
     });
   });
 });

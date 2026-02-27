@@ -21,6 +21,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
 
   const company = response.company;
 
+  // NIF.pt sometimes returns CAE as string, others as an array of strings
   const caeAsString: string = Array.isArray(company.cae) ? company.cae?.[0] : company.cae;
 
   if (!caeAsString) {
