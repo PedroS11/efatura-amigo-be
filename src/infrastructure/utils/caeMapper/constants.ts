@@ -1,6 +1,6 @@
 import { Categories } from "../../companiesTable/types";
 
-export const EXACT_CAE_MAP: Record<string, Categories> = {
+export const EXACT_CAE_REV3_MAP: Record<string, Categories> = {
   // Saude
   "47730": Categories.Saude,
   "47740": Categories.Saude,
@@ -27,6 +27,11 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   "58140": Categories["Jornais e Revista"],
   // Restauração
   "47240": Categories["Alimentacao/Hotelaria"],
+  // Comércio a retalho de livros em estabelecimentos especializados
+  "47610": Categories["Comercio a Retalho de Livros"], // Comércio a retalho de livros em estabelecimentos especializados
+  // Ativdades de Museus e Monumentos Historicos
+  "91020": Categories["Ativdades dos Museus e Monumentos Historicos"], // Atividades de museus e coleções
+  "91030": Categories["Ativdades dos Museus e Monumentos Historicos"], // Atividades dos sítios e monumentos históricos
   // Outros
   "47711": Categories.Outros, // Clothing & Footwear
   "47721": Categories.Outros, // Clothing & Footwear
@@ -53,11 +58,12 @@ export const EXACT_CAE_MAP: Record<string, Categories> = {
   "81100": Categories.Outros // Atividades combinadas de apoio aos edifícios
 };
 
-export const PREFIX_CAE_MAP: Record<string, Categories> = {
+export const PREFIX_CAE_REV3_MAP: Record<string, Categories> = {
   "9602": Categories.Cabeleireiro,
   "750": Categories["Animais de Estimacao"],
   "471": Categories.Outros, // Supermarkets
   "452": Categories["Reparacao Automovel"],
+  "90": Categories["Atividades Artisticas e Literarias"],
   "87": Categories.Lares,
   "86": Categories.Saude,
   "85": Categories.Educacao,
