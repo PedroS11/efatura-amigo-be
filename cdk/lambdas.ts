@@ -30,3 +30,14 @@ export const createProcessNifsLambda = (stack: Stack): LambdaFunction =>
       TELEGRAM_BOT_TOKEN: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramBotToken")
     }
   });
+
+export const createResyncLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "Resync", {
+    runtime: Runtime.NODEJS_22_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/resync"),
+    memorySize: 256,
+    timeout: Duration.minutes(5),
+    logRetention: RetentionDays.THREE_DAYS,
+    architecture: Architecture.ARM_64
+  });
