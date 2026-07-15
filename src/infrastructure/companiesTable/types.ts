@@ -11,18 +11,13 @@ export enum Categories {
   "Alimentacao/Hotelaria",
   Cabeleireiro,
   "Animais de Estimacao",
-  // Number 12 is a <p> tag
-  Transportes = 13,
-  "Jornais e Revista",
-  "Comercio a Retalho de Livros",
-  "Atividades Artisticas e Literarias",
-  "Ativdades dos Museus e Monumentos Historicos"
+  Transportes,
+  "Jornais e Revista"
 }
 
 export interface Company {
   nif: number;
   name: string;
   category?: Categories;
-  caeRev3?: string;
   updatedAt: number;
 }

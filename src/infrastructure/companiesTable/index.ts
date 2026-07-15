@@ -24,18 +24,12 @@ export const getCompany = async (nif: number): Promise<Company | undefined> => {
   return result.Item as Company | undefined;
 };
 
-export const saveCompany = async (
-  nif: number,
-  name: string,
-  category: Categories | undefined = undefined,
-  caeRev3: string | undefined = undefined
-): Promise<void> => {
+export const saveCompany = async (nif: number, name: string, category: Categories | undefined): Promise<void> => {
   const db = getDynamoInstance();
   const item: Company = {
     category,
     name,
     nif,
-    caeRev3,
     updatedAt: Date.now()
   };
 
