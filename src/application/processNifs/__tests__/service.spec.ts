@@ -56,7 +56,7 @@ describe("service", () => {
         error: false,
         message: "Could not find any record for nif 1234556789"
       });
-      expect(saveCompanyMock).toHaveBeenCalledWith(1234556789, "NOT_FOUND", undefined);
+      expect(saveCompanyMock).toHaveBeenCalledWith(1234556789, "NOT_FOUND", undefined, undefined);
     });
 
     it("should return true if cae not found", async () => {
@@ -86,10 +86,10 @@ describe("service", () => {
       const response = await processNif(nif);
 
       expect(response).toBeTruthy();
-      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", 9);
+      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", 8, "56303");
       expect(logMessageMock).toHaveBeenNthCalledWith(2, "Finished processing NIF", {
         cae: ["56303", "56101", "10712", "10711"],
-        category: 9,
+        category: 8,
         nif: 1234556789
       });
     });
@@ -105,7 +105,7 @@ describe("service", () => {
       const response = await processNif(nif);
 
       expect(response).toBeTruthy();
-      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", undefined);
+      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", undefined, "11111");
       expect(logMessageMock).toHaveBeenNthCalledWith(2, "Finished processing NIF", {
         cae: "11111",
         nif: 1234556789
