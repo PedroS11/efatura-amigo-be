@@ -1,4 +1,4 @@
-import { scanTable } from "../../infrastructure/companiesTable";
+import { saveCompany, scanTable } from "../../infrastructure/companiesTable";
 import type { Company } from "../../infrastructure/companiesTable/types";
 
 export const handler = async (): Promise<void> => {
@@ -6,9 +6,9 @@ export const handler = async (): Promise<void> => {
   const affectedCompanies: Company[] = await scanTable();
   console.log(JSON.stringify(affectedCompanies));
 
-  // // Decrease its category by 1 and save
-  // for (const company of affectedCompanies) {
-  //   company.category = company!.category! - 1;
-  //   await saveCompany(company.nif, company.name, company.category);
-  // }
+  // Decrease its category by 1 and save
+  for (const company of affectedCompanies) {
+    company.category = company!.category! - 1;
+    await saveCompany(company.nif, company.name, company.category);
+  }
 };
