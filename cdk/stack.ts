@@ -7,7 +7,7 @@ import type { Construct } from "constructs";
 
 import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
-import { createGetCategoryLambda, createProcessNifsLambda, createResyncLambda } from "./lambdas";
+import { createGetCategoryLambda, createProcessNifsLambda } from "./lambdas";
 
 export class Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -62,14 +62,6 @@ export class Stack extends cdk.Stack {
       enabled: true
     });
     processNifsRule.addTarget(new LambdaFunction(processNifsLambda));
-
-    /**
-     * Resync lambda
-     */
-
-    const resyncLambda = createResyncLambda(this);
-    companiesTable.grantReadWriteData(resyncLambda);
-    resyncLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
     /**
      * HTTP Api

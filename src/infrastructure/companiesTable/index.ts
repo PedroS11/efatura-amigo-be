@@ -1,4 +1,4 @@
-import { BatchGetCommand, GetCommand, PutCommand, ScanCommand, type ScanCommandOutput } from "@aws-sdk/lib-dynamodb";
+import { BatchGetCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 import { getDynamoInstance } from "../utils/aws/dynamo";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
@@ -24,12 +24,18 @@ export const getCompany = async (nif: number): Promise<Company | undefined> => {
   return result.Item as Company | undefined;
 };
 
-export const saveCompany = async (nif: number, name: string, category: Categories | undefined): Promise<void> => {
+export const saveCompany = async (
+  nif: number,
+  name: string,
+  category: Categories | undefined,
+  caeRev3: string | undefined
+): Promise<void> => {
   const db = getDynamoInstance();
   const item: Company = {
     category,
     name,
     nif,
+    caeRev3,
     updatedAt: Date.now()
   };
 
@@ -86,31 +92,4 @@ export const getExistingNifsFromList = async (nifs: number[]): Promise<Company["
   } while (retries < 3);
 
   return existingNifs;
-};
-
-export const scanTable = async (): Promise<Company[]> => {
-  const db = getDynamoInstance();
-
-  let lastEvaluatedKey: ScanCommandOutput["LastEvaluatedKey"];
-  const companies: Company[] = [];
-
-  do {
-    const response: ScanCommandOutput = await db.send(
-      new ScanCommand({
-        TableName: COMPANIES_TABLE,
-        ...(lastEvaluatedKey && {
-          ExclusiveStartKey: lastEvaluatedKey
-        }),
-        FilterExpression: "category >= :newCategory",
-        ExpressionAttributeValues: {
-          ":newCategory": 7
-        }
-      })
-    );
-
-    companies.push(...((response.Items ?? []) as Company[]));
-    lastEvaluatedKey = response.LastEvaluatedKey;
-  } while (lastEvaluatedKey !== undefined);
-
-  return companies;
 };

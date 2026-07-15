@@ -72,7 +72,7 @@ describe("companiesTable", () => {
 
   describe("saveCompany", () => {
     it("should save company information", async () => {
-      await saveCompany(123456789, "Company name", Categories.Educacao);
+      await saveCompany(123456789, "Company name", Categories.Educacao, "88910");
 
       expect(sendMock.mock.calls[0][0]).instanceof(PutCommand);
       expect(sendMock.mock.calls[0][0].input).toEqual({
@@ -80,6 +80,7 @@ describe("companiesTable", () => {
           nif: 123456789,
           name: "Company name",
           category: Categories.Educacao,
+          caeRev3: "88910",
           updatedAt: 949410000000
         },
         TableName: "__COMPANIES_TABLE__"
