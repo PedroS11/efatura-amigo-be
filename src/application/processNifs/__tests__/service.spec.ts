@@ -86,10 +86,10 @@ describe("service", () => {
       const response = await processNif(nif);
 
       expect(response).toBeTruthy();
-      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", 9);
+      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", 8);
       expect(logMessageMock).toHaveBeenNthCalledWith(2, "Finished processing NIF", {
         cae: ["56303", "56101", "10712", "10711"],
-        category: 9,
+        category: 8,
         nif: 1234556789
       });
     });

@@ -5,8 +5,7 @@ export enum Categories {
   Imoveis,
   Lares,
   Outros,
-  // Number 6 is a <p> tag
-  "Reparacao Automovel" = 7,
+  "Reparacao Automovel",
   "Reparacao Motas",
   "Alimentacao/Hotelaria",
   Cabeleireiro,
