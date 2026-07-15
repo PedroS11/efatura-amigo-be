@@ -14,7 +14,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
     return false;
   } else if (response.company === undefined) {
     logMessage(`Company ${nif} not found`, response);
-    await saveCompany(nif, "NOT_FOUND", undefined);
+    await saveCompany(nif, "NOT_FOUND");
 
     return true;
   }
@@ -35,7 +35,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
 
   const category = mapCaeToCategory(Number(caeAsString));
   // Even if no category was found, save it as undefined to avoid re processing the same item over again and waste credits
-  await saveCompany(company.nif, company.title, category);
+  await saveCompany(company.nif, company.title, category, caeAsString);
 
   logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 
