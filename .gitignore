@@ -11,3 +11,4 @@ dist
 layers
 coverage
 .env
+.DS_Store

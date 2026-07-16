@@ -1,7 +1,15 @@
 import type { Stack } from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
-import { type CfnStage, CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
+import {
+  ApiMapping,
+  type CfnStage,
+  CorsHttpMethod,
+  DomainName,
+  HttpApi,
+  HttpMethod
+} from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { Certificate, CertificateValidation } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
@@ -14,6 +22,16 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
   const cfnLogGroup = apiAccessLogs.node.defaultChild as cdk.aws_logs.CfnLogGroup;
   cfnLogGroup.retentionInDays = 3;
 
+  const certificate = new Certificate(stack, "ApiCertificate", {
+    domainName: "efatura.pedroosilva.dev",
+    validation: CertificateValidation.fromDns()
+  });
+
+  const domainName = new DomainName(stack, "CustomDomain", {
+    domainName: "efatura.pedroosilva.dev",
+    certificate
+  });
+
   const httpApi = new HttpApi(stack, "EfaturaAmigoApi", {
     apiName: "EfaturaAmigoApi",
     createDefaultStage: true,
@@ -22,6 +40,12 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
       allowOrigins: ["*"],
       allowHeaders: ["Content-Type"]
     }
+  });
+
+  new ApiMapping(stack, "ApiMapping", {
+    api: httpApi,
+    domainName,
+    stage: httpApi.defaultStage!
   });
 
   // We check if defaultStage exists (it does, because we set true above)
