@@ -9,7 +9,7 @@ import {
   HttpMethod
 } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
-import { Certificate, CertificateValidation } from "aws-cdk-lib/aws-certificatemanager";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
@@ -22,10 +22,11 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
   const cfnLogGroup = apiAccessLogs.node.defaultChild as cdk.aws_logs.CfnLogGroup;
   cfnLogGroup.retentionInDays = 3;
 
-  const certificate = new Certificate(stack, "ApiCertificate", {
-    domainName: "efatura.pedroosilva.dev",
-    validation: CertificateValidation.fromDns()
-  });
+  const certificate = Certificate.fromCertificateArn(
+    stack,
+    "Certificate",
+    "arn:aws:acm:eu-west-2:566348719618:certificate/fb2f1006-2eed-4b81-8758-99333cfb8029"
+  );
 
   const domainName = new DomainName(stack, "CustomDomain", {
     domainName: "efatura.pedroosilva.dev",
