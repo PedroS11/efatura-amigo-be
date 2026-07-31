@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DEPLOY_ENV: ${{ github.event.pull_request.number }}
+      DEPLOY_ENV: ${{ github.head_ref }}
 
     steps:
       - name: Checkout code
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DEPLOY_ENV: ${{ github.event.pull_request.number }}
+      DEPLOY_ENV: ${{ github.head_ref }}
 
     steps:
       - name: Checkout code
