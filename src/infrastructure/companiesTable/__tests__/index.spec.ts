@@ -1,9 +1,9 @@
 import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { BatchGetCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import type { MockInstance } from "vitest";
 
 import { getDynamoInstance } from "../../utils/aws/dynamo/utils";
-import { getCompany, getExistingNifsFromList, saveCompany } from "../index";
+import { getCompany, saveCompany } from "../index";
 import type { Company } from "../types";
 import { Categories } from "../types";
 import { getCompanyFixture } from "./__fixtures__/company";
@@ -84,36 +84,6 @@ describe("companiesTable", () => {
           updatedAt: 949410000000
         },
         TableName: "__COMPANIES_TABLE__"
-      });
-    });
-  });
-
-  describe("getExistingNifsFromList", () => {
-    it("should return existing nifs in the database from list", async () => {
-      sendMock.mockResolvedValueOnce({
-        Responses: {
-          __COMPANIES_TABLE__: [companyFixture]
-        }
-      });
-
-      const result = await getExistingNifsFromList([123456789, 987654321]);
-
-      expect(result).toEqual([123456789]);
-      expect(sendMock.mock.calls[0][0]).instanceof(BatchGetCommand);
-      expect(sendMock.mock.calls[0][0].input).toEqual({
-        RequestItems: {
-          __COMPANIES_TABLE__: {
-            Keys: [
-              {
-                nif: 123456789
-              },
-              {
-                nif: 987654321
-              }
-            ],
-            ProjectionExpression: "nif"
-          }
-        }
       });
     });
   });

@@ -1,4 +1,3 @@
-import { getExistingNifsFromList } from "../../infrastructure/companiesTable";
 import { getCredits } from "../../infrastructure/nif-pt";
 import { MAX_REQUESTS_PER_MINUTE } from "../../infrastructure/nif-pt/constants";
 import { sendMessage } from "../../infrastructure/telegramBot";
@@ -20,17 +19,13 @@ export const handler = async (): Promise<void> => {
     return;
   }
 
-  let nifs = rows.map(({ nif }) => nif);
+  let unprocessedNifs = rows.map(({ nif }) => nif);
 
-  if (nifs.length > credits.minute) {
-    nifs = nifs.slice(0, credits.minute);
+  if (unprocessedNifs.length > credits.minute) {
+    unprocessedNifs = unprocessedNifs.slice(0, credits.minute);
   }
 
-  const existingNifs = await getExistingNifsFromList(nifs);
-
-  const unprocessedNifs = nifs.filter(nif => !existingNifs.includes(nif));
-
-  const nifsToDelete = [...existingNifs];
+  const nifsToDelete: number[] = [];
 
   for (const unprocessedNif of unprocessedNifs) {
     try {
@@ -49,6 +44,6 @@ export const handler = async (): Promise<void> => {
   while (nifsToDelete.length > 0) {
     const batch = nifsToDelete.splice(0, MAX_ITEMS_PER_BATCH);
 
-    await deleteBatch(batch.map(nif => nif));
+    await deleteBatch(batch);
   }
 };

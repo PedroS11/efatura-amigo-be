@@ -1,6 +1,4 @@
 import type { MockInstance } from "vitest";
-
-import { getExistingNifsFromList } from "../../../infrastructure/companiesTable";
 import { getCredits } from "../../../infrastructure/nif-pt";
 import type { Credit } from "../../../infrastructure/nif-pt/types";
 import { sendMessage } from "../../../infrastructure/telegramBot";
@@ -20,7 +18,6 @@ vi.mock("../../../infrastructure/telegramBot");
 describe("handler", () => {
   let getCreditsMock: MockInstance;
   let processNifMock: MockInstance;
-  let getExistingNifsFromListMock: MockInstance;
   let getUnprocessedCompaniesMock: MockInstance;
   let deleteBatchMock: MockInstance;
   let logMessageMock: MockInstance;
@@ -29,7 +26,6 @@ describe("handler", () => {
   beforeEach(() => {
     getCreditsMock = vi.mocked(getCredits);
     processNifMock = vi.mocked(processNif);
-    getExistingNifsFromListMock = vi.mocked(getExistingNifsFromList);
     getUnprocessedCompaniesMock = vi.mocked(getUnprocessedCompanies);
     deleteBatchMock = vi.mocked(deleteBatch);
     logMessageMock = vi.mocked(logMessage);
@@ -97,7 +93,6 @@ describe("handler", () => {
         timestamp: 1769720041556
       }
     ] as UnprocessedCompany[]);
-    getExistingNifsFromListMock.mockResolvedValue([]);
     processNifMock.mockResolvedValue(true);
 
     const response = await handler();
@@ -128,14 +123,14 @@ describe("handler", () => {
         timestamp: 1769720041556
       }
     ] as UnprocessedCompany[]);
-    getExistingNifsFromListMock.mockResolvedValue([987654321]);
     processNifMock.mockResolvedValue(true);
 
     const response = await handler();
 
     expect(response).toEqual(undefined);
-    expect(processNifMock).toHaveBeenCalledWith(123456789);
-    expect(deleteBatchMock).toHaveBeenCalledWith([987654321, 123456789]);
+    expect(processNifMock).toHaveBeenNthCalledWith(1, 123456789);
+    expect(processNifMock).toHaveBeenNthCalledWith(2, 987654321);
+    expect(deleteBatchMock).toHaveBeenCalledWith([123456789, 987654321]);
   });
 
   it("should not remove nifs that failed the processing", async () => {
@@ -156,14 +151,14 @@ describe("handler", () => {
         timestamp: 1769720041556
       }
     ] as UnprocessedCompany[]);
-    getExistingNifsFromListMock.mockResolvedValue([987654321]);
     processNifMock.mockResolvedValue(false);
 
     const response = await handler();
 
     expect(response).toEqual(undefined);
-    expect(processNifMock).toHaveBeenCalledWith(123456789);
-    expect(deleteBatchMock).toHaveBeenCalledWith([987654321]);
+    expect(processNifMock).toHaveBeenNthCalledWith(1, 123456789);
+    expect(processNifMock).toHaveBeenNthCalledWith(2, 987654321);
+    expect(deleteBatchMock).not.toHaveBeenCalled();
     expect(sendMessageMock).toHaveBeenCalledWith("Failed to process nif 123456789");
   });
 
@@ -185,14 +180,14 @@ describe("handler", () => {
         timestamp: 1769720041556
       }
     ] as UnprocessedCompany[]);
-    getExistingNifsFromListMock.mockResolvedValue([987654321]);
     processNifMock.mockRejectedValue(new Error("An error occurred."));
 
     const response = await handler();
 
     expect(response).toEqual(undefined);
-    expect(processNifMock).toHaveBeenCalledWith(123456789);
-    expect(deleteBatchMock).toHaveBeenCalledWith([987654321]);
+    expect(processNifMock).toHaveBeenNthCalledWith(1, 123456789);
+    expect(processNifMock).toHaveBeenNthCalledWith(2, 987654321);
+    expect(deleteBatchMock).not.toHaveBeenCalled();
     expect(sendMessageMock).toHaveBeenCalledWith("Error thrown processing nif 123456789, error: An error occurred.");
   });
 });
