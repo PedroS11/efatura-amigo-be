@@ -19,7 +19,7 @@ export const createProcessNifsLambda = (stack: Stack): LambdaFunction =>
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/processNifs"),
-    memorySize: 128,
+    memorySize: 256,
     logRetention: RetentionDays.THREE_DAYS,
     architecture: Architecture.ARM_64,
     timeout: Duration.minutes(1),
