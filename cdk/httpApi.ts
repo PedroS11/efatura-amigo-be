@@ -30,7 +30,7 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
   );
 
   const domainName = new DomainName(stack, "CustomDomain", {
-    domainName: `efatura.pedroosilva.dev${!isMain() ? `/${getBranchName()}` : ""}`,
+    domainName: `efatura.pedroosilva.dev`,
     certificate
   });
 
@@ -47,7 +47,8 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
   new ApiMapping(stack, "ApiMapping", {
     api: httpApi,
     domainName,
-    stage: httpApi.defaultStage!
+    stage: httpApi.defaultStage!,
+    apiMappingKey: isMain() ? undefined : getBranchName()
   });
 
   // We check if defaultStage exists (it does, because we set true above)
