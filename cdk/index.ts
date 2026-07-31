@@ -2,13 +2,14 @@
 import * as cdk from "aws-cdk-lib";
 
 import { Stack } from "./stack";
+import { getBranchName, isMain } from "./utils";
 
 const app = new cdk.App();
 
 const getStackName = () => {
   let stackname = "EfaturaAmigoBeStack";
-  if (process.env.DEPLOY_ENV) {
-    stackname += `--${process.env.DEPLOY_ENV}`;
+  if (!isMain()) {
+    stackname += `--${getBranchName()}`;
   }
 
   return stackname;

@@ -12,6 +12,7 @@ import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
+import { getBranchName, isMain } from "./utils";
 
 export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
@@ -29,7 +30,7 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
   );
 
   const domainName = new DomainName(stack, "CustomDomain", {
-    domainName: "efatura.pedroosilva.dev",
+    domainName: `efatura.pedroosilva.dev${!isMain() ? `/${getBranchName()}` : ""}`,
     certificate
   });
 
