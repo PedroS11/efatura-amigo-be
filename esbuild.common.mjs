@@ -1,16 +1,13 @@
 import esbuild from "esbuild";
 
-// Create the esbuild build configuration
-esbuild
+export const build = options => esbuild
   .build({
     entryPoints: ["src/application/**/*.ts"],
     bundle: true,
     format: "esm",
     outdir: "dist",
-    sourcemap: true,
-    minify: true,
     outExtension: { ".js": ".mjs" },
-    target: "node22",
+    target: "node24",
     platform: "node",
     external: ["@aws-sdk/*"],
     banner: {
@@ -23,6 +20,6 @@ esbuild
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
       `
-    }
+    },
+      ...options
   })
-  .catch(() => process.exit(1));

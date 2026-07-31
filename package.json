@@ -5,7 +5,8 @@
     "efatura-amigo-be": "cdk/index.js"
   },
   "scripts": {
-    "build": "node esbuild.config.mjs && tsc -noEmit --incremental",
+    "build": "node esbuild.deploy.mjs && tsc -noEmit --incremental",
+    "build:local": "node esbuild.local.mjs && tsc -noEmit --incremental",
     "watch": "tsc -w",
     "cdk": "cdk synth",
     "lint": "biome check src cdk",

@@ -70,6 +70,7 @@ export class Stack extends cdk.Stack {
     const resyncLambda = createResyncLambda(this);
     companiesTable.grantReadWriteData(resyncLambda);
     resyncLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
+    resyncLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
     /**
      * HTTP Api
