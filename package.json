@@ -15,28 +15,28 @@
     "test:coverage": "vitest run --coverage --config ./vitest.config.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.14",
-    "@types/aws-lambda": "^8.10.160",
-    "@types/node": "22.7.9",
-    "@vitest/coverage-v8": "^3.0.9",
-    "aws-cdk": "2.1007.0",
-    "esbuild": "^0.27.2",
-    "globals": "^17.1.0",
+    "@biomejs/biome": "^2.5.6",
+    "@types/aws-lambda": "^8.10.162",
+    "@types/node": "22.20.1",
+    "@vitest/coverage-v8": "^3.2.7",
+    "aws-cdk": "2.1134.0",
+    "esbuild": "^0.28.1",
+    "globals": "^17.8.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
+    "lint-staged": "^16.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "~5.6.3",
-    "vitest": "^3.0.9"
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.7"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.974.0",
-    "@aws-sdk/client-sqs": "^3.974.0",
-    "@aws-sdk/lib-dynamodb": "^3.974.0",
-    "aws-cdk-lib": "2.186.0",
+    "@aws-sdk/client-dynamodb": "^3.1100.0",
+    "@aws-sdk/client-sqs": "^3.1100.0",
+    "@aws-sdk/lib-dynamodb": "^3.1100.0",
+    "aws-cdk-lib": "2.262.2",
     "aws-sdk": "^2.1693.0",
-    "axios": "^1.13.3",
-    "constructs": "^10.0.0",
-    "dotenv": "^17.2.3",
+    "axios": "^1.19.0",
+    "constructs": "^10.8.0",
+    "dotenv": "^17.4.2",
     "telegraf": "^4.16.3"
   }
 }

@@ -8,8 +8,8 @@ import type { UnprocessedCompany } from "./types";
 const UNPROCESSED_COMPANIES_TABLE = getEnvironmentVariable("UNPROCESSED_COMPANIES_TABLE");
 
 /**
- * Get category by NIF
- * @param {number} nif - Nif
+ * Get a specified number of unprocessed companies
+ * @param {number} limit - Number of unprocessed companies to retrieve
  */
 export const getUnprocessedCompanies = async (limit: number): Promise<UnprocessedCompany[]> => {
   const db = getDynamoInstance();
@@ -39,7 +39,7 @@ export const getUnprocessedCompanies = async (limit: number): Promise<Unprocesse
   return companies;
 };
 
-export const deleteBatch = async (nifs: number[]) => {
+export const deleteBatch = async (nifs: number[]): Promise<void> => {
   const db = getDynamoInstance();
 
   const deleteRequests = nifs.map(nif => ({
@@ -59,7 +59,7 @@ export const deleteBatch = async (nifs: number[]) => {
   );
 };
 
-export const addCompany = async (nif: number) => {
+export const addCompanyToProcess = async (nif: number): Promise<void> => {
   const db = getDynamoInstance();
 
   const item: UnprocessedCompany = {

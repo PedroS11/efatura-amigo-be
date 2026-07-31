@@ -4,7 +4,7 @@ import { expect } from "vitest";
 
 import { getCompany } from "../../../infrastructure/companiesTable";
 import { Categories } from "../../../infrastructure/companiesTable/types";
-import { addCompany } from "../../../infrastructure/unprocessedCompaniesTable";
+import { addCompanyToProcess } from "../../../infrastructure/unprocessedCompaniesTable";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesTable");
@@ -16,7 +16,7 @@ describe("handler", () => {
 
   beforeEach(() => {
     getCategoryMock = vi.mocked(getCompany);
-    addCompanyMock = vi.mocked(addCompany);
+    addCompanyMock = vi.mocked(addCompanyToProcess);
   });
 
   afterEach(vi.resetAllMocks);

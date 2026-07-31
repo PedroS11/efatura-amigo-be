@@ -6,7 +6,7 @@ import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 export const createGetCategoryLambda = (stack: Stack): LambdaFunction =>
   new LambdaFunction(stack, "GetCategory", {
-    runtime: Runtime.NODEJS_22_X,
+    runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/getCategory"),
     memorySize: 128,
@@ -16,7 +16,7 @@ export const createGetCategoryLambda = (stack: Stack): LambdaFunction =>
 
 export const createProcessNifsLambda = (stack: Stack): LambdaFunction =>
   new LambdaFunction(stack, "ProcessNifs", {
-    runtime: Runtime.NODEJS_22_X,
+    runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/processNifs"),
     memorySize: 128,

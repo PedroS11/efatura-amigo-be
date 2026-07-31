@@ -2,7 +2,7 @@ import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 
 import { getCompany } from "../../infrastructure/companiesTable";
 import { Categories } from "../../infrastructure/companiesTable/types";
-import { addCompany } from "../../infrastructure/unprocessedCompaniesTable";
+import { addCompanyToProcess } from "../../infrastructure/unprocessedCompaniesTable";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import { isNifValid } from "../../infrastructure/utils/nifValidator";
 import type { GetCategoryResponse } from "./types";
@@ -25,7 +25,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
   // Category not in the DB
   if (company === undefined) {
-    await addCompany(nif);
+    await addCompanyToProcess(nif);
     // Category in the database with a valid category
   } else if (company.category !== undefined) {
     body = {

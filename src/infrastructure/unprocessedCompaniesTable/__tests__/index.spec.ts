@@ -2,7 +2,7 @@ import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { BatchWriteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import type { MockInstance } from "vitest";
 import { getDynamoInstance } from "../../utils/aws/dynamo";
-import { addCompany, deleteBatch, getUnprocessedCompanies } from "../index";
+import { addCompanyToProcess, deleteBatch, getUnprocessedCompanies } from "../index";
 import type { UnprocessedCompany } from "../types";
 
 vi.mock("../../utils/aws/dynamo");
@@ -114,9 +114,9 @@ describe("unprocessedCompaniesTable", () => {
     });
   });
 
-  describe("addCompany", () => {
+  describe("addCompanyToProcess", () => {
     it("should add company to be processed", async () => {
-      await addCompany(123456789);
+      await addCompanyToProcess(123456789);
 
       expect(sendMock.mock.calls[0][0]).instanceof(PutCommand);
       expect(sendMock.mock.calls[0][0].input).toEqual({
