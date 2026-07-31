@@ -1,5 +1,6 @@
 import { scanTable } from "../../infrastructure/companiesTable";
 import type { Company } from "../../infrastructure/companiesTable/types";
+import { addCompanyToProcess } from "../../infrastructure/unprocessedCompaniesTable";
 import type { DynamoDBFilter } from "../../infrastructure/utils/aws/dynamo/utils";
 
 export const handler = async (): Promise<void> => {
@@ -9,13 +10,16 @@ export const handler = async (): Promise<void> => {
       column: "caeRev3",
       comparator: "attribute_not_exists",
       value: undefined
+    },
+    {
+      column: "name",
+      comparator: "<>",
+      value: "NOT_FOUND"
     }
   ];
   const affectedCompanies: Company[] = await scanTable(filters);
-  console.log(JSON.stringify(affectedCompanies));
 
-  // Decrease its category by 1 and save
-  // for (const company of affectedCompanies) {
-  //   await addCompanyToProcess(company.nif);
-  // }
+  for (const company of affectedCompanies) {
+    await addCompanyToProcess(company.nif);
+  }
 };
