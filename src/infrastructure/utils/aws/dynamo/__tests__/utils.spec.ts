@@ -1,6 +1,6 @@
-import { getDynamoInstance } from "../index";
+import { getDynamoInstance } from "../utils";
 
-describe("dynamo", () => {
+describe("utils", () => {
   describe("getDynamoInstance", () => {
     it("should return the same DynamoDBDocumentClient instance", () => {
       const instance1 = getDynamoInstance();
