@@ -3,7 +3,7 @@ import { getCredits } from "../../infrastructure/nif-pt";
 import { MAX_REQUESTS_PER_MINUTE } from "../../infrastructure/nif-pt/constants";
 import { sendMessage } from "../../infrastructure/telegramBot";
 import { deleteBatch, getUnprocessedCompanies } from "../../infrastructure/unprocessedCompaniesTable";
-import { MAX_ITEMS_PER_BATCH } from "../../infrastructure/utils/aws/dynamo";
+import { MAX_ITEMS_PER_BATCH } from "../../infrastructure/utils/aws/dynamo/utils";
 import { logMessage } from "../../infrastructure/utils/logger";
 import { processNif } from "./service";
 

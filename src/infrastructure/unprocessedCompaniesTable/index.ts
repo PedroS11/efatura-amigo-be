@@ -1,7 +1,6 @@
 import type { ScanCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { BatchWriteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-
-import { getDynamoInstance } from "../utils/aws/dynamo";
+import { getDynamoInstance } from "../utils/aws/dynamo/utils";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import type { UnprocessedCompany } from "./types";
 

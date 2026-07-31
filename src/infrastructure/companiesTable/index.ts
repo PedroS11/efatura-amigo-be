@@ -1,6 +1,6 @@
-import { BatchGetCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { BatchGetCommand, GetCommand, PutCommand, ScanCommand, type ScanCommandOutput } from "@aws-sdk/lib-dynamodb";
 
-import { getDynamoInstance } from "../utils/aws/dynamo";
+import { type DynamoDBFilter, getDynamoInstance, mapFilterToFilterExpression } from "../utils/aws/dynamo/utils";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import type { Categories, Company } from "./types";
 
@@ -92,4 +92,33 @@ export const getExistingNifsFromList = async (nifs: number[]): Promise<Company["
   } while (retries < 3);
 
   return existingNifs;
+};
+
+export const scanTable = async (filters: DynamoDBFilter[]): Promise<Company[]> => {
+  const db = getDynamoInstance();
+
+  let lastEvaluatedKey: ScanCommandOutput["LastEvaluatedKey"];
+  const companies: Company[] = [];
+
+  const { filterExpression, expressionAttributeValues, expressionAttributeNames } =
+    mapFilterToFilterExpression(filters);
+
+  do {
+    const response: ScanCommandOutput = await db.send(
+      new ScanCommand({
+        TableName: COMPANIES_TABLE,
+        ...(lastEvaluatedKey && {
+          ExclusiveStartKey: lastEvaluatedKey
+        }),
+        FilterExpression: filterExpression,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ExpressionAttributeNames: expressionAttributeNames
+      })
+    );
+
+    companies.push(...((response.Items ?? []) as Company[]));
+    lastEvaluatedKey = response.LastEvaluatedKey;
+  } while (lastEvaluatedKey !== undefined);
+
+  return companies;
 };

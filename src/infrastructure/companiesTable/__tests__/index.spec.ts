@@ -2,13 +2,13 @@ import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { BatchGetCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import type { MockInstance } from "vitest";
 
-import { getDynamoInstance } from "../../utils/aws/dynamo";
+import { getDynamoInstance } from "../../utils/aws/dynamo/utils";
 import { getCompany, getExistingNifsFromList, saveCompany } from "../index";
 import type { Company } from "../types";
 import { Categories } from "../types";
 import { getCompanyFixture } from "./__fixtures__/company";
 
-vi.mock("../../utils/aws/dynamo");
+vi.mock("../../utils/aws/dynamo/utils");
 
 describe("companiesTable", () => {
   let sendMock: MockInstance;

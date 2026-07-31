@@ -1,11 +1,11 @@
 import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { BatchWriteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import type { MockInstance } from "vitest";
-import { getDynamoInstance } from "../../utils/aws/dynamo";
+import { getDynamoInstance } from "../../utils/aws/dynamo/utils";
 import { addCompanyToProcess, deleteBatch, getUnprocessedCompanies } from "../index";
 import type { UnprocessedCompany } from "../types";
 
-vi.mock("../../utils/aws/dynamo");
+vi.mock("../../utils/aws/dynamo/utils");
 
 describe("unprocessedCompaniesTable", () => {
   let sendMock: MockInstance;
