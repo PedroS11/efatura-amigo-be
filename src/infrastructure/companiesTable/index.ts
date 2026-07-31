@@ -111,7 +111,9 @@ export const scanTable = async (filters: DynamoDBFilter[]): Promise<Company[]> =
           ExclusiveStartKey: lastEvaluatedKey
         }),
         FilterExpression: filterExpression,
-        ExpressionAttributeValues: expressionAttributeValues,
+        ...(Object.keys(expressionAttributeValues ?? {}).length > 0 && {
+          ExpressionAttributeValues: expressionAttributeValues
+        }),
         ExpressionAttributeNames: expressionAttributeNames
       })
     );
