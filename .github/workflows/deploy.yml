@@ -43,4 +43,4 @@ jobs:
             --bootstrap-customer-key false
 
       - name: Deploy CDK Stack
-        run: npx cdk deploy --all --require-approval never
+        run: npx cdk deploy EfaturaAmigoBeStack --require-approval never
