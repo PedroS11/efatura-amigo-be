@@ -19,6 +19,7 @@ jobs:
 
     env:
       DEPLOY_ENV: ${{ github.head_ref }}
+      STACK_NAME: EfaturaAmigoBeStack--${{ github.head_ref }}
 
     steps:
       - name: Checkout code
@@ -58,6 +59,7 @@ jobs:
 
     env:
       DEPLOY_ENV: ${{ github.head_ref }}
+      STACK_NAME: EfaturaAmigoBeStack--${{ github.head_ref }}
 
     steps:
       - name: Checkout code
