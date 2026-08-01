@@ -41,7 +41,7 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
 
   if (isMain()) {
     const domainName = new DomainName(stack, "CustomDomain", {
-      domainName: `my_domain.dev`,
+      domainName: "efatura.pedroosilva.dev",
       certificate
     });
 
