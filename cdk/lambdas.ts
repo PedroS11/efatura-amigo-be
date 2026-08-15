@@ -42,7 +42,12 @@ export const createResyncLambda = (stack: Stack): LambdaFunction =>
     memorySize: 256,
     timeout: Duration.minutes(5),
     logRetention: RetentionDays.THREE_DAYS,
-    architecture: Architecture.ARM_64
+    architecture: Architecture.ARM_64,
+    environment: {
+      ALGOLIA_APPLICATION_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaApplicationId"),
+      ALGOLIA_WRITE_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaWriteApiKey"),
+      ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
+    }
   });
 
 export const createSearchCompaniesLambda = (stack: Stack): LambdaFunction =>
