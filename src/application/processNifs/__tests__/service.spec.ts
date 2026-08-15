@@ -10,6 +10,7 @@ import { processNif } from "../service";
 vi.mock("../../../infrastructure/companiesTable");
 vi.mock("../../../infrastructure/nif-pt");
 vi.mock("../../../infrastructure/utils/logger");
+vi.mock("../../../infrastructure/utils/algolia");
 
 describe("service", () => {
   describe("processNif", () => {
@@ -25,6 +26,10 @@ describe("service", () => {
       logMessageMock = vi.mocked(logMessage);
       saveCompanyMock = vi.mocked(saveCompany);
       logErrorMock = vi.mocked(logError);
+
+      vi.useFakeTimers({
+        now: 1786835051652
+      });
     });
 
     afterEach(vi.resetAllMocks);
@@ -56,7 +61,13 @@ describe("service", () => {
         error: false,
         message: "Could not find any record for nif 1234556789"
       });
-      expect(saveCompanyMock).toHaveBeenCalledWith(1234556789, "NOT_FOUND", undefined, undefined);
+      expect(saveCompanyMock).toHaveBeenCalledWith({
+        caeRev3: undefined,
+        category: undefined,
+        name: "NOT_FOUND",
+        nif: 1234556789,
+        updatedAt: 1786835051652
+      });
     });
 
     it("should return true if cae not found", async () => {
@@ -86,7 +97,13 @@ describe("service", () => {
       const response = await processNif(nif);
 
       expect(response).toBeTruthy();
-      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", 8, "56303");
+      expect(saveCompanyMock).toHaveBeenCalledWith({
+        caeRev3: "56303",
+        category: 8,
+        name: "The Lake Caffé, Lda",
+        nif: 1234556789,
+        updatedAt: 1786835051652
+      });
       expect(logMessageMock).toHaveBeenNthCalledWith(2, "Finished processing NIF", {
         cae: ["56303", "56101", "10712", "10711"],
         category: 8,
@@ -105,7 +122,13 @@ describe("service", () => {
       const response = await processNif(nif);
 
       expect(response).toBeTruthy();
-      expect(saveCompanyMock).toHaveBeenCalledWith(515198374, "The Lake Caffé, Lda", undefined, "11111");
+      expect(saveCompanyMock).toHaveBeenCalledWith({
+        caeRev3: "11111",
+        category: undefined,
+        name: "The Lake Caffé, Lda",
+        nif: 1234556789,
+        updatedAt: 1786835051652
+      });
       expect(logMessageMock).toHaveBeenNthCalledWith(2, "Finished processing NIF", {
         cae: "11111",
         nif: 1234556789
