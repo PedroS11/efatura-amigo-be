@@ -55,7 +55,9 @@ export const scanTable = async (filters: DynamoDBFilter[]): Promise<Company[]> =
         ...(Object.keys(expressionAttributeValues ?? {}).length > 0 && {
           ExpressionAttributeValues: expressionAttributeValues
         }),
-        ExpressionAttributeNames: expressionAttributeNames
+        ...(Object.keys(expressionAttributeNames ?? {}).length > 0 && {
+          ExpressionAttributeNames: expressionAttributeNames
+        })
       })
     );
 
