@@ -12,6 +12,7 @@ import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
+import { isMain } from "./utils";
 
 export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
@@ -28,11 +29,6 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
     "arn:aws:acm:eu-west-2:566348719618:certificate/fb2f1006-2eed-4b81-8758-99333cfb8029"
   );
 
-  const domainName = new DomainName(stack, "CustomDomain", {
-    domainName: "efatura.pedroosilva.dev",
-    certificate
-  });
-
   const httpApi = new HttpApi(stack, "EfaturaAmigoApi", {
     apiName: "EfaturaAmigoApi",
     createDefaultStage: true,
@@ -43,11 +39,18 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
     }
   });
 
-  new ApiMapping(stack, "ApiMapping", {
-    api: httpApi,
-    domainName,
-    stage: httpApi.defaultStage!
-  });
+  if (isMain()) {
+    const domainName = new DomainName(stack, "CustomDomain", {
+      domainName: "efatura.pedroosilva.dev",
+      certificate
+    });
+
+    new ApiMapping(stack, "ApiMapping", {
+      api: httpApi,
+      domainName,
+      stage: httpApi.defaultStage!
+    });
+  }
 
   // We check if defaultStage exists (it does, because we set true above)
   if (httpApi.defaultStage?.node?.defaultChild) {

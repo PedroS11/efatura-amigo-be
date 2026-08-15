@@ -8,6 +8,7 @@ import type { Construct } from "constructs";
 import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
 import { createGetCategoryLambda, createProcessNifsLambda, createResyncLambda } from "./lambdas";
+import { isMain } from "./utils";
 
 export class Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -81,6 +82,8 @@ export class Stack extends cdk.Stack {
     /**
      * Set alerts to when hit free quotas
      */
-    createNoCostsBudget(this);
+    if (isMain()) {
+      createNoCostsBudget(this);
+    }
   }
 }
