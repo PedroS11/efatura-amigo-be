@@ -7,13 +7,10 @@ import { getEnvironmentVariable } from "../../infrastructure/utils/getEnvironmen
 const companiesIndex = getEnvironmentVariable("ALGOLIA_COMPANIES_INDEX");
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-  const query = event.pathParameters?.query;
+  const query = event.queryStringParameters?.query;
 
   if (!query || query === "") {
-    return {
-      body: "query is not valid",
-      statusCode: 400
-    };
+    return createHttpResponse(400, "No query send");
   }
 
   const companies = await searchObjects<Company>(companiesIndex, query);
