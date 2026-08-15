@@ -7,7 +7,12 @@ import type { Construct } from "constructs";
 
 import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
-import { createGetCategoryLambda, createProcessNifsLambda, createResyncLambda } from "./lambdas";
+import {
+  createGetCategoryLambda,
+  createProcessNifsLambda,
+  createResyncLambda,
+  createSearchCompaniesLambda
+} from "./lambdas";
 import { isMain } from "./utils";
 
 export class Stack extends cdk.Stack {
@@ -73,6 +78,12 @@ export class Stack extends cdk.Stack {
     unprocessedCompaniesTable.grantWriteData(resyncLambda);
     resyncLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
     resyncLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
+
+    /**
+     * Search Companies
+     */
+
+    createSearchCompaniesLambda(this);
 
     /**
      * HTTP Api

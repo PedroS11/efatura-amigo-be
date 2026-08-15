@@ -3,7 +3,10 @@ import type { Company } from "../../infrastructure/companiesTable/types";
 import { searchNif } from "../../infrastructure/nif-pt";
 import { saveObject } from "../../infrastructure/utils/algolia";
 import { mapCaeToCategory } from "../../infrastructure/utils/caeMapper";
+import { getEnvironmentVariable } from "../../infrastructure/utils/getEnvironmentVariable";
 import { logError, logMessage } from "../../infrastructure/utils/logger";
+
+const companiesIndex = getEnvironmentVariable("ALGOLIA_COMPANIES_INDEX");
 
 export const processNif = async (nif: number): Promise<boolean> => {
   logMessage("Processing NIF", nif);
@@ -26,7 +29,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
     };
 
     await saveCompany(company);
-    await saveObject("", company);
+    await saveObject(companiesIndex, company);
 
     return true;
   }
@@ -57,7 +60,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
 
   // TODO: Add Promise.all
   await saveCompany(companyToSave);
-  await saveObject("", companyToSave);
+  await saveObject(companiesIndex, companyToSave);
 
   logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 
