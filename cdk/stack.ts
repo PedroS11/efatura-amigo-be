@@ -1,5 +1,5 @@
 import * as cdk from "aws-cdk-lib";
-import { Duration } from "aws-cdk-lib";
+import { Duration, RemovalPolicy } from "aws-cdk-lib";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -22,7 +22,8 @@ export class Stack extends cdk.Stack {
         type: AttributeType.NUMBER,
         name: "nif"
       },
-      billing: Billing.onDemand()
+      billing: Billing.onDemand(),
+      removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
     });
 
     /**
@@ -33,7 +34,8 @@ export class Stack extends cdk.Stack {
         type: AttributeType.NUMBER,
         name: "nif"
       },
-      billing: Billing.onDemand()
+      billing: Billing.onDemand(),
+      removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
     });
 
     /**
