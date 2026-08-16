@@ -2,28 +2,19 @@ import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { searchCompanies } from "../../infrastructure/companiesIndex";
 import type { Company } from "../../infrastructure/companiesTable/types";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
+import { type SearchCompaniesQueryParams, SearchCompaniesQueryParamsSchema } from "./types";
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-  const query = event.queryStringParameters?.query;
+  const result = SearchCompaniesQueryParamsSchema.safeParse(event.queryStringParameters);
 
-  if (!query) {
+  if (!result.success) {
     return createHttpResponse(400, {
-      message: "No query send"
+      message: result.error.message,
+      issues: result.error.issues
     });
   }
 
-  const pagePath = event.queryStringParameters?.page;
-
-  let page: number | undefined;
-  if (pagePath) {
-    page = parseInt(pagePath, 10);
-
-    if (page < 0) {
-      return createHttpResponse(400, {
-        message: "Page must be greater or equal than 0"
-      });
-    }
-  }
+  const { query, page }: SearchCompaniesQueryParams = result.data;
 
   const companies: Company[] = await searchCompanies(query, page);
 
