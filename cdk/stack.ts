@@ -103,6 +103,8 @@ export class Stack extends cdk.Stack {
      */
 
     const getCompanyLambda = createGetCompanyLambda(this);
+    companiesTable.grantReadData(getCompanyLambda);
+    getCompanyLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
     /**
      * HTTP Api
