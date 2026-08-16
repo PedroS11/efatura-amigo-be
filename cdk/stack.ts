@@ -8,6 +8,7 @@ import type { Construct } from "constructs";
 import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
 import {
+  createAuthorizerLambda,
   createGetCategoryLambda,
   createGetCompanyLambda,
   createProcessNifsLambda,
@@ -92,6 +93,8 @@ export class Stack extends cdk.Stack {
      *********************************
      */
 
+    const authorizerLambda = createAuthorizerLambda(this);
+
     /**
      * Search Companies
      */
@@ -109,7 +112,7 @@ export class Stack extends cdk.Stack {
     /**
      * HTTP Api
      */
-    createHttpApi(this, getCategoryLambda, searchCompaniesLambda, getCompanyLambda);
+    createHttpApi(this, getCategoryLambda, searchCompaniesLambda, getCompanyLambda, authorizerLambda);
 
     /**
      * Set alerts to when hit free quotas

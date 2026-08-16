@@ -2,18 +2,11 @@ import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { searchCompanies } from "../../infrastructure/companiesIndex";
 import type { Company } from "../../infrastructure/companiesTable/types";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
-import { getEnvironmentVariable } from "../../infrastructure/utils/getEnvironmentVariable";
-
-const GoogleOAuthSub = getEnvironmentVariable("GOOGLE_OAUTH_SUB");
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-  if (event.requestContext.authorizer?.jwt.claims.sub !== GoogleOAuthSub) {
-    return createHttpResponse(403, "Not authorized");
-  }
-
   const query = event.queryStringParameters?.query;
 
-  if (!query || query === "") {
+  if (!query) {
     return createHttpResponse(400, {
       message: "No query send"
     });

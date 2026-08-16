@@ -8,19 +8,19 @@ import {
   HttpApi,
   HttpMethod
 } from "aws-cdk-lib/aws-apigatewayv2";
-import { HttpJwtAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
+import { HttpLambdaAuthorizer, HttpLambdaResponseType } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { getBranchName, isMain } from "./utils";
 
 export const createHttpApi = (
   stack: Stack,
   getCategoryLambda: LambdaFunction,
   searchCompaniesLambda: LambdaFunction,
-  getCompanyLambda: LambdaFunction
+  getCompanyLambda: LambdaFunction,
+  authorizerLambda: LambdaFunction
 ) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
@@ -86,8 +86,10 @@ export const createHttpApi = (
    * Private API
    */
 
-  const googleAuthorizer = new HttpJwtAuthorizer("GoogleAuthorizer", "https://accounts.google.com", {
-    jwtAudience: [StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")]
+  const googleAuthorizer = new HttpLambdaAuthorizer("GoogleLambdaAuthorizer", authorizerLambda, {
+    authorizerName: "GoogleLambdaAuthorizer",
+    identitySource: ["$request.header.Authorization"],
+    responseTypes: [HttpLambdaResponseType.SIMPLE]
   });
 
   httpApi.addRoutes({

@@ -76,3 +76,18 @@ export const createGetCompanyLambda = (stack: Stack): LambdaFunction =>
     logRetention: RetentionDays.THREE_DAYS,
     architecture: Architecture.ARM_64
   });
+
+export const createAuthorizerLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "Authorizer", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/authorizer"),
+    memorySize: 256,
+    logRetention: RetentionDays.THREE_DAYS,
+    architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(30),
+    environment: {
+      GOOGLE_OAUTH_SUB: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthSub"),
+      GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
+    }
+  });
