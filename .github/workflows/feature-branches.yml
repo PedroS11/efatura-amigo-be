@@ -1,4 +1,4 @@
-name: Deploy CDK
+name: Deploy feature branch
 
 on:
   pull_request:
