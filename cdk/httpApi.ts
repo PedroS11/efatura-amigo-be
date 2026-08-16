@@ -81,7 +81,7 @@ export const createHttpApi = (
   });
 
   const googleAuthorizer = new HttpJwtAuthorizer("GoogleAuthorizer", "https://accounts.google.com", {
-    jwtAudience: ["407408718192.apps.googleusercontent.com"]
+    jwtAudience: ["384434958438-tm5or7k1p4dv278kqrqhimcr9vcjhrko.apps.googleusercontent.com"]
   });
 
   httpApi.addRoutes({
