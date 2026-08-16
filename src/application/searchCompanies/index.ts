@@ -14,7 +14,9 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
   const query = event.queryStringParameters?.query;
 
   if (!query || query === "") {
-    return createHttpResponse(400, "No query send");
+    return createHttpResponse(400, {
+      message: "No query send"
+    });
   }
 
   const pagePath = event.queryStringParameters?.page;
@@ -24,7 +26,9 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
     page = parseInt(pagePath, 10);
 
     if (page < 0) {
-      return createHttpResponse(400, "Page must be greater or equal than 0");
+      return createHttpResponse(400, {
+        message: "Page must be greater or equal than 0"
+      });
     }
   }
 

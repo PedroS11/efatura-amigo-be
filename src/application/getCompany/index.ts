@@ -8,10 +8,9 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
   const nifPath = event.pathParameters?.nif;
 
   if (!isNifValid(nifPath)) {
-    return {
-      body: "Nif is missing or invalid number",
-      statusCode: 400
-    };
+    return createHttpResponse(400, {
+      message: "Nif is missing or invalid number"
+    });
   }
 
   const nif = Number(nifPath);

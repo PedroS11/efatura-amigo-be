@@ -18,7 +18,8 @@ import { getBranchName, isMain } from "./utils";
 export const createHttpApi = (
   stack: Stack,
   getCategoryLambda: LambdaFunction,
-  searchCompaniesLambda: LambdaFunction
+  searchCompaniesLambda: LambdaFunction,
+  getCompanyLambda: LambdaFunction
 ) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
@@ -80,6 +81,10 @@ export const createHttpApi = (
     integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
   });
 
+  /**
+   * Private API
+   */
+
   const googleAuthorizer = new HttpJwtAuthorizer("GoogleAuthorizer", "https://accounts.google.com", {
     jwtAudience: ["384434958438-tm5or7k1p4dv278kqrqhimcr9vcjhrko.apps.googleusercontent.com"]
   });
@@ -88,6 +93,13 @@ export const createHttpApi = (
     path: "/api/search",
     methods: [HttpMethod.GET],
     integration: new HttpLambdaIntegration("SearchCompaniesIntegration", searchCompaniesLambda),
+    authorizer: googleAuthorizer
+  });
+
+  httpApi.addRoutes({
+    path: "/api/company/{nif}",
+    methods: [HttpMethod.GET],
+    integration: new HttpLambdaIntegration("SetCompanyIntegration", getCompanyLambda),
     authorizer: googleAuthorizer
   });
 

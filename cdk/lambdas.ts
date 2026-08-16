@@ -65,3 +65,13 @@ export const createSearchCompaniesLambda = (stack: Stack): LambdaFunction =>
       ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
     }
   });
+
+export const createGetCompanyLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "GetCompany", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/getCompany"),
+    memorySize: 128,
+    logRetention: RetentionDays.THREE_DAYS,
+    architecture: Architecture.ARM_64
+  });

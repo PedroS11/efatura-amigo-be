@@ -9,6 +9,7 @@ import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
 import {
   createGetCategoryLambda,
+  createGetCompanyLambda,
   createProcessNifsLambda,
   createResyncLambda,
   createSearchCompaniesLambda
@@ -85,6 +86,12 @@ export class Stack extends cdk.Stack {
     resyncLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
     resyncLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
+    /*
+     *********************************
+     *********** PRIAVTE API *********
+     *********************************
+     */
+
     /**
      * Search Companies
      */
@@ -92,9 +99,15 @@ export class Stack extends cdk.Stack {
     const searchCompaniesLambda = createSearchCompaniesLambda(this);
 
     /**
+     * Get company
+     */
+
+    const getCompanyLambda = createGetCompanyLambda(this);
+
+    /**
      * HTTP Api
      */
-    createHttpApi(this, getCategoryLambda, searchCompaniesLambda);
+    createHttpApi(this, getCategoryLambda, searchCompaniesLambda, getCompanyLambda);
 
     /**
      * Set alerts to when hit free quotas
