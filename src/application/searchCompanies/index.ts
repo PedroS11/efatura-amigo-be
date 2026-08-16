@@ -13,7 +13,18 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
     return createHttpResponse(400, "No query send");
   }
 
-  const companies = await searchObjects<Company>(companiesIndex, query);
+  const pagePath = event.queryStringParameters?.page;
+
+  let page: number | undefined;
+  if (pagePath) {
+    page = parseInt(pagePath, 10);
+
+    if (page < 0) {
+      return createHttpResponse(400, "Page must be greater or equal than 0");
+    }
+  }
+
+  const companies = await searchObjects<Company>(companiesIndex, query, page);
 
   return createHttpResponse(200, JSON.stringify(companies));
 };

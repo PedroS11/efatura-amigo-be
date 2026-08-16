@@ -1,5 +1,6 @@
-import type { SearchResponses, UpdatedAtWithObjectIdResponse } from "@algolia/client-search";
+import type { UpdatedAtWithObjectIdResponse } from "@algolia/client-search";
 import { algoliasearch } from "algoliasearch";
+import type { SearchResult } from "algoliasearch/lite";
 import { getEnvironmentVariable } from "../getEnvironmentVariable";
 
 const client = algoliasearch(
@@ -18,12 +19,19 @@ export const saveObject = async <T>(
     indexName
   });
 
-export const searchObjects = async <T>(indexName: string, query: string): Promise<SearchResponses<T>> =>
-  await client.search({
+export const searchObjects = async <T>(
+  indexName: string,
+  query: string,
+  page: number | undefined
+): Promise<SearchResult<T>> => {
+  const response = await client.search({
     requests: [
       {
         indexName,
-        query: query
+        query: query,
+        page
       }
     ]
   });
+  return response.results[0];
+};

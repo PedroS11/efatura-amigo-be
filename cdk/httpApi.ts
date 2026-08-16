@@ -8,13 +8,18 @@ import {
   HttpApi,
   HttpMethod
 } from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpJwtAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 import { isMain } from "./utils";
 
-export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) => {
+export const createHttpApi = (
+  stack: Stack,
+  getCategoryLambda: LambdaFunction,
+  searchCompaniesLambda: LambdaFunction
+) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
   });
@@ -73,6 +78,17 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
     path: "/category/{nif}",
     methods: [HttpMethod.GET],
     integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
+  });
+
+  const googleAuthorizer = new HttpJwtAuthorizer("GoogleAuthorizer", "https://accounts.google.com", {
+    jwtAudience: ["384434958438-tm5or7k1p4dv278kqrqhimcr9vcjhrko.apps.googleusercontent.com"]
+  });
+
+  httpApi.addRoutes({
+    path: "/api/search",
+    methods: [HttpMethod.GET],
+    integration: new HttpLambdaIntegration("SearchCompaniesIntegration", searchCompaniesLambda),
+    authorizer: googleAuthorizer
   });
 
   new cdk.CfnOutput(stack, "ApiUrl", {

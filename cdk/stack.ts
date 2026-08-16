@@ -89,12 +89,12 @@ export class Stack extends cdk.Stack {
      * Search Companies
      */
 
-    createSearchCompaniesLambda(this);
+    const searchCompaniesLambda = createSearchCompaniesLambda(this);
 
     /**
      * HTTP Api
      */
-    createHttpApi(this, getCategoryLambda);
+    createHttpApi(this, getCategoryLambda, searchCompaniesLambda);
 
     /**
      * Set alerts to when hit free quotas
