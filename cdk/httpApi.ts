@@ -13,6 +13,7 @@ import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { getBranchName, isMain } from "./utils";
 
 export const createHttpApi = (
@@ -86,7 +87,7 @@ export const createHttpApi = (
    */
 
   const googleAuthorizer = new HttpJwtAuthorizer("GoogleAuthorizer", "https://accounts.google.com", {
-    jwtAudience: ["384434958438-tm5or7k1p4dv278kqrqhimcr9vcjhrko.apps.googleusercontent.com"]
+    jwtAudience: [StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")]
   });
 
   httpApi.addRoutes({
