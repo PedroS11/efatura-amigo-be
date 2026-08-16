@@ -6,7 +6,7 @@ describe("createHttpResponse", () => {
     expect(createHttpResponse(200, JSON.stringify(body))).toEqual({
       body: '{"test":"yes"}',
       headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
         "Access-Control-Allow-Methods": "OPTIONS,GET",
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"

@@ -4,7 +4,7 @@ export const createHttpResponse = (status: number, body: string): APIGatewayProx
   body,
   headers: {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type,Authorization",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "OPTIONS,GET"
   },
