@@ -1,10 +1,7 @@
 import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import { searchCompanies } from "../../infrastructure/companiesIndex";
 import type { Company } from "../../infrastructure/companiesTable/types";
-import { searchObjects } from "../../infrastructure/utils/algolia";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
-import { getEnvironmentVariable } from "../../infrastructure/utils/getEnvironmentVariable";
-
-const companiesIndex = getEnvironmentVariable("ALGOLIA_COMPANIES_INDEX");
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   if (event.requestContext.authorizer?.jwt.claims.sub !== "118343526005367396270") {
@@ -32,7 +29,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
     }
   }
 
-  const companies = await searchObjects<Company>(companiesIndex, query, page);
+  const companies: Company[] = await searchCompanies(query, page);
 
   return createHttpResponse(200, JSON.stringify(companies));
 };

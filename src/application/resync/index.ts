@@ -1,9 +1,6 @@
+import { saveCompanyInAlgolia } from "../../infrastructure/companiesIndex";
 import { scanTable } from "../../infrastructure/companiesTable";
 import type { Company } from "../../infrastructure/companiesTable/types";
-import { saveObject } from "../../infrastructure/utils/algolia";
-import { getEnvironmentVariable } from "../../infrastructure/utils/getEnvironmentVariable";
-
-const companiesIndex = getEnvironmentVariable("ALGOLIA_COMPANIES_INDEX");
 
 export const handler = async (): Promise<void> => {
   // Get all categories with 7 or higher and decrease it by
@@ -25,6 +22,6 @@ export const handler = async (): Promise<void> => {
   for (const company of affectedCompanies) {
     console.log(company);
     // await addCompanyToProcess(company.nif);
-    await saveObject(companiesIndex, company.nif.toString(), company);
+    await saveCompanyInAlgolia(company);
   }
 };
