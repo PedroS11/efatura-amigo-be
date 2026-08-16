@@ -24,18 +24,13 @@ export class Stack extends cdk.Stack {
     /**
      * Companies Table
      */
-    const companiesTable = TableV2.fromTableArn(
-      this,
-      "CompaniesTable",
-      "arn:aws:dynamodb:eu-west-2:566348719618:table/EfaturaAmigoBeStack-CompaniesTable16712407-1K4NMA25X9EQZ"
-    );
-    //     new TableV2(this, "CompaniesTable", {
-    //   partitionKey: {
-    //     type: AttributeType.NUMBER,
-    //     name: "nif"
-    //   },
-    //   billing: Billing.onDemand()
-    // });
+    const companiesTable = new TableV2(this, "CompaniesTable", {
+      partitionKey: {
+        type: AttributeType.NUMBER,
+        name: "nif"
+      },
+      billing: Billing.onDemand()
+    });
 
     /**
      * UnprocessedCompanies Table

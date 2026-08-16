@@ -8,6 +8,12 @@ const client = algoliasearch(
   getEnvironmentVariable("ALGOLIA_WRITE_API_KEY")
 );
 
+/**
+ * Saves object in specified index
+ * @param {string} indexName - Index name
+ * @param {string} objectID - Object id
+ * @param {T} item - Item to save
+ */
 export const saveObject = async <T>(
   indexName: string,
   objectID: string,
@@ -19,6 +25,12 @@ export const saveObject = async <T>(
     indexName
   });
 
+/**
+ * Search objects in specified index
+ * @param {string} indexName - Index name
+ * @param {string} query - Query string
+ * @param {number | undefined} page - Page number
+ */
 export const searchObjects = async <T>(
   indexName: string,
   query: string,
