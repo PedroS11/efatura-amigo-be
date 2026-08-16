@@ -1,4 +1,4 @@
-import type { SearchResponse } from "algoliasearch/lite";
+import type { Hit, SearchResponse } from "algoliasearch/lite";
 import type { Company } from "../companiesTable/types";
 import { saveObject, searchObjects } from "../utils/algolia";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
@@ -12,7 +12,7 @@ export const searchCompanies = async (query: string, page: number | undefined): 
     page
   )) as SearchResponse<Company>;
 
-  return response.hits;
+  return response.hits.map(({ _highlightResult, ...hit }: Hit<Company>): Company => hit);
 };
 
 export const saveCompanyInAlgolia = async (company: Company): Promise<void> => {
