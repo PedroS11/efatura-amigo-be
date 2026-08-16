@@ -8,13 +8,20 @@ import {
   HttpApi,
   HttpMethod
 } from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpLambdaAuthorizer, HttpLambdaResponseType } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
-import { isMain } from "./utils";
+import { getBranchName, isMain } from "./utils";
 
-export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) => {
+export const createHttpApi = (
+  stack: Stack,
+  getCategoryLambda: LambdaFunction,
+  searchCompaniesLambda: LambdaFunction,
+  getCompanyLambda: LambdaFunction,
+  authorizerLambda: LambdaFunction
+) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
   });
@@ -30,12 +37,12 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
   );
 
   const httpApi = new HttpApi(stack, "EfaturaAmigoApi", {
-    apiName: "EfaturaAmigoApi",
+    apiName: `EfaturaAmigoApi${!isMain() ? `--${getBranchName()}` : ""}`,
     createDefaultStage: true,
     corsPreflight: {
       allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS],
       allowOrigins: ["*"],
-      allowHeaders: ["Content-Type"]
+      allowHeaders: ["Content-Type", "Authorization"]
     }
   });
 
@@ -73,6 +80,30 @@ export const createHttpApi = (stack: Stack, getCategoryLambda: LambdaFunction) =
     path: "/category/{nif}",
     methods: [HttpMethod.GET],
     integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
+  });
+
+  /**
+   * Private API
+   */
+
+  const googleAuthorizer = new HttpLambdaAuthorizer("GoogleLambdaAuthorizer", authorizerLambda, {
+    authorizerName: "GoogleLambdaAuthorizer",
+    identitySource: ["$request.header.Authorization"],
+    responseTypes: [HttpLambdaResponseType.SIMPLE]
+  });
+
+  httpApi.addRoutes({
+    path: "/api/search",
+    methods: [HttpMethod.GET],
+    integration: new HttpLambdaIntegration("SearchCompaniesIntegration", searchCompaniesLambda),
+    authorizer: googleAuthorizer
+  });
+
+  httpApi.addRoutes({
+    path: "/api/company/{nif}",
+    methods: [HttpMethod.GET],
+    integration: new HttpLambdaIntegration("SetCompanyIntegration", getCompanyLambda),
+    authorizer: googleAuthorizer
   });
 
   new cdk.CfnOutput(stack, "ApiUrl", {

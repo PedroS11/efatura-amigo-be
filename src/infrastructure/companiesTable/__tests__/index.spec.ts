@@ -4,8 +4,7 @@ import type { MockInstance } from "vitest";
 
 import { getDynamoInstance } from "../../utils/aws/dynamo/utils";
 import { getCompany, saveCompany } from "../index";
-import type { Company } from "../types";
-import { Categories } from "../types";
+import { Categories, type Company } from "../types";
 import { getCompanyFixture } from "./__fixtures__/company";
 
 vi.mock("../../utils/aws/dynamo/utils");
@@ -72,7 +71,14 @@ describe("companiesTable", () => {
 
   describe("saveCompany", () => {
     it("should save company information", async () => {
-      await saveCompany(123456789, "Company name", Categories.Educacao, "88910");
+      const company: Company = {
+        name: "Company name",
+        nif: 123456789,
+        updatedAt: 949410000000,
+        caeRev3: "88910",
+        category: Categories.Educacao
+      };
+      await saveCompany(company);
 
       expect(sendMock.mock.calls[0][0]).instanceof(PutCommand);
       expect(sendMock.mock.calls[0][0].input).toEqual({

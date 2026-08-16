@@ -3,3 +3,4 @@ import { getEnvironmentVariable } from "../src/infrastructure/utils/getEnvironme
 export const isMain = (): boolean => !process.env.DEPLOY_ENV;
 
 export const getStackName = (): string => getEnvironmentVariable("STACK_NAME");
+export const getBranchName = (): string => getEnvironmentVariable("DEPLOY_ENV");

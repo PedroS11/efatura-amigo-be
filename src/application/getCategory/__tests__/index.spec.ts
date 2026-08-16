@@ -49,7 +49,7 @@ describe("handler", () => {
     expect(response).toEqual({
       body: '{"id":2,"name":"Educacao"}',
       headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
         "Access-Control-Allow-Methods": "OPTIONS,GET",
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"
@@ -72,7 +72,7 @@ describe("handler", () => {
     expect(response).toEqual({
       body: "{}",
       headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
         "Access-Control-Allow-Methods": "OPTIONS,GET",
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"
@@ -95,7 +95,7 @@ describe("handler", () => {
     expect(response).toEqual({
       body: "{}",
       headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
         "Access-Control-Allow-Methods": "OPTIONS,GET",
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"

@@ -7,7 +7,14 @@ import type { Construct } from "constructs";
 
 import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
-import { createGetCategoryLambda, createProcessNifsLambda, createResyncLambda } from "./lambdas";
+import {
+  createAuthorizerLambda,
+  createGetCategoryLambda,
+  createGetCompanyLambda,
+  createProcessNifsLambda,
+  createResyncLambda,
+  createSearchCompaniesLambda
+} from "./lambdas";
 import { isMain } from "./utils";
 
 export class Stack extends cdk.Stack {
@@ -22,8 +29,7 @@ export class Stack extends cdk.Stack {
         type: AttributeType.NUMBER,
         name: "nif"
       },
-      billing: Billing.onDemand(),
-      removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
+      billing: Billing.onDemand()
     });
 
     /**
@@ -76,10 +82,32 @@ export class Stack extends cdk.Stack {
     resyncLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
     resyncLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
+    /*
+     *********************************
+     *********** PRIVATE API *********
+     *********************************
+     */
+
+    const authorizerLambda = createAuthorizerLambda(this);
+
+    /**
+     * Search Companies
+     */
+
+    const searchCompaniesLambda = createSearchCompaniesLambda(this);
+
+    /**
+     * Get company
+     */
+
+    const getCompanyLambda = createGetCompanyLambda(this);
+    companiesTable.grantReadData(getCompanyLambda);
+    getCompanyLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
+
     /**
      * HTTP Api
      */
-    createHttpApi(this, getCategoryLambda);
+    createHttpApi(this, getCategoryLambda, searchCompaniesLambda, getCompanyLambda, authorizerLambda);
 
     /**
      * Set alerts to when hit free quotas

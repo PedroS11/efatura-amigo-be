@@ -1,4 +1,6 @@
+import { saveCompanyInAlgolia } from "../../infrastructure/companiesIndex";
 import { saveCompany } from "../../infrastructure/companiesTable";
+import type { Company } from "../../infrastructure/companiesTable/types";
 import { searchNif } from "../../infrastructure/nif-pt";
 import { mapCaeToCategory } from "../../infrastructure/utils/caeMapper";
 import { logError, logMessage } from "../../infrastructure/utils/logger";
@@ -14,7 +16,17 @@ export const processNif = async (nif: number): Promise<boolean> => {
     return false;
   } else if (response.company === undefined) {
     logMessage(`Company ${nif} not found`, response);
-    await saveCompany(nif, "NOT_FOUND", undefined, undefined);
+
+    const company: Company = {
+      category: undefined,
+      name: "NOT_FOUND",
+      nif,
+      caeRev3: undefined,
+      updatedAt: Date.now()
+    };
+
+    await saveCompany(company);
+    await saveCompanyInAlgolia(company);
 
     return true;
   }
@@ -35,7 +47,17 @@ export const processNif = async (nif: number): Promise<boolean> => {
 
   const category = mapCaeToCategory(Number(caeAsString));
   // Even if no category was found, save it as undefined to avoid re processing the same item over again and waste credits
-  await saveCompany(company.nif, company.title, category, caeAsString);
+  const companyToSave: Company = {
+    category,
+    name: company.title,
+    nif,
+    caeRev3: caeAsString,
+    updatedAt: Date.now()
+  };
+
+  // TODO: Add Promise.all
+  await saveCompany(companyToSave);
+  await saveCompanyInAlgolia(companyToSave);
 
   logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 
