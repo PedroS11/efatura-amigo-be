@@ -13,7 +13,7 @@ import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
-import { isMain } from "./utils";
+import { getBranchName, isMain } from "./utils";
 
 export const createHttpApi = (
   stack: Stack,
@@ -35,7 +35,7 @@ export const createHttpApi = (
   );
 
   const httpApi = new HttpApi(stack, "EfaturaAmigoApi", {
-    apiName: "EfaturaAmigoApi",
+    apiName: `EfaturaAmigoApi${!isMain() ? `--${getBranchName()}` : ""}`,
     createDefaultStage: true,
     corsPreflight: {
       allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS],
@@ -81,7 +81,7 @@ export const createHttpApi = (
   });
 
   const googleAuthorizer = new HttpJwtAuthorizer("GoogleAuthorizer", "https://accounts.google.com", {
-    jwtAudience: ["384434958438-tm5or7k1p4dv278kqrqhimcr9vcjhrko.apps.googleusercontent.com"]
+    jwtAudience: ["407408718192.apps.googleusercontent.com"]
   });
 
   httpApi.addRoutes({
