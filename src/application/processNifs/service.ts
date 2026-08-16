@@ -29,7 +29,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
     };
 
     await saveCompany(company);
-    await saveObject(companiesIndex, company);
+    await saveObject(companiesIndex, company.nif.toString(), company);
 
     return true;
   }
@@ -60,7 +60,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
 
   // TODO: Add Promise.all
   await saveCompany(companyToSave);
-  await saveObject(companiesIndex, companyToSave);
+  await saveObject(companiesIndex, company.nif.toString(), companyToSave);
 
   logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 

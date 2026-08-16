@@ -25,6 +25,6 @@ export const handler = async (): Promise<void> => {
   for (const company of affectedCompanies) {
     console.log(company);
     // await addCompanyToProcess(company.nif);
-    await saveObject(companiesIndex, company);
+    await saveObject(companiesIndex, company.nif.toString(), company);
   }
 };

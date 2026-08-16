@@ -13,18 +13,6 @@ permissions:
   contents: read
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug event
-        run: |
-          echo "event_name=${{ github.event_name }}"
-          echo "event_action=${{ github.event.action }}"
-          echo "ref=${{ github.ref }}"
-          echo "sha=${{ github.sha }}"
-          echo "head_ref=${{ github.head_ref }}"
-          echo "base_ref=${{ github.base_ref }}"
-
   deploy:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
