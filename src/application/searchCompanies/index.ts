@@ -9,7 +9,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
   if (!result.success) {
     return createHttpResponse(400, {
-      message: result.error.message,
+      message: "Invalid query string",
       issues: result.error.issues
     });
   }
