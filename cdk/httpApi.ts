@@ -82,6 +82,12 @@ export const createHttpApi = (
     integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
   });
 
+  httpApi.addRoutes({
+    path: "/api/category/{nif}",
+    methods: [HttpMethod.GET],
+    integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
+  });
+
   /**
    * Private API
    */
