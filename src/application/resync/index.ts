@@ -20,9 +20,11 @@ export const handler = async (): Promise<void> => {
   //   }
   // ];
   const affectedCompanies: Company[] = await scanTable([]);
+  console.log("count", affectedCompanies.length);
 
-  for (const _company of affectedCompanies) {
+  for (const company of affectedCompanies) {
+    console.log(company);
     // await addCompanyToProcess(company.nif);
-    await saveObject(companiesIndex, _company);
+    await saveObject(companiesIndex, company);
   }
 };
