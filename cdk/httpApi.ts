@@ -20,7 +20,8 @@ export const createHttpApi = (
   getCategoryLambda: LambdaFunction,
   searchCompaniesLambda: LambdaFunction,
   getCompanyLambda: LambdaFunction,
-  authorizerLambda: LambdaFunction
+  authorizerLambda: LambdaFunction,
+  getMetadataLambda: LambdaFunction
 ) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
@@ -109,6 +110,13 @@ export const createHttpApi = (
     path: "/api/company/{nif}",
     methods: [HttpMethod.GET],
     integration: new HttpLambdaIntegration("SetCompanyIntegration", getCompanyLambda),
+    authorizer: googleAuthorizer
+  });
+
+  httpApi.addRoutes({
+    path: "/api/metadata",
+    methods: [HttpMethod.GET],
+    integration: new HttpLambdaIntegration("GetMetadataIntegration", getMetadataLambda),
     authorizer: googleAuthorizer
   });
 

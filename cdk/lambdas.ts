@@ -90,3 +90,13 @@ export const createAuthorizerLambda = (stack: Stack): LambdaFunction =>
       GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
     }
   });
+
+export const createGetMetadataLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "GetMetadata", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/getMetadata"),
+    memorySize: 128,
+    logRetention: RetentionDays.THREE_DAYS,
+    architecture: Architecture.ARM_64
+  });

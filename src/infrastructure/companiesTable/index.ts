@@ -1,5 +1,5 @@
 import { GetCommand, PutCommand, ScanCommand, type ScanCommandOutput } from "@aws-sdk/lib-dynamodb";
-
+import { describeTable } from "../utils/aws/dynamo/describeTable";
 import { type DynamoDBFilter, getDynamoInstance, mapFilterToFilterExpression } from "../utils/aws/dynamo/utils";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import type { Company } from "./types";
@@ -69,3 +69,5 @@ export const scanTable = async (filters: DynamoDBFilter[]): Promise<Company[]> =
 
   return companies;
 };
+
+export const getCompaniesTableMetadata = async () => await describeTable(COMPANIES_TABLE);

@@ -1,5 +1,6 @@
 import type { ScanCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { BatchWriteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { describeTable } from "../utils/aws/dynamo/describeTable";
 import { getDynamoInstance } from "../utils/aws/dynamo/utils";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import type { UnprocessedCompany } from "./types";
@@ -73,3 +74,5 @@ export const addCompanyToProcess = async (nif: number): Promise<void> => {
     })
   );
 };
+
+export const getCompaniesTableMetadata = async () => await describeTable(UNPROCESSED_COMPANIES_TABLE);

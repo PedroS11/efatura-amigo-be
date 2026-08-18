@@ -11,6 +11,7 @@ import {
   createAuthorizerLambda,
   createGetCategoryLambda,
   createGetCompanyLambda,
+  createGetMetadataLambda,
   createProcessNifsLambda,
   createResyncLambda,
   createSearchCompaniesLambda
@@ -105,9 +106,26 @@ export class Stack extends cdk.Stack {
     getCompanyLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
 
     /**
+     * Get metadata
+     */
+
+    const getMetadataLambda = createGetMetadataLambda(this);
+    companiesTable.grantReadData(getMetadataLambda);
+    getMetadataLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
+    unprocessedCompaniesTable.grantReadData(getMetadataLambda);
+    getMetadataLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
+
+    /**
      * HTTP Api
      */
-    createHttpApi(this, getCategoryLambda, searchCompaniesLambda, getCompanyLambda, authorizerLambda);
+    createHttpApi(
+      this,
+      getCategoryLambda,
+      searchCompaniesLambda,
+      getCompanyLambda,
+      authorizerLambda,
+      getMetadataLambda
+    );
 
     /**
      * Set alerts to when hit free quotas
