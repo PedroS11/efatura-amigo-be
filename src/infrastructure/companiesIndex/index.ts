@@ -1,7 +1,8 @@
 import type { Hit, SearchResponse } from "algoliasearch/lite";
-import type { Company } from "../companiesTable/types";
+import { Categories, type Company } from "../companiesTable/types";
 import { saveObject, searchObjects } from "../utils/algolia";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
+import type { SearchCompaniesResponse, SearchedCompany } from "./types";
 
 const companiesIndex = getEnvironmentVariable("ALGOLIA_COMPANIES_INDEX");
 
@@ -10,14 +11,24 @@ const companiesIndex = getEnvironmentVariable("ALGOLIA_COMPANIES_INDEX");
  * @param {string} query - Query string
  * @param {number | undefined} page - Page number
  */
-export const searchCompanies = async (query: string, page: number | undefined): Promise<Company[]> => {
+export const searchCompanies = async (query: string, page: number | undefined): Promise<SearchCompaniesResponse> => {
   const response: SearchResponse<Company> = (await searchObjects<Company>(
     companiesIndex,
     query,
     page
   )) as SearchResponse<Company>;
 
-  return response.hits.map(({ _highlightResult, ...hit }: Hit<Company>): Company => hit);
+  return {
+    items: response.hits.map(
+      ({ _highlightResult, objectID, ...hit }: Hit<Company>): SearchedCompany => ({
+        ...hit,
+        category: hit.category ? Categories[hit.category] : undefined
+      })
+    ),
+    page: response.page!,
+    nrHits: response.nbHits!,
+    nrPages: response.nbPages!
+  };
 };
 
 /**

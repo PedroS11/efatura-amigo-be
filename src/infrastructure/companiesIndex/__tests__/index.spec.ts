@@ -23,6 +23,7 @@ describe("companiesIndex", () => {
         hits: [
           {
             nif: 123456789,
+            objectID: 123456789,
             name: "Company name",
             category: Categories.Educacao,
             updatedAt: 949410000000,
@@ -32,19 +33,27 @@ describe("companiesIndex", () => {
               }
             }
           }
-        ]
+        ],
+        page: 0,
+        nbHits: 1,
+        nbPages: 1
       });
 
       const companies = await searchCompanies("company", 0);
 
-      expect(companies).toEqual([
-        {
-          nif: 123456789,
-          name: "Company name",
-          category: Categories.Educacao,
-          updatedAt: 949410000000
-        }
-      ]);
+      expect(companies).toEqual({
+        items: [
+          {
+            category: "Educacao",
+            name: "Company name",
+            nif: 123456789,
+            updatedAt: 949410000000
+          }
+        ],
+        nrHits: 1,
+        nrPages: 1,
+        page: 0
+      });
       expect(searchObjectsMock).toHaveBeenCalledWith("__COMPANIES_INDEX__", "company", 0);
     });
   });
