@@ -1,5 +1,6 @@
 import type { APIGatewayProxyResult } from "aws-lambda";
 import { getCompaniesTableMetadata } from "../../infrastructure/companiesTable";
+import { getCredits } from "../../infrastructure/nif-pt";
 import { getUnprocessedCompaniesTableMetadata } from "../../infrastructure/unprocessedCompaniesTable";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import type { GetMetadataResponse } from "./types";
@@ -7,6 +8,7 @@ import type { GetMetadataResponse } from "./types";
 export const handler = async (): Promise<APIGatewayProxyResult> => {
   const companiesTableMetadata = await getCompaniesTableMetadata();
   const unprocessedCompaniesTableMetadata = await getUnprocessedCompaniesTableMetadata();
+  const credits = await getCredits();
 
   const metadata: GetMetadataResponse = {
     companiesTable: {
@@ -14,6 +16,9 @@ export const handler = async (): Promise<APIGatewayProxyResult> => {
     },
     unprocessedCompaniesTable: {
       itemCount: unprocessedCompaniesTableMetadata.Table?.ItemCount ?? 0
+    },
+    nif: {
+      credits
     }
   };
 
