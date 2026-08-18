@@ -7,7 +7,7 @@ export interface GetMetadataResponse {
   unprocessedCompaniesTable: {
     itemCount: number;
   };
-  nif: {
+  nifPt: {
     credits: Credit;
   };
 }

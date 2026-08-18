@@ -17,7 +17,7 @@ export const handler = async (): Promise<APIGatewayProxyResult> => {
     unprocessedCompaniesTable: {
       itemCount: unprocessedCompaniesTableMetadata.Table?.ItemCount ?? 0
     },
-    nif: {
+    nifPt: {
       credits
     }
   };
