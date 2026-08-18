@@ -75,4 +75,4 @@ export const addCompanyToProcess = async (nif: number): Promise<void> => {
   );
 };
 
-export const getCompaniesTableMetadata = async () => await describeTable(UNPROCESSED_COMPANIES_TABLE);
+export const getUnprocessedCompaniesTableMetadata = async () => await describeTable(UNPROCESSED_COMPANIES_TABLE);
