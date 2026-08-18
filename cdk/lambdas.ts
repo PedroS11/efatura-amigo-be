@@ -98,5 +98,8 @@ export const createGetMetadataLambda = (stack: Stack): LambdaFunction =>
     code: Code.fromAsset("dist/getMetadata"),
     memorySize: 128,
     logRetention: RetentionDays.THREE_DAYS,
-    architecture: Architecture.ARM_64
+    architecture: Architecture.ARM_64,
+    environment: {
+      NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
+    }
   });
