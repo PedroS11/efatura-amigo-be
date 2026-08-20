@@ -1,4 +1,4 @@
-import { jwtVerify } from "jose";
+import { errors, jwtVerify } from "jose";
 import type { MockInstance } from "vitest";
 
 import { getAuthorizationHeader, UnauthorizedError, verifyGoogleBearerToken } from "../verifyGoogleBearerToken";
@@ -7,10 +7,15 @@ const { mockJwks } = vi.hoisted(() => ({
   mockJwks: {}
 }));
 
-vi.mock("jose", () => ({
-  createRemoteJWKSet: vi.fn(() => mockJwks),
-  jwtVerify: vi.fn()
-}));
+vi.mock("jose", async importOriginal => {
+  const actual = await importOriginal<typeof import("jose")>();
+
+  return {
+    ...actual,
+    createRemoteJWKSet: vi.fn(() => mockJwks),
+    jwtVerify: vi.fn()
+  };
+});
 
 describe("verifyGoogleBearerToken", () => {
   let jwtVerifyMock: MockInstance;
@@ -96,10 +101,22 @@ describe("verifyGoogleBearerToken", () => {
       await expect(verifyGoogleBearerToken("Bearer valid-token")).rejects.toThrow(UnauthorizedError);
     });
 
-    it("should throw when token verification fails", async () => {
-      jwtVerifyMock.mockRejectedValue(new Error("Invalid token"));
+    it("should throw UnauthorizedError when token verification fails", async () => {
+      jwtVerifyMock.mockRejectedValue(new errors.JWTInvalid("Invalid token"));
 
-      await expect(verifyGoogleBearerToken("Bearer valid-token")).rejects.toThrow("Invalid token");
+      await expect(verifyGoogleBearerToken("Bearer valid-token")).rejects.toThrow(UnauthorizedError);
+    });
+
+    it("should throw UnauthorizedError when token is expired", async () => {
+      jwtVerifyMock.mockRejectedValue(new errors.JWTExpired("expired", {}));
+
+      await expect(verifyGoogleBearerToken("Bearer expired-token")).rejects.toThrow(UnauthorizedError);
+    });
+
+    it("should rethrow unexpected errors", async () => {
+      jwtVerifyMock.mockRejectedValue(new Error("Network error"));
+
+      await expect(verifyGoogleBearerToken("Bearer valid-token")).rejects.toThrow("Network error");
     });
   });
 });

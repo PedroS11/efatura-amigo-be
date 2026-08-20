@@ -1,6 +1,7 @@
-import { createRemoteJWKSet, jwtVerify } from "jose";
+import { createRemoteJWKSet, errors, jwtVerify } from "jose";
 
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
+import { logError } from "../utils/logger";
 import type { VerifiedGoogleUser } from "./types";
 
 const GOOGLE_ISSUER = "https://accounts.google.com";
@@ -23,18 +24,32 @@ export const verifyGoogleBearerToken = async (authorizationHeader: string | unde
 
   const token = authorizationHeader.replace(/^Bearer\s+/i, "");
 
-  const { payload } = await jwtVerify(token, GOOGLE_JWKS, {
-    issuer: [GOOGLE_ISSUER, "https://accounts.google.com"],
-    audience: getEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID")
-  });
+  try {
+    const { payload } = await jwtVerify(token, GOOGLE_JWKS, {
+      issuer: [GOOGLE_ISSUER, "https://accounts.google.com"],
+      audience: getEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID")
+    });
 
-  if (payload.sub !== getEnvironmentVariable("GOOGLE_OAUTH_SUB")) {
-    throw new UnauthorizedError();
+    if (payload.sub !== getEnvironmentVariable("GOOGLE_OAUTH_SUB")) {
+      throw new UnauthorizedError();
+    }
+
+    return {
+      sub: payload.sub,
+      email: typeof payload.email === "string" ? payload.email : undefined,
+      name: typeof payload.name === "string" ? payload.name : undefined
+    };
+  } catch (error) {
+    logError("Error verifying Google bearer token", error);
+
+    if (error instanceof UnauthorizedError) {
+      throw error;
+    }
+
+    if (error instanceof errors.JOSEError) {
+      throw new UnauthorizedError();
+    }
+
+    throw error;
   }
-
-  return {
-    sub: payload.sub,
-    email: typeof payload.email === "string" ? payload.email : undefined,
-    name: typeof payload.name === "string" ? payload.name : undefined
-  };
 };
