@@ -3,19 +3,13 @@ import type { MockInstance } from "vitest";
 
 import { getCompany } from "../../../infrastructure/companiesTable";
 import { Categories, type Company } from "../../../infrastructure/companiesTable/types";
+import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesTable");
 
 describe("handler", () => {
   let getCompanyMock: MockInstance;
-
-  const httpHeaders = {
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
-    "Access-Control-Allow-Methods": "OPTIONS,GET",
-    "Access-Control-Allow-Origin": "*",
-    "Content-Type": "application/json"
-  };
 
   beforeEach(() => {
     getCompanyMock = vi.mocked(getCompany);
@@ -34,7 +28,7 @@ describe("handler", () => {
       body: JSON.stringify({
         message: "Nif is missing or invalid number"
       }),
-      headers: httpHeaders,
+      headers: expectedHttpHeaders,
       statusCode: 400
     });
     expect(getCompanyMock).not.toHaveBeenCalled();
@@ -51,7 +45,7 @@ describe("handler", () => {
 
     expect(response).toEqual({
       body: "Not Found",
-      headers: httpHeaders,
+      headers: expectedHttpHeaders,
       statusCode: 404
     });
     expect(getCompanyMock).toHaveBeenCalledWith(502258241);
@@ -76,7 +70,7 @@ describe("handler", () => {
 
     expect(response).toEqual({
       body: JSON.stringify(company),
-      headers: httpHeaders,
+      headers: expectedHttpHeaders,
       statusCode: 200
     });
     expect(getCompanyMock).toHaveBeenCalledWith(502258241);

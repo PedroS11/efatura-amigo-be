@@ -5,6 +5,7 @@ import { expect } from "vitest";
 import { getCompany } from "../../../infrastructure/companiesTable";
 import { Categories } from "../../../infrastructure/companiesTable/types";
 import { addCompanyToProcess } from "../../../infrastructure/unprocessedCompaniesTable";
+import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesTable");
@@ -48,12 +49,7 @@ describe("handler", () => {
 
     expect(response).toEqual({
       body: '{"id":2,"name":"Educacao"}',
-      headers: {
-        "Access-Control-Allow-Headers": "Content-Type,Authorization",
-        "Access-Control-Allow-Methods": "OPTIONS,GET",
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
-      },
+      headers: expectedHttpHeaders,
       statusCode: 200
     });
     expect(getCategoryMock).toHaveBeenCalledWith(123456789);
@@ -71,12 +67,7 @@ describe("handler", () => {
 
     expect(response).toEqual({
       body: "{}",
-      headers: {
-        "Access-Control-Allow-Headers": "Content-Type,Authorization",
-        "Access-Control-Allow-Methods": "OPTIONS,GET",
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
-      },
+      headers: expectedHttpHeaders,
       statusCode: 200
     });
     expect(getCategoryMock).toHaveBeenCalledWith(123456789);
@@ -94,12 +85,7 @@ describe("handler", () => {
 
     expect(response).toEqual({
       body: "{}",
-      headers: {
-        "Access-Control-Allow-Headers": "Content-Type,Authorization",
-        "Access-Control-Allow-Methods": "OPTIONS,GET",
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
-      },
+      headers: expectedHttpHeaders,
       statusCode: 200
     });
     expect(getCategoryMock).toHaveBeenCalledWith(123456789);

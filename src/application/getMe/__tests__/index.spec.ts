@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2 } from "aws-lambda";
 import type { MockInstance } from "vitest";
 
 import { UnauthorizedError, verifyGoogleBearerToken } from "../../../infrastructure/auth/verifyGoogleBearerToken";
+import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/auth/verifyGoogleBearerToken", async importOriginal => {
@@ -15,13 +16,6 @@ vi.mock("../../../infrastructure/auth/verifyGoogleBearerToken", async importOrig
 
 describe("handler", () => {
   let verifyGoogleBearerTokenMock: MockInstance;
-
-  const httpHeaders = {
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
-    "Access-Control-Allow-Methods": "OPTIONS,GET",
-    "Access-Control-Allow-Origin": "*",
-    "Content-Type": "application/json"
-  };
 
   beforeEach(() => {
     verifyGoogleBearerTokenMock = vi.mocked(verifyGoogleBearerToken);
@@ -42,7 +36,7 @@ describe("handler", () => {
       body: JSON.stringify({
         message: "Unauthorized"
       }),
-      headers: httpHeaders,
+      headers: expectedHttpHeaders,
       statusCode: 401
     });
     expect(verifyGoogleBearerTokenMock).toHaveBeenCalledWith("Bearer invalid-token");
@@ -69,7 +63,7 @@ describe("handler", () => {
         name: "User Name",
         picture: "https://example.com/photo.jpg"
       }),
-      headers: httpHeaders,
+      headers: expectedHttpHeaders,
       statusCode: 200
     });
     expect(verifyGoogleBearerTokenMock).toHaveBeenCalledWith("Bearer valid-token");

@@ -5,7 +5,7 @@ import { HttpLambdaAuthorizer, HttpLambdaResponseType } from "aws-cdk-lib/aws-ap
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
-import { getBranchName, isMain } from "./utils";
+import { getAllowedOrigins, getBranchName, isMain } from "./utils";
 
 export const createHttpApi = (
   stack: Stack,
@@ -29,7 +29,7 @@ export const createHttpApi = (
     createDefaultStage: true,
     corsPreflight: {
       allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS],
-      allowOrigins: ["https://efatura.pedroosilva.dev"],
+      allowOrigins: getAllowedOrigins(),
       allowHeaders: ["Content-Type", "Authorization"]
     }
   });

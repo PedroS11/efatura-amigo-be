@@ -3,19 +3,13 @@ import type { MockInstance } from "vitest";
 
 import { searchCompanies } from "../../../infrastructure/companiesIndex";
 import { Categories, type Company } from "../../../infrastructure/companiesTable/types";
+import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesIndex");
 
 describe("handler", () => {
   let searchCompaniesMock: MockInstance;
-
-  const httpHeaders = {
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
-    "Access-Control-Allow-Methods": "OPTIONS,GET",
-    "Access-Control-Allow-Origin": "*",
-    "Content-Type": "application/json"
-  };
 
   beforeEach(() => {
     searchCompaniesMock = vi.mocked(searchCompanies);
@@ -69,7 +63,7 @@ describe("handler", () => {
 
     expect(response).toEqual({
       body: JSON.stringify(companies),
-      headers: httpHeaders,
+      headers: expectedHttpHeaders,
       statusCode: 200
     });
     expect(searchCompaniesMock).toHaveBeenCalledWith("company", undefined);
