@@ -29,7 +29,7 @@ export const createHttpApi = (
     createDefaultStage: true,
     corsPreflight: {
       allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS],
-      allowOrigins: ["*"],
+      allowOrigins: ["https://efatura.pedroosilva.dev"],
       allowHeaders: ["Content-Type", "Authorization"]
     }
   });
