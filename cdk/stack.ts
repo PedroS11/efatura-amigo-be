@@ -11,6 +11,7 @@ import {
   createAuthorizerLambda,
   createGetCategoryLambda,
   createGetCompanyLambda,
+  createGetMeLambda,
   createGetMetadataLambda,
   createProcessNifsLambda,
   createResyncLambda,
@@ -116,6 +117,12 @@ export class Stack extends cdk.Stack {
     getMetadataLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
     /**
+     * Get me
+     */
+
+    const getMeLambda = createGetMeLambda(this);
+
+    /**
      * HTTP Api
      */
     createHttpApi(
@@ -124,7 +131,8 @@ export class Stack extends cdk.Stack {
       searchCompaniesLambda,
       getCompanyLambda,
       authorizerLambda,
-      getMetadataLambda
+      getMetadataLambda,
+      getMeLambda
     );
 
     /**

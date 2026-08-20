@@ -1,16 +1,8 @@
 import type { Stack } from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
-import {
-  ApiMapping,
-  type CfnStage,
-  CorsHttpMethod,
-  DomainName,
-  HttpApi,
-  HttpMethod
-} from "aws-cdk-lib/aws-apigatewayv2";
+import { type CfnStage, CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaAuthorizer, HttpLambdaResponseType } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 import { getBranchName, isMain } from "./utils";
@@ -21,7 +13,8 @@ export const createHttpApi = (
   searchCompaniesLambda: LambdaFunction,
   getCompanyLambda: LambdaFunction,
   authorizerLambda: LambdaFunction,
-  getMetadataLambda: LambdaFunction
+  getMetadataLambda: LambdaFunction,
+  getMeLambda: LambdaFunction
 ) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
@@ -30,12 +23,6 @@ export const createHttpApi = (
   // To avoid creating a lambda just for log retention that used node 20 (soon to stop being supported)
   const cfnLogGroup = apiAccessLogs.node.defaultChild as cdk.aws_logs.CfnLogGroup;
   cfnLogGroup.retentionInDays = 3;
-
-  const certificate = Certificate.fromCertificateArn(
-    stack,
-    "Certificate",
-    "arn:aws:acm:eu-west-2:566348719618:certificate/fb2f1006-2eed-4b81-8758-99333cfb8029"
-  );
 
   const httpApi = new HttpApi(stack, "EfaturaAmigoApi", {
     apiName: `EfaturaAmigoApi${!isMain() ? `--${getBranchName()}` : ""}`,
@@ -46,19 +33,6 @@ export const createHttpApi = (
       allowHeaders: ["Content-Type", "Authorization"]
     }
   });
-
-  if (isMain()) {
-    const domainName = new DomainName(stack, "CustomDomain", {
-      domainName: "efatura.pedroosilva.dev",
-      certificate
-    });
-
-    new ApiMapping(stack, "ApiMapping", {
-      api: httpApi,
-      domainName,
-      stage: httpApi.defaultStage!
-    });
-  }
 
   // We check if defaultStage exists (it does, because we set true above)
   if (httpApi.defaultStage?.node?.defaultChild) {
@@ -77,6 +51,7 @@ export const createHttpApi = (
     };
   }
 
+  // Legacy, to be deleted
   httpApi.addRoutes({
     path: "/category/{nif}",
     methods: [HttpMethod.GET],
@@ -118,6 +93,12 @@ export const createHttpApi = (
     methods: [HttpMethod.GET],
     integration: new HttpLambdaIntegration("GetMetadataIntegration", getMetadataLambda),
     authorizer: googleAuthorizer
+  });
+
+  httpApi.addRoutes({
+    path: "/api/me",
+    methods: [HttpMethod.GET],
+    integration: new HttpLambdaIntegration("GetMeIntegration", getMeLambda)
   });
 
   new cdk.CfnOutput(stack, "ApiUrl", {

@@ -103,3 +103,17 @@ export const createGetMetadataLambda = (stack: Stack): LambdaFunction =>
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
     }
   });
+
+export const createGetMeLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "GetMe", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/getMe"),
+    memorySize: 128,
+    logRetention: RetentionDays.THREE_DAYS,
+    architecture: Architecture.ARM_64,
+    environment: {
+      GOOGLE_OAUTH_SUB: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthSub"),
+      GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
+    }
+  });

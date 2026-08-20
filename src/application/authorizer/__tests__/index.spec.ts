@@ -1,23 +1,23 @@
 import type { APIGatewayRequestAuthorizerEventV2 } from "aws-lambda";
-import { jwtVerify } from "jose";
 import type { MockInstance } from "vitest";
 
+import { UnauthorizedError, verifyGoogleBearerToken } from "../../../infrastructure/auth/verifyGoogleBearerToken";
 import { logError } from "../../../infrastructure/utils/logger";
 import { handler } from "../index";
 
-const { mockJwks } = vi.hoisted(() => ({
-  mockJwks: {}
-}));
+vi.mock("../../../infrastructure/auth/verifyGoogleBearerToken", async importOriginal => {
+  const actual = await importOriginal<typeof import("../../../infrastructure/auth/verifyGoogleBearerToken")>();
 
-vi.mock("jose", () => ({
-  createRemoteJWKSet: vi.fn(() => mockJwks),
-  jwtVerify: vi.fn()
-}));
+  return {
+    ...actual,
+    verifyGoogleBearerToken: vi.fn()
+  };
+});
 
 vi.mock("../../../infrastructure/utils/logger");
 
 describe("handler", () => {
-  let jwtVerifyMock: MockInstance;
+  let verifyGoogleBearerTokenMock: MockInstance;
   let logErrorMock: MockInstance;
 
   const event = {
@@ -25,13 +25,15 @@ describe("handler", () => {
   } as APIGatewayRequestAuthorizerEventV2;
 
   beforeEach(() => {
-    jwtVerifyMock = vi.mocked(jwtVerify);
+    verifyGoogleBearerTokenMock = vi.mocked(verifyGoogleBearerToken);
     logErrorMock = vi.mocked(logError);
   });
 
   afterEach(vi.resetAllMocks);
 
   it("should deny requests without a token", async () => {
+    verifyGoogleBearerTokenMock.mockRejectedValue(new UnauthorizedError());
+
     const response = await handler({
       identitySource: []
     } as unknown as APIGatewayRequestAuthorizerEventV2);
@@ -39,17 +41,11 @@ describe("handler", () => {
     expect(response).toEqual({
       isAuthorized: false
     });
-    expect(jwtVerifyMock).not.toHaveBeenCalled();
   });
 
   it("should authorize valid tokens for the configured user", async () => {
-    jwtVerifyMock.mockResolvedValue({
-      payload: {
-        sub: "__GOOGLE_SUB__"
-      },
-      protectedHeader: {
-        alg: "RS256"
-      }
+    verifyGoogleBearerTokenMock.mockResolvedValue({
+      sub: "__GOOGLE_SUB__"
     });
 
     const response = await handler(event);
@@ -57,41 +53,11 @@ describe("handler", () => {
     expect(response).toEqual({
       isAuthorized: true
     });
-    expect(jwtVerifyMock).toHaveBeenCalledWith("valid-token", mockJwks, {
-      issuer: ["https://accounts.google.com", "https://accounts.google.com"],
-      audience: "__GOOGLE_CLIENT_ID__"
-    });
-  });
-
-  it("should strip Bearer prefix before verifying the token", async () => {
-    jwtVerifyMock.mockResolvedValue({
-      payload: {
-        sub: "__GOOGLE_SUB__"
-      },
-      protectedHeader: {
-        alg: "RS256"
-      }
-    });
-
-    await handler({
-      identitySource: ["Bearer valid-token"]
-    } as APIGatewayRequestAuthorizerEventV2);
-
-    expect(jwtVerifyMock).toHaveBeenCalledWith("valid-token", mockJwks, {
-      audience: "__GOOGLE_CLIENT_ID__",
-      issuer: ["https://accounts.google.com", "https://accounts.google.com"]
-    });
+    expect(verifyGoogleBearerTokenMock).toHaveBeenCalledWith("Bearer valid-token");
   });
 
   it("should deny requests when sub does not match", async () => {
-    jwtVerifyMock.mockResolvedValue({
-      payload: {
-        sub: "another-user"
-      },
-      protectedHeader: {
-        alg: "RS256"
-      }
-    });
+    verifyGoogleBearerTokenMock.mockRejectedValue(new UnauthorizedError());
 
     const response = await handler(event);
 
@@ -101,7 +67,7 @@ describe("handler", () => {
   });
 
   it("should deny requests when token verification fails", async () => {
-    jwtVerifyMock.mockRejectedValue(new Error("Invalid token"));
+    verifyGoogleBearerTokenMock.mockRejectedValue(new Error("Invalid token"));
 
     const response = await handler(event);
 
