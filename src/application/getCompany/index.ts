@@ -9,9 +9,13 @@ export const handler = async (event: APIGatewayProxyEventV2WithContext): Promise
   const nifPath = event.pathParameters?.nif;
 
   if (!isNifValid(nifPath)) {
-    return createHttpResponse(400, {
-      message: "Nif is missing or invalid number"
-    });
+    return createHttpResponse(
+      400,
+      {
+        message: "Nif is missing or invalid number"
+      },
+      event.headers?.origin
+    );
   }
 
   const nif = Number(nifPath);
@@ -19,7 +23,7 @@ export const handler = async (event: APIGatewayProxyEventV2WithContext): Promise
   const company = await getCompany(nif);
 
   if (!company) {
-    return createHttpResponse(404, "Not Found");
+    return createHttpResponse(404, { message: "Not Found" }, event.headers?.origin);
   }
 
   return createHttpResponse(200, JSON.stringify(company), event.headers?.origin);

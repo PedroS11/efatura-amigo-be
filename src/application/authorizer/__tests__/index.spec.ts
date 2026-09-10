@@ -29,7 +29,18 @@ describe("handler", () => {
 
   afterEach(vi.resetAllMocks);
 
-  it("should deny requests without a cookie", async () => {
+  it("should deny requests without a cookie header", async () => {
+    const response = await handler({
+      headers: {}
+    } as unknown as APIGatewayRequestAuthorizerEvent);
+
+    expect(response).toEqual({
+      context: undefined,
+      isAuthorized: false
+    });
+  });
+
+  it("should deny requests with an empty cookie header", async () => {
     const response = await handler({
       headers: {
         cookie: ""

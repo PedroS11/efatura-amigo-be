@@ -10,18 +10,26 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
     const cookieHeader = event.headers?.cookie;
 
     if (!cookieHeader) {
-      return createHttpResponse(200, {
-        message: "OK"
-      });
+      return createHttpResponse(
+        200,
+        {
+          message: "OK"
+        },
+        event.headers?.origin
+      );
     }
 
     const cookies = cookie.parseCookie(cookieHeader);
     const sessionId = cookies[COOKIE_SESSON_KEY];
 
     if (!sessionId) {
-      return createHttpResponse(200, {
-        message: "OK"
-      });
+      return createHttpResponse(
+        200,
+        {
+          message: "OK"
+        },
+        event.headers?.origin
+      );
     }
 
     await deleteSession(sessionId);

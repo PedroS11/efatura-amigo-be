@@ -19,7 +19,13 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
     const body: LoginPayload = JSON.parse(event.body ?? "");
 
     if (!body?.credential) {
-      return createHttpResponse(400, "Invalid body");
+      return createHttpResponse(
+        400,
+        {
+          message: "Invalid body"
+        },
+        event.headers?.origin
+      );
     }
 
     const response = await verifyGoogleBearerToken(body.credential);
@@ -41,9 +47,9 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
     logError("Error login in", error);
 
     if (error instanceof UnauthorizedError) {
-      return createHttpResponse(401, { message: "Unauthorized" });
+      return createHttpResponse(401, { message: "Unauthorized" }, event.headers?.origin);
     } else if (error instanceof ForbiddenError) {
-      return createHttpResponse(403, { message: "Forbidden" });
+      return createHttpResponse(403, { message: "Forbidden" }, event.headers?.origin);
     }
 
     throw error;

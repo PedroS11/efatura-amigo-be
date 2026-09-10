@@ -26,6 +26,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: ""
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
@@ -44,6 +47,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "123456789"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
@@ -62,6 +68,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "123456789"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
@@ -80,6 +89,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "123456789"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 

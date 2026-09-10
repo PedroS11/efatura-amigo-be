@@ -13,6 +13,9 @@ describe("handler", () => {
             email: "a@a.com"
           }
         }
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayProxyEventV2WithContext);
 

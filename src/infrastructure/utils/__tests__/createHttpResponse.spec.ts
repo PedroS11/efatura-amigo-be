@@ -6,7 +6,12 @@ describe("createHttpResponse", () => {
     const body = { test: "yes" };
     expect(createHttpResponse(200, JSON.stringify(body))).toEqual({
       body: '{"test":"yes"}',
-      headers: expectedHttpHeaders,
+      headers: {
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST",
+        "Content-Type": "application/json"
+      },
       statusCode: 200
     });
   });

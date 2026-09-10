@@ -8,10 +8,14 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
   const result = SearchCompaniesQueryParamsSchema.safeParse(event.queryStringParameters);
 
   if (!result.success) {
-    return createHttpResponse(400, {
-      message: "Invalid query string",
-      issues: result.error.issues
-    });
+    return createHttpResponse(
+      400,
+      {
+        message: "Invalid query string",
+        issues: result.error.issues
+      },
+      event.headers?.origin
+    );
   }
 
   const { query, page }: SearchCompaniesQueryParams = result.data;

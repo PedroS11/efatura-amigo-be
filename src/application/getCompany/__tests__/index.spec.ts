@@ -1,9 +1,9 @@
-import type { APIGatewayEvent } from "aws-lambda";
 import type { MockInstance } from "vitest";
 
 import { getCompany } from "../../../infrastructure/companiesTable";
 import { Categories, type Company } from "../../../infrastructure/companiesTable/types";
 import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/__fixtures__/expectedHttpHeaders";
+import type { APIGatewayProxyEventV2WithContext } from "../../../infrastructure/utils/aws/apiGateway/types";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesTable");
@@ -21,8 +21,11 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: ""
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
-    } as unknown as APIGatewayEvent);
+    } as unknown as APIGatewayProxyEventV2WithContext);
 
     expect(response).toEqual({
       body: JSON.stringify({
@@ -40,11 +43,16 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "502258241"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
-    } as unknown as APIGatewayEvent);
+    } as unknown as APIGatewayProxyEventV2WithContext);
 
     expect(response).toEqual({
-      body: "Not Found",
+      body: JSON.stringify({
+        message: "Not Found"
+      }),
       headers: expectedHttpHeaders,
       statusCode: 404
     });
@@ -65,8 +73,11 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "502258241"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
-    } as unknown as APIGatewayEvent);
+    } as unknown as APIGatewayProxyEventV2WithContext);
 
     expect(response).toEqual({
       body: JSON.stringify(company),
