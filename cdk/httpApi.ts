@@ -99,8 +99,7 @@ export const createHttpApi = (
   httpApi.addRoutes({
     path: "/api/auth/login",
     methods: [HttpMethod.POST],
-    integration: new HttpLambdaIntegration("LoginIntegration", loginLambda),
-    authorizer: googleAuthorizer
+    integration: new HttpLambdaIntegration("LoginIntegration", loginLambda)
   });
 
   // Logout endpoint needs to be public

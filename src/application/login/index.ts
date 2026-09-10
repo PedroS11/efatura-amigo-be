@@ -8,7 +8,7 @@ import {
 import { saveSession } from "../../infrastructure/sessionsTable";
 import { generateCookie, SEVEN_DAYS_IN_SECONDS } from "../../infrastructure/utils/cookies";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
-import { logError } from "../../infrastructure/utils/logger";
+import { logError, logMessage } from "../../infrastructure/utils/logger";
 
 interface LoginPayload {
   credential: string;
@@ -22,7 +22,11 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
       return createHttpResponse(400, "Invalid body");
     }
 
+    logMessage("Login", body);
+
     const response = await verifyGoogleBearerToken(body.credential);
+
+    logMessage("Login response", response);
 
     const sessionId = randomBytes(32).toString("hex");
 
