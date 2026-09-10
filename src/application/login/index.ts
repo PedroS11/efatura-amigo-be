@@ -38,9 +38,32 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
       id: sessionId
     });
 
+    logMessage("Session saved");
+
     const cookie = generateCookie(sessionId);
 
-    return createHttpResponse(200, response, undefined, [cookie]);
+    console.log("COOKIE:", cookie);
+    console.log("HEADERS", event.headers);
+    console.log(
+      "RESPONSE:",
+      createHttpResponse(
+        200,
+        response,
+        {
+          "Access-Control-Allow-Origin": event.headers?.origin ?? ""
+        },
+        [cookie]
+      )
+    );
+
+    return createHttpResponse(
+      200,
+      response,
+      {
+        "Access-Control-Allow-Origin": event.headers?.origin ?? ""
+      },
+      [cookie]
+    );
   } catch (error) {
     logError("Error login in", error);
 
