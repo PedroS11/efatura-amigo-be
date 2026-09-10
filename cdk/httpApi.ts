@@ -32,7 +32,7 @@ export const createHttpApi = (
     corsPreflight: {
       allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS, CorsHttpMethod.POST],
       allowOrigins: getAllowedOrigins(),
-      allowHeaders: ["Content-Type", "Authorization"],
+      allowHeaders: ["Content-Type"],
       allowCredentials: true
     }
   });
