@@ -54,7 +54,7 @@ export class Stack extends cdk.Stack {
      */
     const sessionsTable = new TableV2(this, "SessionsTable", {
       partitionKey: {
-        type: AttributeType.NUMBER,
+        type: AttributeType.STRING,
         name: "id"
       },
       billing: Billing.onDemand(),
