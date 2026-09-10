@@ -24,12 +24,12 @@ export class ForbiddenError extends Error {
 export const getAuthorizationHeader = (headers: Record<string, string | undefined> | undefined): string | undefined =>
   headers?.authorization ?? headers?.Authorization;
 
-export const verifyGoogleBearerToken = async (authorizationHeader: string | undefined): Promise<VerifiedGoogleUser> => {
-  if (!authorizationHeader) {
+export const verifyGoogleBearerToken = async (bearerToken: string | undefined): Promise<VerifiedGoogleUser> => {
+  if (!bearerToken) {
     throw new UnauthorizedError();
   }
 
-  const token = authorizationHeader.replace(/^Bearer\s+/i, "");
+  const token = bearerToken.replace(/^Bearer\s+/i, "");
 
   try {
     const { payload } = await jwtVerify(token, GOOGLE_JWKS, {

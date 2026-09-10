@@ -10,7 +10,7 @@ export const createHttpResponse = (
   body: typeof body === "string" ? body : JSON.stringify(body),
   headers: {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Origin": getAllowedOrigins().join(","),
     "Access-Control-Allow-Methods": "OPTIONS,GET,POST",
     "Access-Control-Allow-Credentials": "true",

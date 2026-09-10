@@ -1,5 +1,5 @@
 import { createHttpResponse } from "../createHttpResponse";
-import { expectedHttpHeaders } from "./expectedHttpHeaders";
+import { expectedHttpHeaders } from "./__fixtures__/expectedHttpHeaders";
 
 describe("createHttpResponse", () => {
   it("should create a 200 response", () => {

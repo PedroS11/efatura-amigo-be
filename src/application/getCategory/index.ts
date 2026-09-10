@@ -1,4 +1,4 @@
-import type {APIGatewayEvent, APIGatewayProxyResult, APIGatewayProxyStructuredResultV2} from "aws-lambda";
+import type { APIGatewayEvent, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 
 import { getCompany } from "../../infrastructure/companiesTable";
 import { Categories } from "../../infrastructure/companiesTable/types";

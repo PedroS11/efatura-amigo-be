@@ -5,7 +5,7 @@ import { expect } from "vitest";
 import { getCompany } from "../../../infrastructure/companiesTable";
 import { Categories } from "../../../infrastructure/companiesTable/types";
 import { addCompanyToProcess } from "../../../infrastructure/unprocessedCompaniesTable";
-import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
+import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/__fixtures__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesTable");

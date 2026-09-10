@@ -1,7 +1,7 @@
 import { errors, jwtVerify } from "jose";
 import type { MockInstance } from "vitest";
 
-import { getAuthorizationHeader, UnauthorizedError, verifyGoogleBearerToken } from "../verifyGoogleBearerToken";
+import { ForbiddenError, UnauthorizedError, verifyGoogleBearerToken } from "../verifyGoogleBearerToken";
 
 const { mockJwks } = vi.hoisted(() => ({
   mockJwks: {}
@@ -25,20 +25,6 @@ describe("verifyGoogleBearerToken", () => {
   });
 
   afterEach(vi.resetAllMocks);
-
-  describe("getAuthorizationHeader", () => {
-    it("should return lowercase authorization header", () => {
-      expect(getAuthorizationHeader({ authorization: "Bearer token" })).toBe("Bearer token");
-    });
-
-    it("should return capitalized Authorization header", () => {
-      expect(getAuthorizationHeader({ Authorization: "Bearer token" })).toBe("Bearer token");
-    });
-
-    it("should return undefined when header is missing", () => {
-      expect(getAuthorizationHeader({})).toBeUndefined();
-    });
-  });
 
   describe("verifyGoogleBearerToken", () => {
     it("should throw UnauthorizedError when header is missing", async () => {
@@ -88,7 +74,7 @@ describe("verifyGoogleBearerToken", () => {
       });
     });
 
-    it("should throw UnauthorizedError when sub does not match", async () => {
+    it("should throw ForbidenError when sub does not match", async () => {
       jwtVerifyMock.mockResolvedValue({
         payload: {
           sub: "another-user"
@@ -98,7 +84,7 @@ describe("verifyGoogleBearerToken", () => {
         }
       });
 
-      await expect(verifyGoogleBearerToken("Bearer valid-token")).rejects.toThrow(UnauthorizedError);
+      await expect(verifyGoogleBearerToken("Bearer valid-token")).rejects.toThrow(ForbiddenError);
     });
 
     it("should throw UnauthorizedError when token verification fails", async () => {

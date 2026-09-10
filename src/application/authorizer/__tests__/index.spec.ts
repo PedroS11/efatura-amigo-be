@@ -68,7 +68,6 @@ describe("handler", () => {
   });
 
   it("should deny requests when session expired ", async () => {
-    const t = Date.now() - 1000;
     getSessionByIdMock.mockResolvedValue({
       sub: "__GOOGLE_SUB__",
       name: "test",
@@ -108,7 +107,7 @@ describe("handler", () => {
       name: "test",
       email: "a@a.com",
       id: "123",
-      expiresAt: "11111111111"
+      expiresAt: Date.now() + 1000
     });
 
     const response = await handler(event);
