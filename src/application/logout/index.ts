@@ -1,5 +1,6 @@
 import type { APIGatewayEvent, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import * as cookie from "cookie";
+import { deleteSession } from "../../infrastructure/sessionsTable";
 import { COOKIE_SESSON_KEY, generateDeleteCookie } from "../../infrastructure/utils/cookies";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import { logError } from "../../infrastructure/utils/logger";
@@ -15,7 +16,11 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
     const cookies = cookie.parseCookie(cookieHeader);
     const sessionId = cookies[COOKIE_SESSON_KEY];
 
-    // Delete from dynamo
+    if (!sessionId) {
+      return createHttpResponse(200, "Ok");
+    }
+
+    await deleteSession(sessionId);
 
     const deleteCookie = generateDeleteCookie();
 
