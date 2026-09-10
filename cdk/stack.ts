@@ -13,6 +13,8 @@ import {
   createGetCompanyLambda,
   createGetMeLambda,
   createGetMetadataLambda,
+  createLoginLambda,
+  createLogoutLambda,
   createProcessNifsLambda,
   createResyncLambda,
   createSearchCompaniesLambda
@@ -31,7 +33,8 @@ export class Stack extends cdk.Stack {
         type: AttributeType.NUMBER,
         name: "nif"
       },
-      billing: Billing.onDemand()
+      billing: Billing.onDemand(),
+      removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
     });
 
     /**
@@ -41,6 +44,18 @@ export class Stack extends cdk.Stack {
       partitionKey: {
         type: AttributeType.NUMBER,
         name: "nif"
+      },
+      billing: Billing.onDemand(),
+      removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
+    });
+
+    /**
+     * Sessions Table
+     */
+    const sessionsTable = new TableV2(this, "SessionsTable", {
+      partitionKey: {
+        type: AttributeType.NUMBER,
+        name: "id"
       },
       billing: Billing.onDemand(),
       removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
@@ -84,14 +99,35 @@ export class Stack extends cdk.Stack {
     resyncLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
     resyncLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
 
+    /**
+     * Logout lambda
+     */
+
+    const logoutLambda = createLogoutLambda(this);
+    sessionsTable.grantWriteData(logoutLambda);
+    logoutLambda.addEnvironment("SESSIONS_TABLE", sessionsTable.tableName);
+
     /*
      *********************************
      *********** PRIVATE API *********
      *********************************
      */
 
-    const authorizerLambda = createAuthorizerLambda(this);
+    /**
+     * Authorizer
+     */
 
+    const authorizerLambda = createAuthorizerLambda(this);
+    sessionsTable.grantReadData(authorizerLambda);
+    authorizerLambda.addEnvironment("SESSIONS_TABLE", sessionsTable.tableName);
+
+    /**
+     * Login
+     */
+
+    const loginLambda = createLoginLambda(this);
+    sessionsTable.grantWriteData(loginLambda);
+    loginLambda.addEnvironment("SESSIONS_TABLE", sessionsTable.tableName);
     /**
      * Search Companies
      */
@@ -132,6 +168,8 @@ export class Stack extends cdk.Stack {
       getCompanyLambda,
       authorizerLambda,
       getMetadataLambda,
+      loginLambda,
+      logoutLambda,
       getMeLambda
     );
 

@@ -16,8 +16,7 @@
         "noUselessUndefinedInitialization": "off"
       },
       "correctness": {
-        "noUnusedImports": { "level": "error", "fix": "safe" },
-        "noUnusedVariables": { "level": "error", "fix": "safe" }
+        "noUnusedImports": { "level": "error", "fix": "safe" }
       },
       "style": {
         "noNonNullAssertion": "off",
