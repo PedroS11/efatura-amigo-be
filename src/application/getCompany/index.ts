@@ -1,10 +1,10 @@
-import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayEvent, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 
 import { getCompany } from "../../infrastructure/companiesTable";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import { isNifValid } from "../../infrastructure/utils/nifValidator";
 
-export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyStructuredResultV2> => {
   const nifPath = event.pathParameters?.nif;
 
   if (!isNifValid(nifPath)) {

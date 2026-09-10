@@ -1,10 +1,10 @@
-import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayEvent, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { searchCompanies } from "../../infrastructure/companiesIndex";
 import type { SearchCompaniesResponse } from "../../infrastructure/companiesIndex/types";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import { type SearchCompaniesQueryParams, SearchCompaniesQueryParamsSchema } from "./types";
 
-export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyStructuredResultV2> => {
   const result = SearchCompaniesQueryParamsSchema.safeParse(event.queryStringParameters);
 
   if (!result.success) {

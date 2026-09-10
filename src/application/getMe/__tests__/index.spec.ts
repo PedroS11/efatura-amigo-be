@@ -1,12 +1,12 @@
 import type { APIGatewayProxyEventV2 } from "aws-lambda";
 import type { MockInstance } from "vitest";
 
-import { UnauthorizedError, verifyGoogleBearerToken } from "../../../infrastructure/auth/verifyGoogleBearerToken";
+import { UnauthorizedError, verifyGoogleBearerToken } from "../../../infrastructure/googleAuth/verifyGoogleBearerToken";
 import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/auth/verifyGoogleBearerToken", async importOriginal => {
-  const actual = await importOriginal<typeof import("../../../infrastructure/auth/verifyGoogleBearerToken")>();
+  const actual = await importOriginal<typeof import("../../../infrastructure/googleAuth/verifyGoogleBearerToken")>();
 
   return {
     ...actual,

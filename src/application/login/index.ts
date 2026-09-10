@@ -4,8 +4,9 @@ import {
   ForbiddenError,
   UnauthorizedError,
   verifyGoogleBearerToken
-} from "../../infrastructure/auth/verifyGoogleBearerToken";
-import { generateCookie } from "../../infrastructure/utils/cookies";
+} from "../../infrastructure/googleAuth/verifyGoogleBearerToken";
+import { saveSession } from "../../infrastructure/sessionsTable";
+import { generateCookie, SEVEN_DAYS_IN_SECONDS } from "../../infrastructure/utils/cookies";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import { logError } from "../../infrastructure/utils/logger";
 
@@ -25,7 +26,13 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
 
     const sessionId = randomBytes(32).toString("hex");
 
-    // Save in Dynamo
+    await saveSession({
+      sub: response.sub,
+      name: response.name,
+      email: response.email,
+      expiresAt: Date.now() + SEVEN_DAYS_IN_SECONDS * 1000,
+      id: sessionId
+    });
 
     const cookie = generateCookie(sessionId);
 

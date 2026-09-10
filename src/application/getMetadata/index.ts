@@ -1,11 +1,11 @@
-import type { APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { getCompaniesTableMetadata } from "../../infrastructure/companiesTable";
 import { getCredits } from "../../infrastructure/nif-pt";
 import { getUnprocessedCompaniesTableMetadata } from "../../infrastructure/unprocessedCompaniesTable";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import type { GetMetadataResponse } from "./types";
 
-export const handler = async (): Promise<APIGatewayProxyResult> => {
+export const handler = async (): Promise<APIGatewayProxyStructuredResultV2> => {
   const companiesTableMetadata = await getCompaniesTableMetadata();
   const unprocessedCompaniesTableMetadata = await getUnprocessedCompaniesTableMetadata();
   const credits = await getCredits();
