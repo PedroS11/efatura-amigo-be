@@ -3,12 +3,13 @@ import * as cookie from "cookie";
 import type { VerifiedGoogleUser } from "../../infrastructure/googleAuth/types";
 import { getSessionById } from "../../infrastructure/sessionsTable";
 import { COOKIE_SESSON_KEY } from "../../infrastructure/utils/cookies";
-import { logError } from "../../infrastructure/utils/logger";
+import { logError, logMessage } from "../../infrastructure/utils/logger";
 
 export const handler = async (
   event: APIGatewayRequestAuthorizerEvent
 ): Promise<APIGatewaySimpleAuthorizerWithContextResult<VerifiedGoogleUser | undefined>> => {
   try {
+    logMessage("HEADERS", event.headers);
     const cookieHeader = event.headers?.cookie;
 
     if (!cookieHeader) {
@@ -21,6 +22,9 @@ export const handler = async (
     const cookies = cookie.parseCookie(cookieHeader);
     const sessionId = cookies[COOKIE_SESSON_KEY];
 
+    logMessage("cookies", cookies);
+    logMessage("sessionId", sessionId);
+
     if (!sessionId) {
       return {
         isAuthorized: false,
@@ -29,6 +33,7 @@ export const handler = async (
     }
 
     const session = await getSessionById(sessionId);
+    logMessage("session", session);
 
     if (!session) {
       return {
