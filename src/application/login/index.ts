@@ -29,6 +29,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
     logMessage("Login response", response);
 
     const sessionId = randomBytes(32).toString("hex");
+    logMessage("sessionId", sessionId);
 
     await saveSession({
       sub: response.sub,
