@@ -57,6 +57,9 @@ describe("handler", () => {
       headers: expectedHttpHeaders,
       statusCode: 200
     });
+    expect(getCompaniesTableMetadataMock).toHaveBeenCalledOnce();
+    expect(getUnprocessedCompaniesTableMetadataMock).toHaveBeenCalledOnce();
+    expect(getCreditsMock).toHaveBeenCalledOnce();
   });
 
   it("should default item counts to zero when table metadata is missing", async () => {
