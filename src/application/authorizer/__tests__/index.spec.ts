@@ -1,85 +1,126 @@
-import type { APIGatewayRequestAuthorizerEventV2 } from "aws-lambda";
+import type { APIGatewayRequestAuthorizerEvent } from "aws-lambda";
 import type { MockInstance } from "vitest";
 
-import { UnauthorizedError, verifyGoogleBearerToken } from "../../../infrastructure/googleAuth/verifyGoogleBearerToken";
+import { getSessionById } from "../../../infrastructure/sessionsTable";
 import { logError } from "../../../infrastructure/utils/logger";
 import { handler } from "../index";
 
-vi.mock("../../../infrastructure/auth/verifyGoogleBearerToken", async importOriginal => {
-  const actual = await importOriginal<typeof import("../../../infrastructure/googleAuth/verifyGoogleBearerToken")>();
-
-  return {
-    ...actual,
-    verifyGoogleBearerToken: vi.fn()
-  };
-});
-
 vi.mock("../../../infrastructure/utils/logger");
+vi.mock("../../../infrastructure/sessionsTable");
 
-describe.skip("handler", () => {
-  let verifyGoogleBearerTokenMock: MockInstance;
+describe("handler", () => {
   let logErrorMock: MockInstance;
+  let getSessionByIdMock: MockInstance;
 
   const event = {
-    identitySource: ["Bearer valid-token"]
-  } as APIGatewayRequestAuthorizerEventV2;
+    headers: {
+      cookie: "__Host-session=123; Max-Age=604800; Path=/; HttpOnly; Secure; SameSite=Lax"
+    }
+  } as unknown as APIGatewayRequestAuthorizerEvent;
 
   beforeEach(() => {
-    verifyGoogleBearerTokenMock = vi.mocked(verifyGoogleBearerToken);
+    getSessionByIdMock = vi.mocked(getSessionById);
     logErrorMock = vi.mocked(logError);
+
+    vi.useFakeTimers({
+      now: new Date("2026-01-01T00:00:00.000Z").getTime()
+    });
   });
 
   afterEach(vi.resetAllMocks);
 
-  it("should deny requests without a token", async () => {
-    verifyGoogleBearerTokenMock.mockRejectedValue(new UnauthorizedError());
-
-    // @ts-expect-error
+  it("should deny requests without a cookie", async () => {
     const response = await handler({
-      identitySource: []
-    } as unknown as APIGatewayRequestAuthorizerEventV2);
+      headers: {
+        cookie: ""
+      }
+    } as unknown as APIGatewayRequestAuthorizerEvent);
 
     expect(response).toEqual({
+      context: undefined,
       isAuthorized: false
     });
   });
 
-  it("should authorize valid tokens for the configured user", async () => {
-    verifyGoogleBearerTokenMock.mockResolvedValue({
-      sub: "__GOOGLE_SUB__"
-    });
-
-    // @ts-expect-error
-    const response = await handler(event);
-
-    expect(response).toEqual({
-      isAuthorized: true
-    });
-    expect(verifyGoogleBearerTokenMock).toHaveBeenCalledWith("Bearer valid-token");
-  });
-
-  it("should deny requests when sub does not match", async () => {
-    verifyGoogleBearerTokenMock.mockRejectedValue(new UnauthorizedError());
-    // @ts-expect-error
-
-    const response = await handler(event);
+  it("should deny requests without a session cookie", async () => {
+    const response = await handler({
+      headers: {
+        cookie: "any_cookie=456;"
+      }
+    } as unknown as APIGatewayRequestAuthorizerEvent);
 
     expect(response).toEqual({
+      context: undefined,
       isAuthorized: false
     });
   });
 
-  it("should deny requests when token verification fails", async () => {
-    verifyGoogleBearerTokenMock.mockRejectedValue(new Error("Invalid token"));
+  it("should deny requests when session does exist", async () => {
+    getSessionByIdMock.mockResolvedValue(undefined);
 
-    // @ts-expect-error
     const response = await handler(event);
 
     expect(response).toEqual({
-      isAuthorized: false
+      isAuthorized: false,
+      context: undefined
     });
+    expect(getSessionByIdMock).toHaveBeenCalledWith("123");
+  });
+
+  it("should deny requests when session expired ", async () => {
+    const t = Date.now() - 1000;
+    getSessionByIdMock.mockResolvedValue({
+      sub: "__GOOGLE_SUB__",
+      name: "test",
+      email: "a@a.com",
+      id: "123",
+      expiresAt: Date.now() - 1000
+    });
+
+    const response = await handler(event);
+
+    expect(response).toEqual({
+      isAuthorized: false,
+      context: undefined
+    });
+    expect(getSessionByIdMock).toHaveBeenCalledWith("123");
+  });
+
+  it("should deny requests when something goes wrong", async () => {
+    const error = new Error("Something went wrong");
+    getSessionByIdMock.mockRejectedValue(error);
+
+    const response = await handler(event);
+
+    expect(response).toEqual({
+      isAuthorized: false,
+      context: undefined
+    });
+
     expect(logErrorMock).toHaveBeenCalledWith("Authorization failed", {
-      error: "Invalid token"
+      error: "Something went wrong"
     });
+  });
+
+  it("should authorize valid cookies for the configured user", async () => {
+    getSessionByIdMock.mockResolvedValue({
+      sub: "__GOOGLE_SUB__",
+      name: "test",
+      email: "a@a.com",
+      id: "123",
+      expiresAt: "11111111111"
+    });
+
+    const response = await handler(event);
+
+    expect(response).toEqual({
+      isAuthorized: true,
+      context: {
+        sub: "__GOOGLE_SUB__",
+        name: "test",
+        email: "a@a.com"
+      }
+    });
+    expect(getSessionByIdMock).toHaveBeenCalledWith("123");
   });
 });

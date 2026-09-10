@@ -25,7 +25,7 @@ describe("handler", () => {
     } as unknown as APIGatewayEvent);
 
     expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body)).toMatchObject({
+    expect(JSON.parse(response.body!)).toMatchObject({
       message: "Invalid query string"
     });
     expect(searchCompaniesMock).not.toHaveBeenCalled();
@@ -37,7 +37,7 @@ describe("handler", () => {
     } as unknown as APIGatewayEvent);
 
     expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body)).toMatchObject({
+    expect(JSON.parse(response.body!)).toMatchObject({
       message: "Invalid query string"
     });
     expect(searchCompaniesMock).not.toHaveBeenCalled();

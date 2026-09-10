@@ -14,7 +14,7 @@ export const handler = async (
     if (!cookieHeader) {
       return {
         isAuthorized: false,
-        context: { sub: "", name: undefined, email: undefined }
+        context: undefined
       };
     }
 
@@ -24,7 +24,7 @@ export const handler = async (
     if (!sessionId) {
       return {
         isAuthorized: false,
-        context: { sub: "", name: undefined, email: undefined }
+        context: undefined
       };
     }
 
@@ -33,14 +33,14 @@ export const handler = async (
     if (!session) {
       return {
         isAuthorized: false,
-        context: { sub: "", name: undefined, email: undefined }
+        context: undefined
       };
     }
 
-    if (session.expiresAt <= Math.floor(Date.now() / 1000)) {
+    if (session.expiresAt <= Date.now()) {
       return {
         isAuthorized: false,
-        context: { sub: "", name: undefined, email: undefined }
+        context: undefined
       };
     }
 
@@ -59,7 +59,7 @@ export const handler = async (
 
     return {
       isAuthorized: false,
-      context: { sub: "", name: undefined, email: undefined }
+      context: undefined
     };
   }
 };
