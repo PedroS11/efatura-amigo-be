@@ -1,10 +1,11 @@
-import type { APIGatewayEvent, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
+import type { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 
 import { getCompany } from "../../infrastructure/companiesTable";
+import type { APIGatewayProxyEventV2WithContext } from "../../infrastructure/utils/aws/apiGateway/types";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import { isNifValid } from "../../infrastructure/utils/nifValidator";
 
-export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyStructuredResultV2> => {
+export const handler = async (event: APIGatewayProxyEventV2WithContext): Promise<APIGatewayProxyStructuredResultV2> => {
   const nifPath = event.pathParameters?.nif;
 
   if (!isNifValid(nifPath)) {
@@ -21,5 +22,5 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
     return createHttpResponse(404, "Not Found");
   }
 
-  return createHttpResponse(200, JSON.stringify(company));
+  return createHttpResponse(200, JSON.stringify(company), event.headers?.origin);
 };

@@ -22,9 +22,6 @@ export const handler = async (
     const cookies = cookie.parseCookie(cookieHeader);
     const sessionId = cookies[COOKIE_SESSON_KEY];
 
-    logMessage("cookies", cookies);
-    logMessage("sessionId", sessionId);
-
     if (!sessionId) {
       return {
         isAuthorized: false,
@@ -33,7 +30,6 @@ export const handler = async (
     }
 
     const session = await getSessionById(sessionId);
-    logMessage("session", session);
 
     if (!session) {
       return {

@@ -33,6 +33,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
       {
         message: "OK"
       },
+      event.headers?.origin,
       undefined,
       [deleteCookie]
     );

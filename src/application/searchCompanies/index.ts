@@ -18,5 +18,5 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
 
   const searchResults: SearchCompaniesResponse = await searchCompanies(query, page);
 
-  return createHttpResponse(200, JSON.stringify(searchResults));
+  return createHttpResponse(200, JSON.stringify(searchResults), event.headers?.origin);
 };

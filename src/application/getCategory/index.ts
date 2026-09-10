@@ -35,5 +35,5 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
     };
   }
 
-  return createHttpResponse(200, JSON.stringify(body));
+  return createHttpResponse(200, JSON.stringify(body), event.headers?.origin);
 };

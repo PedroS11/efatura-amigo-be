@@ -7,5 +7,5 @@ import type { GetMeResponse } from "./types";
 export const handler = async (event: APIGatewayProxyEventV2WithContext): Promise<APIGatewayProxyStructuredResultV2> => {
   const user: GetMeResponse = event.requestContext.authorizer.lambda;
 
-  return createHttpResponse(200, user);
+  return createHttpResponse(200, user, event.headers?.origin);
 };

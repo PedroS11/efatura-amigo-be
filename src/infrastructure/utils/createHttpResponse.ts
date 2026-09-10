@@ -4,6 +4,7 @@ import { getAllowedOrigins } from "../../../cdk/utils";
 export const createHttpResponse = (
   status: number,
   body: string | object,
+  origin: string = "",
   headers?: APIGatewayProxyStructuredResultV2["headers"],
   cookies?: APIGatewayProxyStructuredResultV2["cookies"]
 ): APIGatewayProxyStructuredResultV2 => ({
@@ -11,7 +12,7 @@ export const createHttpResponse = (
   headers: {
     "Content-Type": "application/json",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Origin": getAllowedOrigins().join(","),
+    ...(getAllowedOrigins().includes(origin) && { "Access-Control-Allow-Origin": origin }),
     "Access-Control-Allow-Methods": "OPTIONS,GET,POST",
     "Access-Control-Allow-Credentials": "true",
     ...headers
