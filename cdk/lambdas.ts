@@ -136,7 +136,7 @@ export const createGetMeLambda = (stack: Stack): LambdaFunction => {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/getMe"),
-    memorySize: 128,
+    memorySize: 256,
     architecture: Architecture.ARM_64
   });
 
