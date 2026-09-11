@@ -3,23 +3,25 @@ import { Architecture, Code, Function as LambdaFunction, Runtime } from "aws-cdk
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { createLogGroup } from "./utils";
 
-export const createGetCategoryLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "GetCategory", {
+export const createGetCategoryLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "GetCategory", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/getCategory"),
     memorySize: 128,
-    logGroup: createLogGroup(stack, "GetCategory"),
     architecture: Architecture.ARM_64
   });
+  createLogGroup(stack, lambda);
 
-export const createProcessNifsLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "ProcessNifs", {
+  return lambda;
+};
+
+export const createProcessNifsLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "ProcessNifs", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/processNifs"),
     memorySize: 256,
-    logGroup: createLogGroup(stack, "ProcessNifs"),
     architecture: Architecture.ARM_64,
     timeout: Duration.minutes(1),
     reservedConcurrentExecutions: 1,
@@ -32,15 +34,18 @@ export const createProcessNifsLambda = (stack: Stack): LambdaFunction =>
       ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
     }
   });
+  createLogGroup(stack, lambda);
 
-export const createResyncLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "Resync", {
+  return lambda;
+};
+
+export const createResyncLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "Resync", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/resync"),
     memorySize: 256,
     timeout: Duration.minutes(5),
-    logGroup: createLogGroup(stack, "Resync"),
     architecture: Architecture.ARM_64,
     environment: {
       ALGOLIA_APPLICATION_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaApplicationId"),
@@ -48,14 +53,17 @@ export const createResyncLambda = (stack: Stack): LambdaFunction =>
       ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
     }
   });
+  createLogGroup(stack, lambda);
 
-export const createSearchCompaniesLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "SearchCompanies", {
+  return lambda;
+};
+
+export const createSearchCompaniesLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "SearchCompanies", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/searchCompanies"),
     memorySize: 256,
-    logGroup: createLogGroup(stack, "SearchCompanies"),
     architecture: Architecture.ARM_64,
     timeout: Duration.seconds(30),
     environment: {
@@ -64,24 +72,30 @@ export const createSearchCompaniesLambda = (stack: Stack): LambdaFunction =>
       ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
     }
   });
+  createLogGroup(stack, lambda);
 
-export const createGetCompanyLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "GetCompany", {
+  return lambda;
+};
+
+export const createGetCompanyLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "GetCompany", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/getCompany"),
     memorySize: 128,
-    logGroup: createLogGroup(stack, "GetCompany"),
     architecture: Architecture.ARM_64
   });
+  createLogGroup(stack, lambda);
 
-export const createAuthorizerLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "Authorizer", {
+  return lambda;
+};
+
+export const createAuthorizerLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "Authorizer", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/authorizer"),
     memorySize: 256,
-    logGroup: createLogGroup(stack, "Authorizer"),
     architecture: Architecture.ARM_64,
     timeout: Duration.seconds(30),
     environment: {
@@ -89,51 +103,67 @@ export const createAuthorizerLambda = (stack: Stack): LambdaFunction =>
       GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
     }
   });
+  createLogGroup(stack, lambda);
 
-export const createGetMetadataLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "GetMetadata", {
+  return lambda;
+};
+
+export const createGetMetadataLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "GetMetadata", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/getMetadata"),
     memorySize: 128,
-    logGroup: createLogGroup(stack, "GetMetadata"),
     architecture: Architecture.ARM_64,
     environment: {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
     }
   });
+  createLogGroup(stack, lambda);
 
-export const createGetMeLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "GetMe", {
+  return lambda;
+};
+
+export const createGetMeLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "GetMe", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/getMe"),
     memorySize: 128,
-    logGroup: createLogGroup(stack, "GetMe"),
     architecture: Architecture.ARM_64
   });
+  createLogGroup(stack, lambda);
 
-export const createLoginLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "Login", {
+  return lambda;
+};
+
+export const createLoginLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "Login", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/login"),
     timeout: Duration.seconds(30),
     memorySize: 256,
-    logGroup: createLogGroup(stack, "Login"),
     architecture: Architecture.ARM_64,
     environment: {
       GOOGLE_OAUTH_SUB: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthSub"),
       GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
     }
   });
+  createLogGroup(stack, lambda);
 
-export const createLogoutLambda = (stack: Stack): LambdaFunction =>
-  new LambdaFunction(stack, "Logout", {
+  return lambda;
+};
+
+export const createLogoutLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "Logout", {
     runtime: Runtime.NODEJS_24_X,
     handler: "index.handler",
     code: Code.fromAsset("dist/logout"),
     memorySize: 128,
-    logGroup: createLogGroup(stack, "Logout"),
     architecture: Architecture.ARM_64
   });
+  createLogGroup(stack, lambda);
+
+  return lambda;
+};
