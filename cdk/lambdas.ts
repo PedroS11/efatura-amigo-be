@@ -119,7 +119,7 @@ export const createLoginLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/login"),
     timeout: Duration.seconds(30),
-    memorySize: 128,
+    memorySize: 256,
     logGroup: createLogGroup(stack, "Login"),
     architecture: Architecture.ARM_64,
     environment: {
