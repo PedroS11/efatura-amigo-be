@@ -11,7 +11,8 @@ export const createGetCategoryLambda = (stack: Stack): LambdaFunction => {
     memorySize: 128,
     architecture: Architecture.ARM_64
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "GetCategory", lambda);
 
   return lambda;
 };
@@ -34,7 +35,8 @@ export const createProcessNifsLambda = (stack: Stack): LambdaFunction => {
       ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
     }
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "ProcessNifs", lambda);
 
   return lambda;
 };
@@ -53,7 +55,8 @@ export const createResyncLambda = (stack: Stack): LambdaFunction => {
       ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
     }
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "Resync", lambda);
 
   return lambda;
 };
@@ -72,7 +75,8 @@ export const createSearchCompaniesLambda = (stack: Stack): LambdaFunction => {
       ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
     }
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "SearchCompanies", lambda);
 
   return lambda;
 };
@@ -85,7 +89,8 @@ export const createGetCompanyLambda = (stack: Stack): LambdaFunction => {
     memorySize: 128,
     architecture: Architecture.ARM_64
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "GetCompany", lambda);
 
   return lambda;
 };
@@ -103,7 +108,8 @@ export const createAuthorizerLambda = (stack: Stack): LambdaFunction => {
       GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
     }
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "Authorizer", lambda);
 
   return lambda;
 };
@@ -119,7 +125,8 @@ export const createGetMetadataLambda = (stack: Stack): LambdaFunction => {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
     }
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "GetMetadata", lambda);
 
   return lambda;
 };
@@ -132,7 +139,8 @@ export const createGetMeLambda = (stack: Stack): LambdaFunction => {
     memorySize: 128,
     architecture: Architecture.ARM_64
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "GetMe", lambda);
 
   return lambda;
 };
@@ -150,7 +158,8 @@ export const createLoginLambda = (stack: Stack): LambdaFunction => {
       GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
     }
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "Login", lambda);
 
   return lambda;
 };
@@ -163,7 +172,8 @@ export const createLogoutLambda = (stack: Stack): LambdaFunction => {
     memorySize: 128,
     architecture: Architecture.ARM_64
   });
-  createLogGroup(stack, lambda);
+
+  createLogGroup(stack, "Logout", lambda);
 
   return lambda;
 };
