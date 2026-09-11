@@ -14,15 +14,22 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export class ForbiddenError extends Error {
+  constructor(message = "Forbidden") {
+    super(message);
+    this.name = "Forbidden";
+  }
+}
+
 export const getAuthorizationHeader = (headers: Record<string, string | undefined> | undefined): string | undefined =>
   headers?.authorization ?? headers?.Authorization;
 
-export const verifyGoogleBearerToken = async (authorizationHeader: string | undefined): Promise<VerifiedGoogleUser> => {
-  if (!authorizationHeader) {
+export const verifyGoogleBearerToken = async (bearerToken: string | undefined): Promise<VerifiedGoogleUser> => {
+  if (!bearerToken) {
     throw new UnauthorizedError();
   }
 
-  const token = authorizationHeader.replace(/^Bearer\s+/i, "");
+  const token = bearerToken.replace(/^Bearer\s+/i, "");
 
   try {
     const { payload } = await jwtVerify(token, GOOGLE_JWKS, {
@@ -31,7 +38,7 @@ export const verifyGoogleBearerToken = async (authorizationHeader: string | unde
     });
 
     if (payload.sub !== getEnvironmentVariable("GOOGLE_OAUTH_SUB")) {
-      throw new UnauthorizedError();
+      throw new ForbiddenError();
     }
 
     return {
@@ -41,10 +48,6 @@ export const verifyGoogleBearerToken = async (authorizationHeader: string | unde
     };
   } catch (error) {
     logError("Error verifying Google bearer token", error);
-
-    if (error instanceof UnauthorizedError) {
-      throw error;
-    }
 
     if (error instanceof errors.JOSEError) {
       throw new UnauthorizedError();

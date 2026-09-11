@@ -1,5 +1,5 @@
-import type { Stack } from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
+import { Duration, type Stack } from "aws-cdk-lib";
 import { type CfnStage, CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaAuthorizer, HttpLambdaResponseType } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
@@ -14,6 +14,8 @@ export const createHttpApi = (
   getCompanyLambda: LambdaFunction,
   authorizerLambda: LambdaFunction,
   getMetadataLambda: LambdaFunction,
+  loginLambda: LambdaFunction,
+  logoutLambda: LambdaFunction,
   getMeLambda: LambdaFunction
 ) => {
   const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
@@ -28,9 +30,10 @@ export const createHttpApi = (
     apiName: `EfaturaAmigoApi${!isMain() ? `--${getBranchName()}` : ""}`,
     createDefaultStage: true,
     corsPreflight: {
-      allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS],
+      allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.OPTIONS, CorsHttpMethod.POST],
       allowOrigins: getAllowedOrigins(),
-      allowHeaders: ["Content-Type", "Authorization"]
+      allowHeaders: ["Content-Type"],
+      allowCredentials: true
     }
   });
 
@@ -51,17 +54,10 @@ export const createHttpApi = (
     };
   }
 
-  // Legacy, to be deleted
-  httpApi.addRoutes({
-    path: "/category/{nif}",
-    methods: [HttpMethod.GET],
-    integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
-  });
-
   httpApi.addRoutes({
     path: "/api/category/{nif}",
     methods: [HttpMethod.GET],
-    integration: new HttpLambdaIntegration("LambdaIntegration", getCategoryLambda)
+    integration: new HttpLambdaIntegration("GetCategoryIntegration", getCategoryLambda)
   });
 
   /**
@@ -70,8 +66,9 @@ export const createHttpApi = (
 
   const googleAuthorizer = new HttpLambdaAuthorizer("GoogleLambdaAuthorizer", authorizerLambda, {
     authorizerName: "GoogleLambdaAuthorizer",
-    identitySource: ["$request.header.Authorization"],
-    responseTypes: [HttpLambdaResponseType.SIMPLE]
+    identitySource: ["$request.header.Cookie"],
+    responseTypes: [HttpLambdaResponseType.SIMPLE],
+    resultsCacheTtl: Duration.seconds(0)
   });
 
   httpApi.addRoutes({
@@ -95,10 +92,28 @@ export const createHttpApi = (
     authorizer: googleAuthorizer
   });
 
+  /**
+   * Auth
+   */
+
   httpApi.addRoutes({
-    path: "/api/me",
+    path: "/api/auth/login",
+    methods: [HttpMethod.POST],
+    integration: new HttpLambdaIntegration("LoginIntegration", loginLambda)
+  });
+
+  // Logout endpoint needs to be public
+  httpApi.addRoutes({
+    path: "/api/auth/logout",
+    methods: [HttpMethod.POST],
+    integration: new HttpLambdaIntegration("LogoutIntegration", logoutLambda)
+  });
+
+  httpApi.addRoutes({
+    path: "/api/auth/me",
     methods: [HttpMethod.GET],
-    integration: new HttpLambdaIntegration("GetMeIntegration", getMeLambda)
+    integration: new HttpLambdaIntegration("GetMeIntegration", getMeLambda),
+    authorizer: googleAuthorizer
   });
 
   new cdk.CfnOutput(stack, "ApiUrl", {

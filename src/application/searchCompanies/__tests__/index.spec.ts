@@ -3,7 +3,7 @@ import type { MockInstance } from "vitest";
 
 import { searchCompanies } from "../../../infrastructure/companiesIndex";
 import { Categories, type Company } from "../../../infrastructure/companiesTable/types";
-import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
+import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/__fixtures__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesIndex");
@@ -21,11 +21,14 @@ describe("handler", () => {
     const response = await handler({
       queryStringParameters: {
         page: "-1"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
     expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body)).toMatchObject({
+    expect(JSON.parse(response.body!)).toMatchObject({
       message: "Invalid query string"
     });
     expect(searchCompaniesMock).not.toHaveBeenCalled();
@@ -33,11 +36,14 @@ describe("handler", () => {
 
   it("should return 400 if query is missing", async () => {
     const response = await handler({
-      queryStringParameters: {}
+      queryStringParameters: {},
+      headers: {
+        origin: "http://localhost:5173"
+      }
     } as unknown as APIGatewayEvent);
 
     expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body)).toMatchObject({
+    expect(JSON.parse(response.body!)).toMatchObject({
       message: "Invalid query string"
     });
     expect(searchCompaniesMock).not.toHaveBeenCalled();
@@ -58,6 +64,9 @@ describe("handler", () => {
     const response = await handler({
       queryStringParameters: {
         query: "company"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
@@ -76,6 +85,9 @@ describe("handler", () => {
       queryStringParameters: {
         query: "company",
         page: "2"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 

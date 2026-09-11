@@ -5,7 +5,7 @@ import { expect } from "vitest";
 import { getCompany } from "../../../infrastructure/companiesTable";
 import { Categories } from "../../../infrastructure/companiesTable/types";
 import { addCompanyToProcess } from "../../../infrastructure/unprocessedCompaniesTable";
-import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/expectedHttpHeaders";
+import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/__fixtures__/expectedHttpHeaders";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesTable");
@@ -26,6 +26,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: ""
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
@@ -44,6 +47,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "123456789"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
@@ -62,6 +68,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "123456789"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 
@@ -80,6 +89,9 @@ describe("handler", () => {
     const response = await handler({
       pathParameters: {
         nif: "123456789"
+      },
+      headers: {
+        origin: "http://localhost:5173"
       }
     } as unknown as APIGatewayEvent);
 

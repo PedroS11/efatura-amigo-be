@@ -1,16 +1,23 @@
-import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import type { MockInstance } from "vitest";
 
-import { getDynamoInstance } from "../../utils/aws/dynamo/utils";
-import { getCompany, saveCompany } from "../index";
+import { describeTable } from "../../utils/aws/dynamo/describeTable";
+import { fullScanTable } from "../../utils/aws/dynamo/fullScanTable";
+import { getItem } from "../../utils/aws/dynamo/getItem";
+import { putItem } from "../../utils/aws/dynamo/putItem";
+import { getCompaniesTableMetadata, getCompany, saveCompany, scanTable } from "../index";
 import { Categories, type Company } from "../types";
 import { getCompanyFixture } from "./__fixtures__/company";
 
-vi.mock("../../utils/aws/dynamo/utils");
+vi.mock("../../utils/aws/dynamo/getItem");
+vi.mock("../../utils/aws/dynamo/putItem");
+vi.mock("../../utils/aws/dynamo/describeTable");
+vi.mock("../../utils/aws/dynamo/fullScanTable");
 
 describe("companiesTable", () => {
-  let sendMock: MockInstance;
+  let getItemMock: MockInstance;
+  let putItemMock: MockInstance;
+  let describeTableMock: MockInstance;
+  let fullScanTableMock: MockInstance;
   let companyFixture: Company;
 
   beforeEach(() => {
@@ -18,21 +25,17 @@ describe("companiesTable", () => {
     vi.setSystemTime(new Date(2000, 1, 1, 13));
 
     companyFixture = getCompanyFixture();
-
-    sendMock = vi.fn();
-
-    vi.mocked(getDynamoInstance).mockReturnValue({
-      send: sendMock
-    } as unknown as DynamoDBDocumentClient);
+    getItemMock = vi.mocked(getItem);
+    putItemMock = vi.mocked(putItem);
+    describeTableMock = vi.mocked(describeTable);
+    fullScanTableMock = vi.mocked(fullScanTable);
   });
 
   afterEach(vi.resetAllMocks);
 
   describe("getCompany", () => {
     it("should return company if it exists in the database", async () => {
-      sendMock.mockResolvedValue({
-        Item: companyFixture
-      });
+      getItemMock.mockResolvedValue(companyFixture);
 
       const company = await getCompany(123456789);
 
@@ -42,29 +45,19 @@ describe("companiesTable", () => {
         nif: 123456789,
         updatedAt: 949410000000
       });
-      expect(sendMock.mock.calls[0][0]).instanceof(GetCommand);
-      expect(sendMock.mock.calls[0][0].input).toEqual({
-        Key: {
-          nif: 123456789
-        },
-        TableName: "__COMPANIES_TABLE__"
+      expect(getItemMock).toHaveBeenCalledWith("__COMPANIES_TABLE__", {
+        nif: 123456789
       });
     });
 
     it("should return undefined if company doesn't exist in the database", async () => {
-      sendMock.mockResolvedValue({
-        Item: undefined
-      });
+      getItemMock.mockResolvedValue(undefined);
 
       const company = await getCompany(123456789);
 
       expect(company).toEqual(undefined);
-      expect(sendMock.mock.calls[0][0]).instanceof(GetCommand);
-      expect(sendMock.mock.calls[0][0].input).toEqual({
-        Key: {
-          nif: 123456789
-        },
-        TableName: "__COMPANIES_TABLE__"
+      expect(getItemMock).toHaveBeenCalledWith("__COMPANIES_TABLE__", {
+        nif: 123456789
       });
     });
   });
@@ -78,19 +71,51 @@ describe("companiesTable", () => {
         caeRev3: "88910",
         category: Categories.Educacao
       };
+
       await saveCompany(company);
 
-      expect(sendMock.mock.calls[0][0]).instanceof(PutCommand);
-      expect(sendMock.mock.calls[0][0].input).toEqual({
-        Item: {
-          nif: 123456789,
-          name: "Company name",
-          category: Categories.Educacao,
-          caeRev3: "88910",
-          updatedAt: 949410000000
-        },
-        TableName: "__COMPANIES_TABLE__"
+      expect(putItemMock).toHaveBeenCalledWith("__COMPANIES_TABLE__", {
+        nif: 123456789,
+        name: "Company name",
+        category: Categories.Educacao,
+        caeRev3: "88910",
+        updatedAt: 949410000000
       });
+    });
+  });
+
+  describe("scanTable", () => {
+    it("should scan the table with the provided filters", async () => {
+      const companies = [companyFixture];
+      const filters = [
+        {
+          column: "category",
+          comparator: "=" as const,
+          value: 2
+        }
+      ];
+      fullScanTableMock.mockResolvedValue(companies);
+
+      const result = await scanTable(filters);
+
+      expect(result).toEqual(companies);
+      expect(fullScanTableMock).toHaveBeenCalledWith("__COMPANIES_TABLE__", filters);
+    });
+  });
+
+  describe("getCompaniesTableMetadata", () => {
+    it("should return table metadata", async () => {
+      const metadata = {
+        Table: {
+          ItemCount: 42
+        }
+      };
+      describeTableMock.mockResolvedValue(metadata);
+
+      const result = await getCompaniesTableMetadata();
+
+      expect(result).toEqual(metadata);
+      expect(describeTableMock).toHaveBeenCalledWith("__COMPANIES_TABLE__");
     });
   });
 });

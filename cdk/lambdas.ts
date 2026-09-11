@@ -111,9 +111,29 @@ export const createGetMeLambda = (stack: Stack): LambdaFunction =>
     code: Code.fromAsset("dist/getMe"),
     memorySize: 128,
     logRetention: RetentionDays.THREE_DAYS,
+    architecture: Architecture.ARM_64
+  });
+
+export const createLoginLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "Login", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/login"),
+    memorySize: 128,
+    logRetention: RetentionDays.THREE_DAYS,
     architecture: Architecture.ARM_64,
     environment: {
       GOOGLE_OAUTH_SUB: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthSub"),
       GOOGLE_OAUTH_CLIENT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthClientId")
     }
+  });
+
+export const createLogoutLambda = (stack: Stack): LambdaFunction =>
+  new LambdaFunction(stack, "Logout", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/logout"),
+    memorySize: 128,
+    logRetention: RetentionDays.THREE_DAYS,
+    architecture: Architecture.ARM_64
   });

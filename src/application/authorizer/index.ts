@@ -1,24 +1,66 @@
-import type { APIGatewayRequestAuthorizerEventV2, APIGatewaySimpleAuthorizerResult } from "aws-lambda";
+import type { APIGatewayRequestAuthorizerEvent, APIGatewaySimpleAuthorizerWithContextResult } from "aws-lambda";
+import * as cookie from "cookie";
+import type { VerifiedGoogleUser } from "../../infrastructure/googleAuth/types";
+import { getSessionById } from "../../infrastructure/sessionsTable";
+import { COOKIE_SESSON_KEY } from "../../infrastructure/utils/cookies";
+import { logError, logMessage } from "../../infrastructure/utils/logger";
 
-import { UnauthorizedError, verifyGoogleBearerToken } from "../../infrastructure/auth/verifyGoogleBearerToken";
-import { logError } from "../../infrastructure/utils/logger";
-
-export const handler = async (event: APIGatewayRequestAuthorizerEventV2): Promise<APIGatewaySimpleAuthorizerResult> => {
+export const handler = async (
+  event: APIGatewayRequestAuthorizerEvent
+): Promise<APIGatewaySimpleAuthorizerWithContextResult<VerifiedGoogleUser | undefined>> => {
   try {
-    await verifyGoogleBearerToken(event.identitySource?.[0]);
+    logMessage("HEADERS", event.headers);
+    const cookieHeader = event.headers?.cookie;
 
-    return {
-      isAuthorized: true
-    };
-  } catch (error) {
-    if (!(error instanceof UnauthorizedError)) {
-      logError("Authorization failed", {
-        error: (error as Error).message
-      });
+    if (!cookieHeader) {
+      return {
+        isAuthorized: false,
+        context: undefined
+      };
+    }
+
+    const cookies = cookie.parseCookie(cookieHeader);
+    const sessionId = cookies[COOKIE_SESSON_KEY];
+
+    if (!sessionId) {
+      return {
+        isAuthorized: false,
+        context: undefined
+      };
+    }
+
+    const session = await getSessionById(sessionId);
+
+    if (!session) {
+      return {
+        isAuthorized: false,
+        context: undefined
+      };
+    }
+
+    if (session.expiresAt <= Date.now()) {
+      return {
+        isAuthorized: false,
+        context: undefined
+      };
     }
 
     return {
-      isAuthorized: false
+      isAuthorized: true,
+      context: {
+        email: session.email,
+        name: session.name,
+        sub: session.sub
+      }
+    };
+  } catch (error) {
+    logError("Authorization failed", {
+      error: (error as Error).message
+    });
+
+    return {
+      isAuthorized: false,
+      context: undefined
     };
   }
 };

@@ -1,6 +1,8 @@
 import type { ScanCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { BatchWriteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { batchWrite, type RequestItemsValue } from "../utils/aws/dynamo/batchWrite";
 import { describeTable } from "../utils/aws/dynamo/describeTable";
+import { putItem } from "../utils/aws/dynamo/putItem";
 import { getDynamoInstance } from "../utils/aws/dynamo/utils";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
 import type { UnprocessedCompany } from "./types";
@@ -40,9 +42,7 @@ export const getUnprocessedCompanies = async (limit: number): Promise<Unprocesse
 };
 
 export const deleteBatch = async (nifs: number[]): Promise<void> => {
-  const db = getDynamoInstance();
-
-  const deleteRequests = nifs.map(nif => ({
+  const deleteRequests: RequestItemsValue = nifs.map(nif => ({
     DeleteRequest: {
       Key: {
         nif
@@ -50,29 +50,16 @@ export const deleteBatch = async (nifs: number[]): Promise<void> => {
     }
   }));
 
-  await db.send(
-    new BatchWriteCommand({
-      RequestItems: {
-        [UNPROCESSED_COMPANIES_TABLE]: deleteRequests
-      }
-    })
-  );
+  await batchWrite(UNPROCESSED_COMPANIES_TABLE, deleteRequests);
 };
 
 export const addCompanyToProcess = async (nif: number): Promise<void> => {
-  const db = getDynamoInstance();
-
   const item: UnprocessedCompany = {
     nif,
     timestamp: Date.now()
   };
 
-  await db.send(
-    new PutCommand({
-      TableName: UNPROCESSED_COMPANIES_TABLE,
-      Item: item
-    })
-  );
+  await putItem(UNPROCESSED_COMPANIES_TABLE, item);
 };
 
 export const getUnprocessedCompaniesTableMetadata = async () => await describeTable(UNPROCESSED_COMPANIES_TABLE);
