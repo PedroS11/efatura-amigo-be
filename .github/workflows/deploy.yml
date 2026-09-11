@@ -26,6 +26,9 @@ jobs:
           role-to-assume: arn:aws:iam::566348719618:role/Github-Actions
           aws-region: eu-west-2
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
