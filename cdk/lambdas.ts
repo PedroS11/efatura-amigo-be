@@ -151,7 +151,7 @@ export const createLoginLambda = (stack: Stack): LambdaFunction => {
     handler: "index.handler",
     code: Code.fromAsset("dist/login"),
     timeout: Duration.seconds(30),
-    memorySize: 256,
+    memorySize: 512,
     architecture: Architecture.ARM_64,
     environment: {
       GOOGLE_OAUTH_SUB: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthSub"),
