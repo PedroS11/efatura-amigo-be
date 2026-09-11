@@ -1,5 +1,5 @@
 import type { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
-import { getAllowedOrigins } from "../../../cdk/utils";
+import { getAllowedOrigins } from "./allowedOrigins";
 
 export const createHttpResponse = (
   status: number,
