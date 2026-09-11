@@ -1,8 +1,7 @@
-import type { Stack } from "aws-cdk-lib";
-import { Duration } from "aws-cdk-lib";
+import { Duration, type Stack } from "aws-cdk-lib";
 import { Architecture, Code, Function as LambdaFunction, Runtime } from "aws-cdk-lib/aws-lambda";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { createLogGroup } from "./utils";
 
 export const createGetCategoryLambda = (stack: Stack): LambdaFunction =>
   new LambdaFunction(stack, "GetCategory", {
@@ -10,7 +9,7 @@ export const createGetCategoryLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/getCategory"),
     memorySize: 128,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "GetCategory"),
     architecture: Architecture.ARM_64
   });
 
@@ -20,7 +19,7 @@ export const createProcessNifsLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/processNifs"),
     memorySize: 256,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "ProcessNifs"),
     architecture: Architecture.ARM_64,
     timeout: Duration.minutes(1),
     reservedConcurrentExecutions: 1,
@@ -41,7 +40,7 @@ export const createResyncLambda = (stack: Stack): LambdaFunction =>
     code: Code.fromAsset("dist/resync"),
     memorySize: 256,
     timeout: Duration.minutes(5),
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "Resync"),
     architecture: Architecture.ARM_64,
     environment: {
       ALGOLIA_APPLICATION_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaApplicationId"),
@@ -56,7 +55,7 @@ export const createSearchCompaniesLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/searchCompanies"),
     memorySize: 256,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "SearchCompanies"),
     architecture: Architecture.ARM_64,
     timeout: Duration.seconds(30),
     environment: {
@@ -72,7 +71,7 @@ export const createGetCompanyLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/getCompany"),
     memorySize: 128,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "GetCompany"),
     architecture: Architecture.ARM_64
   });
 
@@ -82,7 +81,7 @@ export const createAuthorizerLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/authorizer"),
     memorySize: 256,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "Authorizer"),
     architecture: Architecture.ARM_64,
     timeout: Duration.seconds(30),
     environment: {
@@ -97,7 +96,7 @@ export const createGetMetadataLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/getMetadata"),
     memorySize: 128,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "GetMetadata"),
     architecture: Architecture.ARM_64,
     environment: {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
@@ -110,7 +109,7 @@ export const createGetMeLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/getMe"),
     memorySize: 128,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "GetMe"),
     architecture: Architecture.ARM_64
   });
 
@@ -120,7 +119,7 @@ export const createLoginLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/login"),
     memorySize: 128,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "Login"),
     architecture: Architecture.ARM_64,
     environment: {
       GOOGLE_OAUTH_SUB: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/GoogleOAuthSub"),
@@ -134,6 +133,6 @@ export const createLogoutLambda = (stack: Stack): LambdaFunction =>
     handler: "index.handler",
     code: Code.fromAsset("dist/logout"),
     memorySize: 128,
-    logRetention: RetentionDays.THREE_DAYS,
+    logGroup: createLogGroup(stack, "Logout"),
     architecture: Architecture.ARM_64
   });

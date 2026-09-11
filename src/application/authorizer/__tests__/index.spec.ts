@@ -78,7 +78,7 @@ describe("handler", () => {
     expect(getSessionByIdMock).toHaveBeenCalledWith("123");
   });
 
-  it("should deny requests when session expired ", async () => {
+  it("should deny requests with an expired session ", async () => {
     getSessionByIdMock.mockResolvedValue({
       sub: "__GOOGLE_SUB__",
       name: "test",
