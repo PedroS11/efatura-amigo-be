@@ -6,7 +6,7 @@ let axiosInstance: AxiosInstance;
 
 export const getAxiosInstance = (): AxiosInstance => {
   if (!axiosInstance) {
-    axiosInstance = axiosLoggerInterceptor(axios.create());
+    axiosInstance = axiosLoggerInterceptor(axios.create({ timeout: 8000 }));
   }
 
   return axiosInstance;

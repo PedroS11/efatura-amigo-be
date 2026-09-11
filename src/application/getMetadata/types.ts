@@ -8,6 +8,6 @@ export interface GetMetadataResponse {
     itemCount: number;
   };
   nifPt: {
-    credits: Credit;
+    credits: Credit | null;
   };
 }
