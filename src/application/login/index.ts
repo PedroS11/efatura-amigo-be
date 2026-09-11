@@ -8,7 +8,7 @@ import {
 import { saveSession } from "../../infrastructure/sessionsTable";
 import { generateCookie, SEVEN_DAYS_IN_SECONDS } from "../../infrastructure/utils/cookies";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
-import { logError } from "../../infrastructure/utils/logger";
+import { logError, logMessage } from "../../infrastructure/utils/logger";
 
 interface LoginPayload {
   credential: string;
@@ -28,6 +28,8 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
       );
     }
 
+    logMessage("Verifying Google Token");
+
     const response = await verifyGoogleBearerToken(body.credential);
 
     const sessionId = randomBytes(32).toString("hex");
@@ -40,6 +42,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
       id: sessionId
     });
 
+    logMessage("Generating cookie");
     const cookie = generateCookie(sessionId);
 
     return createHttpResponse(200, response, event.headers?.origin, undefined, [cookie]);
