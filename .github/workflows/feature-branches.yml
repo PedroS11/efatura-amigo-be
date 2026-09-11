@@ -41,7 +41,7 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --immutable --prefer-offline
+        run: yarn install --immutable
 
       - name: Build Project
         run: yarn build
@@ -84,7 +84,7 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        run: yarn install --immutable --prefer-offline
+        run: yarn install --immutable
 
       - name: Build Project
         run: yarn build
