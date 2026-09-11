@@ -1,13 +1,12 @@
 {
   "name": "efatura-amigo-be",
   "version": "0.1.0",
-  "bin": {
-    "efatura-amigo-be": "cdk/index.js"
-  },
+  "packageManager": "yarn@4.18.0",
+  "bin": "cdk/index.js",
   "scripts": {
-    "build": "node esbuild.deploy.mjs && tsc -noEmit --incremental",
-    "build:local": "node esbuild.local.mjs && tsc -noEmit --incremental",
-    "watch": "tsc -w",
+    "build": "node esbuild.deploy.mjs && node ./node_modules/typescript/lib/tsc.js -noEmit --incremental",
+    "build:local": "node esbuild.local.mjs && node ./node_modules/typescript/lib/tsc.js -noEmit --incremental",
+    "watch": "node ./node_modules/typescript/lib/tsc.js -w",
     "cdk": "cdk synth",
     "lint": "biome check src cdk",
     "lint:fix": "biome check --write src cdk",

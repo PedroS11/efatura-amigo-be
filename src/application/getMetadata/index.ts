@@ -7,9 +7,11 @@ import { createHttpResponse } from "../../infrastructure/utils/createHttpRespons
 import type { GetMetadataResponse } from "./types";
 
 export const handler = async (event: APIGatewayProxyEventV2WithContext): Promise<APIGatewayProxyStructuredResultV2> => {
-  const companiesTableMetadata = await getCompaniesTableMetadata();
-  const unprocessedCompaniesTableMetadata = await getUnprocessedCompaniesTableMetadata();
-  const credits = await getCredits();
+  const [companiesTableMetadata, unprocessedCompaniesTableMetadata, credits] = await Promise.all([
+    getCompaniesTableMetadata(),
+    getUnprocessedCompaniesTableMetadata(),
+    getCredits()
+  ]);
 
   const metadata: GetMetadataResponse = {
     companiesTable: {

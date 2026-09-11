@@ -9,7 +9,8 @@ export const createGetCategoryLambda = (stack: Stack): LambdaFunction => {
     handler: "index.handler",
     code: Code.fromAsset("dist/getCategory"),
     memorySize: 128,
-    architecture: Architecture.ARM_64
+    architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(10)
   });
 
   createLogGroup(stack, "GetCategory", lambda);
@@ -87,7 +88,8 @@ export const createGetCompanyLambda = (stack: Stack): LambdaFunction => {
     handler: "index.handler",
     code: Code.fromAsset("dist/getCompany"),
     memorySize: 128,
-    architecture: Architecture.ARM_64
+    architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(10)
   });
 
   createLogGroup(stack, "GetCompany", lambda);
@@ -121,6 +123,7 @@ export const createGetMetadataLambda = (stack: Stack): LambdaFunction => {
     code: Code.fromAsset("dist/getMetadata"),
     memorySize: 128,
     architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(10),
     environment: {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey")
     }
@@ -137,7 +140,8 @@ export const createGetMeLambda = (stack: Stack): LambdaFunction => {
     handler: "index.handler",
     code: Code.fromAsset("dist/getMe"),
     memorySize: 256,
-    architecture: Architecture.ARM_64
+    architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(10)
   });
 
   createLogGroup(stack, "GetMe", lambda);
@@ -170,7 +174,8 @@ export const createLogoutLambda = (stack: Stack): LambdaFunction => {
     handler: "index.handler",
     code: Code.fromAsset("dist/logout"),
     memorySize: 128,
-    architecture: Architecture.ARM_64
+    architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(10)
   });
 
   createLogGroup(stack, "Logout", lambda);
