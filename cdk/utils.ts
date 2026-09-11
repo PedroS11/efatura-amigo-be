@@ -1,4 +1,4 @@
-import { RemovalPolicy, type Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { getEnvironmentVariable } from "../src/infrastructure/utils/getEnvironmentVariable";
 
@@ -11,6 +11,5 @@ export const getAllowedOrigins = (): string[] => ["https://efatura.pedroosilva.d
 
 export const createLogGroup = (stack: Stack, lambdaName: string): LogGroup =>
   new LogGroup(stack, `${lambdaName}LogGroup`, {
-    retention: RetentionDays.THREE_DAYS,
-    removalPolicy: RemovalPolicy.DESTROY
+    retention: RetentionDays.THREE_DAYS
   });
