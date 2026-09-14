@@ -41,7 +41,7 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
 };
 
 export const getCredits = async (): Promise<Credit> => {
-  const response: AxiosResponse<GetCreditsResponse> = await getAxiosInstance().get("http://www.nif.pt/", {
+  const response: AxiosResponse<GetCreditsResponse> = await getAxiosInstance(3000).get("http://www.nif.pt/", {
     params: {
       json: "1",
       credits: "1",

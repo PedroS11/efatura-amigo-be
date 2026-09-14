@@ -4,9 +4,9 @@ import type { SearchNifPtResponse, SearchNifResponse } from "./types";
 
 let axiosInstance: AxiosInstance;
 
-export const getAxiosInstance = (): AxiosInstance => {
+export const getAxiosInstance = (timeout: number = 8000): AxiosInstance => {
   if (!axiosInstance) {
-    axiosInstance = axiosLoggerInterceptor(axios.create({ timeout: 8000 }));
+    axiosInstance = axiosLoggerInterceptor(axios.create({ timeout }));
   }
 
   return axiosInstance;
