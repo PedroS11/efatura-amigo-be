@@ -1,5 +1,5 @@
 import type { UpdatedAtWithObjectIdResponse } from "@algolia/client-search";
-import { algoliasearch } from "algoliasearch";
+import { algoliasearch, type DeletedAtResponse } from "algoliasearch";
 import type { SearchResult } from "algoliasearch/lite";
 import { getEnvironmentVariable } from "../getEnvironmentVariable";
 
@@ -47,3 +47,15 @@ export const searchObjects = async <T>(
   });
   return response.results[0];
 };
+
+/**
+ * Removes object from specified index
+ * @param {string} indexName - Index name
+ * @param {string} objectID - Object id
+ * @param {T} item - Item to remove
+ */
+export const deleteObject = async <T>(indexName: string, objectID: string): Promise<DeletedAtResponse> =>
+  await client.deleteObject({
+    indexName,
+    objectID
+  });

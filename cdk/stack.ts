@@ -40,7 +40,7 @@ export class Stack extends cdk.Stack {
       },
       billing: Billing.onDemand(),
       removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
-      dynamoStream: StreamViewType.NEW_IMAGE
+      dynamoStream: StreamViewType.NEW_AND_OLD_IMAGES
     });
 
     /**
