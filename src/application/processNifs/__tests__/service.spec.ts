@@ -10,7 +10,6 @@ import { processNif } from "../service";
 vi.mock("../../../infrastructure/companiesTable");
 vi.mock("../../../infrastructure/nif-pt");
 vi.mock("../../../infrastructure/utils/logger");
-vi.mock("../../../infrastructure/utils/algolia");
 
 describe("service", () => {
   describe("processNif", () => {
