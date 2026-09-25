@@ -3,8 +3,9 @@ import { Duration, RemovalPolicy } from "aws-cdk-lib";
 import { AttributeType, Billing, StreamViewType, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { StartingPosition } from "aws-cdk-lib/aws-lambda";
-import { DynamoEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { CfnPipe } from "aws-cdk-lib/aws-pipes";
 import type { Construct } from "constructs";
 import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
@@ -21,6 +22,7 @@ import {
   createSearchCompaniesLambda,
   createUpdateAlgoliaLambda
 } from "./lambdas";
+import { updateAlgoliaQueues } from "./queues";
 import { isMain } from "./utils";
 
 export class Stack extends cdk.Stack {
@@ -101,11 +103,37 @@ export class Stack extends cdk.Stack {
      * UpdateAlgolia
      */
 
+    const [updateAlgoliaSQS] = updateAlgoliaQueues(this);
+
+    const pipeRole = new Role(this, "UpdateToAlgoliaPipeRole", {
+      assumedBy: new ServicePrincipal("pipes.amazonaws.com")
+    });
+    companiesTable.grantStreamRead(pipeRole);
+    updateAlgoliaSQS.grantSendMessages(pipeRole);
+
+    const pipe = new CfnPipe(this, "StreamToUpdateAlgoliaSQSPipe", {
+      roleArn: pipeRole.roleArn,
+      source: companiesTable.tableStreamArn!,
+      sourceParameters: {
+        dynamoDbStreamParameters: {
+          startingPosition: "LATEST",
+          batchSize: 10,
+          maximumRetryAttempts: 3
+        }
+        // Optional: only forward certain events
+        // filterCriteria: {
+        //   filters: [{ pattern: JSON.stringify({ eventName: ['INSERT', 'MODIFY'] }) }],
+        // },
+      },
+      target: updateAlgoliaSQS.queueArn
+    });
+    // Make sure the role's policy exists before the pipe is created
+    pipe.node.addDependency(pipeRole);
+
     const updateAlgoliaLambda = createUpdateAlgoliaLambda(this);
 
     updateAlgoliaLambda.addEventSource(
-      new DynamoEventSource(companiesTable, {
-        startingPosition: StartingPosition.LATEST,
+      new SqsEventSource(updateAlgoliaSQS, {
         batchSize: 10
       })
     );

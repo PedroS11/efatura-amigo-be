@@ -2,17 +2,21 @@ import type { MockInstance } from "vitest";
 
 import { Categories, type Company } from "../../companiesTable/types";
 import { saveObject, searchObjects } from "../../utils/algolia";
+import { logMessage } from "../../utils/logger";
 import { saveCompanyInAlgolia, searchCompanies } from "../index";
 
 vi.mock("../../utils/algolia");
+vi.mock("../../utils/logger");
 
 describe("companiesIndex", () => {
   let searchObjectsMock: MockInstance;
   let saveObjectMock: MockInstance;
+  let logMessageMock: MockInstance;
 
   beforeEach(() => {
     searchObjectsMock = vi.mocked(searchObjects);
     saveObjectMock = vi.mocked(saveObject);
+    logMessageMock = vi.mocked(logMessage);
   });
 
   afterEach(vi.resetAllMocks);
@@ -70,6 +74,12 @@ describe("companiesIndex", () => {
       await saveCompanyInAlgolia(company);
 
       expect(saveObjectMock).toHaveBeenCalledWith("__COMPANIES_INDEX__", "123456789", company);
+      expect(logMessageMock).toHaveBeenNthCalledWith(1, "Updating company: Company name, nif: 123456789", {
+        category: 2,
+        name: "Company name",
+        nif: 123456789,
+        updatedAt: 949410000000
+      });
     });
   });
 });
