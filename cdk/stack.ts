@@ -134,7 +134,7 @@ export class Stack extends cdk.Stack {
 
     updateAlgoliaLambda.addEventSource(
       new SqsEventSource(updateAlgoliaSQS, {
-        batchSize: 10
+        batchSize: 1
       })
     );
 
