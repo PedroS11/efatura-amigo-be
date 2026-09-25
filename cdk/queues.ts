@@ -3,7 +3,7 @@ import { Queue } from "aws-cdk-lib/aws-sqs";
 
 export const updateAlgoliaQueues = (stack: Stack): Queue[] => {
   const dlq = new Queue(stack, "UpdateAlgoliaDLQ", {
-    retentionPeriod: Duration.days(15)
+    retentionPeriod: Duration.days(14)
   });
 
   const sqs = new Queue(stack, "UpdateAlgoliaSQS", {
