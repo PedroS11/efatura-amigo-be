@@ -30,10 +30,7 @@ export const createProcessNifsLambda = (stack: Stack): LambdaFunction => {
     environment: {
       NIF_PT_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/NifPtApiKey"),
       TELEGRAM_CHAT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramChatId"),
-      TELEGRAM_BOT_TOKEN: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramBotToken"),
-      ALGOLIA_APPLICATION_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaApplicationId"),
-      ALGOLIA_WRITE_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaWriteApiKey"),
-      ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
+      TELEGRAM_BOT_TOKEN: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramBotToken")
     }
   });
 
@@ -179,6 +176,26 @@ export const createLogoutLambda = (stack: Stack): LambdaFunction => {
   });
 
   createLogGroup(stack, "Logout", lambda);
+
+  return lambda;
+};
+
+export const createUpdateAlgoliaLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "UpdateAlgolia", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/updateAlgolia"),
+    memorySize: 256,
+    architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(30),
+    environment: {
+      ALGOLIA_APPLICATION_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaApplicationId"),
+      ALGOLIA_WRITE_API_KEY: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaWriteApiKey"),
+      ALGOLIA_COMPANIES_INDEX: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/AlgoliaCompaniesIndex")
+    }
+  });
+
+  createLogGroup(stack, "UpdateAlgolia", lambda);
 
   return lambda;
 };

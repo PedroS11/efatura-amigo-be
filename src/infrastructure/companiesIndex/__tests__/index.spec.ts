@@ -1,18 +1,24 @@
 import type { MockInstance } from "vitest";
 
 import { Categories, type Company } from "../../companiesTable/types";
-import { saveObject, searchObjects } from "../../utils/algolia";
-import { saveCompanyInAlgolia, searchCompanies } from "../index";
+import { deleteObject, saveObject, searchObjects } from "../../utils/algolia";
+import { logMessage } from "../../utils/logger";
+import { removeCompanyFromAlgolia, saveCompanyInAlgolia, searchCompanies } from "../index";
 
 vi.mock("../../utils/algolia");
+vi.mock("../../utils/logger");
 
 describe("companiesIndex", () => {
   let searchObjectsMock: MockInstance;
   let saveObjectMock: MockInstance;
+  let deleteObjectMock: MockInstance;
+  let logMessageMock: MockInstance;
 
   beforeEach(() => {
     searchObjectsMock = vi.mocked(searchObjects);
     saveObjectMock = vi.mocked(saveObject);
+    logMessageMock = vi.mocked(logMessage);
+    deleteObjectMock = vi.mocked(deleteObject);
   });
 
   afterEach(vi.resetAllMocks);
@@ -70,6 +76,28 @@ describe("companiesIndex", () => {
       await saveCompanyInAlgolia(company);
 
       expect(saveObjectMock).toHaveBeenCalledWith("__COMPANIES_INDEX__", "123456789", company);
+      expect(logMessageMock).toHaveBeenNthCalledWith(1, "Updating company: Company name, nif: 123456789", {
+        category: 2,
+        name: "Company name",
+        nif: 123456789,
+        updatedAt: 949410000000
+      });
+    });
+  });
+
+  describe("removeCompanyFromAlgolia", () => {
+    it("should remove company using nif as object id", async () => {
+      const company: Company = {
+        nif: 123456789,
+        name: "Company name",
+        category: Categories.Educacao,
+        updatedAt: 949410000000
+      };
+
+      await removeCompanyFromAlgolia(company.nif);
+
+      expect(deleteObjectMock).toHaveBeenCalledWith("__COMPANIES_INDEX__", "123456789");
+      expect(logMessageMock).toHaveBeenNthCalledWith(1, "Deleting company nif: 123456789");
     });
   });
 });

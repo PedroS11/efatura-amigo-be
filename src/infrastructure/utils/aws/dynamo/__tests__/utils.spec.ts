@@ -1,4 +1,4 @@
-import { getDynamoInstance, mapFilterToFilterExpression } from "../utils";
+import { getDynamoInstance, mapFilterToFilterExpression, unmarshallRecord } from "../utils";
 
 describe("utils", () => {
   describe("getDynamoInstance", () => {
@@ -73,6 +73,40 @@ describe("utils", () => {
           ":category": 7
         },
         filterExpression: "#name <> :name AND #category >= :category"
+      });
+    });
+  });
+
+  describe("unmarshallRecord", () => {
+    it("should return an empty object if no image provided", () => {
+      expect(unmarshallRecord(undefined)).toEqual({});
+    });
+
+    it("should unmarshall dynamo db record", () => {
+      expect(
+        unmarshallRecord({
+          nif: {
+            N: "516600800"
+          },
+          caeRev3: {
+            S: "49320"
+          },
+          category: {
+            N: "11"
+          },
+          name: {
+            S: "Distância Arrojada - Unipessoal Lda"
+          },
+          updatedAt: {
+            N: "1785856882885"
+          }
+        })
+      ).toEqual({
+        nif: 516600800,
+        caeRev3: "49320",
+        category: 11,
+        name: "Distância Arrojada - Unipessoal Lda",
+        updatedAt: 1785856882885
       });
     });
   });

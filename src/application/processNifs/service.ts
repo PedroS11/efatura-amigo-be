@@ -1,4 +1,3 @@
-import { saveCompanyInAlgolia } from "../../infrastructure/companiesIndex";
 import { saveCompany } from "../../infrastructure/companiesTable";
 import type { Company } from "../../infrastructure/companiesTable/types";
 import { searchNif } from "../../infrastructure/nif-pt";
@@ -26,7 +25,6 @@ export const processNif = async (nif: number): Promise<boolean> => {
     };
 
     await saveCompany(company);
-    await saveCompanyInAlgolia(company);
 
     return true;
   }
@@ -55,9 +53,7 @@ export const processNif = async (nif: number): Promise<boolean> => {
     updatedAt: Date.now()
   };
 
-  // TODO: Add Promise.all
   await saveCompany(companyToSave);
-  await saveCompanyInAlgolia(companyToSave);
 
   logMessage("Finished processing NIF", { nif, cae: company.cae, category });
 

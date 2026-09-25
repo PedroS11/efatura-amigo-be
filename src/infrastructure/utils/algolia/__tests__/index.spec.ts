@@ -1,16 +1,18 @@
-const { mockAddOrUpdateObject, mockSearch } = vi.hoisted(() => ({
+const { mockAddOrUpdateObject, mockSearch, mockDeleteObject } = vi.hoisted(() => ({
   mockAddOrUpdateObject: vi.fn(),
-  mockSearch: vi.fn()
+  mockSearch: vi.fn(),
+  mockDeleteObject: vi.fn()
 }));
 
 vi.mock("algoliasearch", () => ({
   algoliasearch: vi.fn(() => ({
     addOrUpdateObject: mockAddOrUpdateObject,
+    deleteObject: mockDeleteObject,
     search: mockSearch
   }))
 }));
 
-import { saveObject, searchObjects } from "../index";
+import { deleteObject, saveObject, searchObjects } from "../index";
 
 describe("algolia", () => {
   afterEach(vi.resetAllMocks);
@@ -65,6 +67,24 @@ describe("algolia", () => {
             page: 0
           }
         ]
+      });
+    });
+  });
+
+  describe("deleteObject", () => {
+    it("should delete an object from the index", async () => {
+      const expectedResponse = {
+        taskID: 1,
+        deletedAt: "2026-01-01T00:00:00.000Z"
+      };
+
+      mockDeleteObject.mockResolvedValue(expectedResponse);
+
+      const response = await deleteObject("__COMPANIES_INDEX__", "123456789");
+      expect(response).toEqual(expectedResponse);
+      expect(mockDeleteObject).toHaveBeenCalledWith({
+        objectID: "123456789",
+        indexName: "__COMPANIES_INDEX__"
       });
     });
   });

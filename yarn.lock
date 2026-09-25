@@ -1791,6 +1791,7 @@ __metadata:
     "@aws-sdk/client-dynamodb": "npm:^3.1111.0"
     "@aws-sdk/client-sqs": "npm:^3.1111.0"
     "@aws-sdk/lib-dynamodb": "npm:^3.1111.0"
+    "@aws-sdk/util-dynamodb": "npm:^3.996.9"
     "@biomejs/biome": "npm:^2.5.8"
     "@types/aws-lambda": "npm:^8.10.162"
     "@types/node": "npm:26.2.0"

@@ -1,7 +1,8 @@
 import type { Hit, SearchResponse } from "algoliasearch/lite";
 import { Categories, type Company } from "../companiesTable/types";
-import { saveObject, searchObjects } from "../utils/algolia";
+import { deleteObject, saveObject, searchObjects } from "../utils/algolia";
 import { getEnvironmentVariable } from "../utils/getEnvironmentVariable";
+import { logMessage } from "../utils/logger";
 import type { SearchCompaniesResponse, SearchedCompany } from "./types";
 
 const companiesIndex = getEnvironmentVariable("ALGOLIA_COMPANIES_INDEX");
@@ -36,5 +37,17 @@ export const searchCompanies = async (query: string, page: number | undefined): 
  * @param {Company} company - Company object
  */
 export const saveCompanyInAlgolia = async (company: Company): Promise<void> => {
+  logMessage(`Updating company: ${company.name}, nif: ${company.nif}`, company);
+
   await saveObject(companiesIndex, company.nif.toString(), company);
+};
+
+/**
+ * Removes company from Algolia
+ * @param {number} nif - Company nif
+ */
+export const removeCompanyFromAlgolia = async (nif: number): Promise<void> => {
+  logMessage(`Deleting company nif: ${nif}`);
+
+  await deleteObject(companiesIndex, nif.toString());
 };

@@ -1,6 +1,8 @@
 import type { DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, type ScanCommandInput } from "@aws-sdk/lib-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import type { StreamRecord } from "aws-sdk/clients/dynamodbstreams";
 
 export const MAX_ITEMS_PER_BATCH = 25;
 
@@ -62,4 +64,17 @@ export const mapFilterToFilterExpression = (filters: DynamoDBFilter[]) => {
     expressionAttributeValues,
     expressionAttributeNames
   };
+};
+
+type DynamoImage = Parameters<typeof unmarshall>[0];
+
+/**
+ * Converts a dynamoDB row into an interface object
+ * @param {object} row - Object that comes from dynamodb.NewImage or dynamodb.OldImage
+ */
+export const unmarshallRecord = <T>(row: StreamRecord["NewImage"]): T => {
+  if (row && Object.keys(row).length) {
+    return <T>unmarshall(row as DynamoImage);
+  }
+  return {} as T;
 };
