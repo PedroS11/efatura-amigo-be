@@ -19,7 +19,7 @@ jobs:
 
     env:
       DEPLOY_ENV: ${{ github.head_ref }}
-      STACK_NAME: EfaturaAmigoBeStack--${{ github.head_ref }}
+      STACK_NAME: EfaturaAmigoBeStack-${{ github.head_ref }}
 
     steps:
       - name: Checkout code
@@ -54,7 +54,7 @@ jobs:
             --bootstrap-customer-key false
 
       - name: Deploy CDK Stack
-        run: npx cdk deploy EfaturaAmigoBeStack--${DEPLOY_ENV} --require-approval never
+        run: npx cdk deploy EfaturaAmigoBeStack-${DEPLOY_ENV} --require-approval never
 
   destroy:
     if: github.event.action == 'closed'
@@ -62,7 +62,7 @@ jobs:
 
     env:
       DEPLOY_ENV: ${{ github.head_ref }}
-      STACK_NAME: EfaturaAmigoBeStack--${{ github.head_ref }}
+      STACK_NAME: EfaturaAmigoBeStack-${{ github.head_ref }}
 
     steps:
       - name: Checkout code
@@ -90,4 +90,4 @@ jobs:
         run: yarn build
 
       - name: Destroy CDK Stack
-        run: npx cdk destroy EfaturaAmigoBeStack--${DEPLOY_ENV} --force
+        run: npx cdk destroy EfaturaAmigoBeStack-${DEPLOY_ENV} --force

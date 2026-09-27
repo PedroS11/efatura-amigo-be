@@ -199,3 +199,23 @@ export const createUpdateAlgoliaLambda = (stack: Stack): LambdaFunction => {
 
   return lambda;
 };
+
+export const createProcessAlarmLambda = (stack: Stack): LambdaFunction => {
+  const lambda = new LambdaFunction(stack, "ProcessAlarm", {
+    runtime: Runtime.NODEJS_24_X,
+    handler: "index.handler",
+    code: Code.fromAsset("dist/processAlarm"),
+    memorySize: 256,
+    architecture: Architecture.ARM_64,
+    timeout: Duration.seconds(30),
+    environment: {
+      TELEGRAM_CHAT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramChatId"),
+      TELEGRAM_BOT_TOKEN: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramBotToken"),
+      STACK_NAME: stack.stackName
+    }
+  });
+
+  createLogGroup(stack, "ProcessAlarm", lambda);
+
+  return lambda;
+};
