@@ -6,7 +6,7 @@ automatically select the most appropriate category when validating invoices on t
 
 ## Stack
 
-![architecture](https://lucid.app/publicSegments/view/d9d8ad88-92fa-4293-8698-f5103c0dcec1/image.png "architecture")
+[![architecture](https://lucid.app/publicSegments/view/00068990-45fd-40d4-9fef-e2800133cad7/image.png)](https://lucid.app/publicSegments/view/00068990-45fd-40d4-9fef-e2800133cad7/image.png)
 
 The stack has a public and a private API to serve the data that is processed every minute by a cron job
 
