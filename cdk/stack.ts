@@ -1,12 +1,16 @@
 import * as cdk from "aws-cdk-lib";
 import { Duration, RemovalPolicy } from "aws-cdk-lib";
+import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { AttributeType, Billing, StreamViewType, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { CfnPipe } from "aws-cdk-lib/aws-pipes";
+import { Topic } from "aws-cdk-lib/aws-sns";
+import { SqsSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
 import type { Construct } from "constructs";
+import { createUpdateAlgoliaDLQAlarm } from "./alarms";
 import { createNoCostsBudget } from "./budget";
 import { createHttpApi } from "./httpApi";
 import {
@@ -17,12 +21,13 @@ import {
   createGetMetadataLambda,
   createLoginLambda,
   createLogoutLambda,
+  createProcessAlarmLambda,
   createProcessNifsLambda,
   createResyncLambda,
   createSearchCompaniesLambda,
   createUpdateAlgoliaLambda
 } from "./lambdas";
-import { updateAlgoliaQueues } from "./queues";
+import { createProcessAlarmQueues, createUpdateAlgoliaQueues } from "./queues";
 import { isMain } from "./utils";
 
 export class Stack extends cdk.Stack {
@@ -103,7 +108,7 @@ export class Stack extends cdk.Stack {
      * UpdateAlgolia
      */
 
-    const [updateAlgoliaSQS] = updateAlgoliaQueues(this);
+    const [updateAlgoliaSQS, updateAlgoliaDLQ] = createUpdateAlgoliaQueues(this);
 
     const pipeRole = new Role(this, "UpdateToAlgoliaPipeRole", {
       assumedBy: new ServicePrincipal("pipes.amazonaws.com")
@@ -137,6 +142,36 @@ export class Stack extends cdk.Stack {
         batchSize: 1
       })
     );
+
+    /**
+     * ProcessAlarm
+     */
+
+    const processAlarmLambda = createProcessAlarmLambda(this);
+    const [processAlarmSQS] = createProcessAlarmQueues(this);
+
+    processAlarmLambda.addEventSource(new SqsEventSource(processAlarmSQS));
+
+    /**
+     * Alarms topic
+     */
+
+    const alarmsTopic = new Topic(this, "AlarmsTopic");
+
+    /**
+     * UpdateAloglia alarm
+     */
+
+    const updateAlgoliaDLQAlarm = createUpdateAlgoliaDLQAlarm(this, updateAlgoliaDLQ);
+
+    alarmsTopic.addSubscription(
+      new SqsSubscription(processAlarmSQS, {
+        rawMessageDelivery: true
+      })
+    );
+
+    updateAlgoliaDLQAlarm.addAlarmAction(new SnsAction(alarmsTopic));
+    updateAlgoliaDLQAlarm.addOkAction(new SnsAction(alarmsTopic));
 
     /**
      * Resync lambda
