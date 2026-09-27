@@ -210,7 +210,8 @@ export const createProcessAlarmLambda = (stack: Stack): LambdaFunction => {
     timeout: Duration.seconds(30),
     environment: {
       TELEGRAM_CHAT_ID: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramChatId"),
-      TELEGRAM_BOT_TOKEN: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramBotToken")
+      TELEGRAM_BOT_TOKEN: StringParameter.valueForStringParameter(stack, "/EfaturaAmigoBe/TelegramBotToken"),
+      STACK_NAME: stack.stackName
     }
   });
 
