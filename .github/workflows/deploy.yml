@@ -49,7 +49,7 @@ jobs:
             --bootstrap-customer-key false
 
       - name: Deploy CDK Stack
-        run: npx cdk deploy $STACK_NAME --require-approval never --outputs-file cdk-outputs.json
+        run: npx cdk deploy "$STACK_NAME" --require-approval never --outputs-file cdk-outputs.json
 
       - name: Read API URL
         id: api
