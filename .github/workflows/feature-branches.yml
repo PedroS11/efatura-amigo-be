@@ -56,17 +56,22 @@ jobs:
       - name: Deploy CDK Stack
         run: npx cdk deploy EfaturaAmigoBeStack-${DEPLOY_ENV} --require-approval never --outputs-file cdk-outputs.json
 
-      - name: Read API URL
-        id: api
-        run: echo "url=$(jq -r --arg stack "$STACK_NAME" '.[$stack].ApiUrl' cdk-outputs.json)" >> "$GITHUB_OUTPUT"
+      - name: Prepare Worker deploy
+        id: worker
+        run: |
+          slug=$(echo "$DEPLOY_ENV" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-40 | sed 's/-*$//')
+          url=$(jq -r 'to_entries[0].value.ApiUrl // empty' cdk-outputs.json)
+          [ -n "$url" ] || { echo "ApiUrl not found"; exit 1; }
+          echo "name=efatura-amigo-api-$slug" >> "$GITHUB_OUTPUT"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy API Worker
+      - name: Deploy branch Worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
-          command: deploy --var EFATURA_API_BASE_URL:${{ steps.api.outputs.url }}
+          command: deploy --env preview --name ${{ steps.worker.outputs.name }} --var EFATURA_API_BASE_URL:${{ steps.worker.outputs.url }}
 
   destroy:
     if: github.event.action == 'closed'
@@ -103,3 +108,18 @@ jobs:
 
       - name: Destroy CDK Stack
         run: npx cdk destroy EfaturaAmigoBeStack-${DEPLOY_ENV} --force
+
+      - name: Worker name
+        id: worker
+        run: |
+          slug=$(echo "$DEPLOY_ENV" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-40 | sed 's/-*$//')
+          echo "name=efatura-amigo-api-$slug" >> "$GITHUB_OUTPUT"
+
+          - name: Delete branch Worker
+            continue-on-error: true   # don't fail if it was never deployed
+            uses: cloudflare/wrangler-action@v3
+            with:
+              apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+              accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+              workingDirectory: worker
+              command: delete --name ${{ steps.worker.outputs.name }} --force
