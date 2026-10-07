@@ -6,16 +6,19 @@ import type { Credit } from "../../../infrastructure/nif-pt/types";
 import { getUnprocessedCompaniesTableMetadata } from "../../../infrastructure/unprocessedCompaniesTable";
 import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/__fixtures__/expectedHttpHeaders";
 import type { APIGatewayProxyEventV2WithContext } from "../../../infrastructure/utils/aws/apiGateway/types";
+import { getQueueAttributes } from "../../../infrastructure/utils/aws/sqs/getQueueAttributes";
 import { handler } from "../index";
 
 vi.mock("../../../infrastructure/companiesTable");
 vi.mock("../../../infrastructure/unprocessedCompaniesTable");
 vi.mock("../../../infrastructure/nif-pt");
+vi.mock("../../../infrastructure/utils/aws/sqs/getQueueAttributes");
 
 describe("handler", () => {
   let getCompaniesTableMetadataMock: MockInstance;
   let getUnprocessedCompaniesTableMetadataMock: MockInstance;
   let getCreditsMock: MockInstance;
+  let getQueueAttributesMock: MockInstance;
 
   const credits = {
     month: 963,
@@ -29,6 +32,7 @@ describe("handler", () => {
     getCompaniesTableMetadataMock = vi.mocked(getCompaniesTableMetadata);
     getUnprocessedCompaniesTableMetadataMock = vi.mocked(getUnprocessedCompaniesTableMetadata);
     getCreditsMock = vi.mocked(getCredits);
+    getQueueAttributesMock = vi.mocked(getQueueAttributes);
   });
 
   afterEach(vi.resetAllMocks);
@@ -41,6 +45,11 @@ describe("handler", () => {
       Table: { ItemCount: 7 }
     });
     getCreditsMock.mockResolvedValue(credits);
+    getQueueAttributesMock.mockResolvedValue({
+      Attributes: {
+        ApproximateNumberOfMessages: 10
+      }
+    });
 
     const response = await handler({
       headers: {
@@ -52,7 +61,10 @@ describe("handler", () => {
       body: JSON.stringify({
         companiesTable: { itemCount: 42 },
         unprocessedCompaniesTable: { itemCount: 7 },
-        nifPt: { credits }
+        nifPt: { credits },
+        updateToAlgoliaDLQ: {
+          messagesCount: 10
+        }
       }),
       headers: expectedHttpHeaders,
       statusCode: 200
@@ -66,6 +78,7 @@ describe("handler", () => {
     getCompaniesTableMetadataMock.mockResolvedValue({});
     getUnprocessedCompaniesTableMetadataMock.mockResolvedValue({});
     getCreditsMock.mockResolvedValue(credits);
+    getQueueAttributesMock.mockResolvedValue({});
 
     const response = await handler({
       headers: {
@@ -77,7 +90,10 @@ describe("handler", () => {
       body: JSON.stringify({
         companiesTable: { itemCount: 0 },
         unprocessedCompaniesTable: { itemCount: 0 },
-        nifPt: { credits }
+        nifPt: { credits },
+        updateToAlgoliaDLQ: {
+          messagesCount: 0
+        }
       }),
       headers: expectedHttpHeaders,
       statusCode: 200
