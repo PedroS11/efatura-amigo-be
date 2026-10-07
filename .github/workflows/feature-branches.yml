@@ -115,11 +115,11 @@ jobs:
           slug=$(echo "$DEPLOY_ENV" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-40 | sed 's/-*$//')
           echo "name=efatura-amigo-api-$slug" >> "$GITHUB_OUTPUT"
 
-          - name: Delete branch Worker
-            continue-on-error: true   # don't fail if it was never deployed
-            uses: cloudflare/wrangler-action@v3
-            with:
-              apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-              accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-              workingDirectory: worker
-              command: delete --name ${{ steps.worker.outputs.name }} --force
+      - name: Delete branch Worker
+        continue-on-error: true   # don't fail if it was never deployed
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+          command: delete --name ${{ steps.worker.outputs.name }} --force
