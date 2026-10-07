@@ -54,7 +54,19 @@ jobs:
             --bootstrap-customer-key false
 
       - name: Deploy CDK Stack
-        run: npx cdk deploy EfaturaAmigoBeStack-${DEPLOY_ENV} --require-approval never
+        run: npx cdk deploy EfaturaAmigoBeStack-${DEPLOY_ENV} --require-approval never --outputs-file cdk-outputs.json
+
+      - name: Read API URL
+        id: api
+        run: echo "url=$(jq -r '.EfaturaAmigoBeStack-${DEPLOY_ENV}.ApiUrl' cdk-outputs.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy API Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+          command: deploy --var EFATURA_API_BASE_URL:${{ steps.api.outputs.url }}
 
   destroy:
     if: github.event.action == 'closed'

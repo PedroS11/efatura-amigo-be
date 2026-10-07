@@ -12,10 +12,12 @@
     "lint:fix": "biome check --write src cdk",
     "prepare": "husky install",
     "test": "vitest run --config ./vitest.config.ts",
-    "test:coverage": "vitest run --coverage --config ./vitest.config.ts"
+    "test:coverage": "vitest run --coverage --config ./vitest.config.ts",
+    "worker:deploy": "wrangler deploy -c worker/wrangler.toml"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.8",
+    "@cloudflare/workers-types": "^5.20261007.1",
     "@types/aws-lambda": "^8.10.162",
     "@types/node": "26.2.0",
     "@vitest/coverage-v8": "^4.1.10",
@@ -26,7 +28,8 @@
     "lint-staged": "^17.3.0",
     "ts-node": "^10.9.2",
     "typescript": "~7.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.148.0"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1111.0",
