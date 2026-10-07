@@ -18,7 +18,7 @@ export const createHttpApi = (
   logoutLambda: LambdaFunction,
   getMeLambda: LambdaFunction
 ) => {
-  const apiAccessLogs = new LogGroup(stack, "ApiAccessLogs", {
+  const apiAccessLogs = new LogGroup(stack, "ApiAccessLogsV2", {
     removalPolicy: cdk.RemovalPolicy.DESTROY
   });
 
