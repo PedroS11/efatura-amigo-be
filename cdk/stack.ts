@@ -242,6 +242,8 @@ export class Stack extends cdk.Stack {
     getMetadataLambda.addEnvironment("COMPANIES_TABLE", companiesTable.tableName);
     unprocessedCompaniesTable.grantReadData(getMetadataLambda);
     getMetadataLambda.addEnvironment("UNPROCESSED_COMPANIES_TABLE", unprocessedCompaniesTable.tableName);
+    updateAlgoliaDLQ.grant(getMetadataLambda, "sqs:GetQueueAttributes");
+    getMetadataLambda.addEnvironment("UPDATE_TO_ALGOLIA_DLQ", updateAlgoliaDLQ.queueUrl);
 
     /**
      * Get me

@@ -10,4 +10,7 @@ export interface GetMetadataResponse {
   nifPt: {
     credits: Credit | null;
   };
+  updateToAlgoliaDLQ: {
+    messagesCount: number;
+  };
 }
