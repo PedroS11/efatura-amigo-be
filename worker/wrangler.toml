@@ -1,0 +1,76 @@
+# worker/wrangler.toml
+#
+# Production (deploy.yml):       wrangler deploy --var EFATURA_API_BASE_URL:<main ApiUrl>
+# Feature branches (PR workflow): wrangler deploy --env preview --name efatura-amigo-api-<branch> \
+#                                   --var EFATURA_API_BASE_URL:<branch ApiUrl>
+# Local:                          wrangler dev [--env preview] (reads worker/.dev.vars)
+
+name = "efatura-amigo-api"
+main = "index.ts"
+compatibility_date = "2024-08-20"
+
+# ---------- Production ----------
+# Only reachable through the custom domain route, no public *.workers.dev URL
+workers_dev = false
+preview_urls = false
+
+routes = [
+  { pattern = "efatura.pedroosilva.dev/api/*", zone_name = "pedroosilva.dev" }
+]
+
+# Fallback for manual deploys; the pipeline overrides it with the CDK ApiUrl output
+[vars]
+EFATURA_API_BASE_URL = "https://g5o95bvqaj.execute-api.eu-west-2.amazonaws.com"
+
+[[ratelimits]]
+name = "API_RATE_LIMITER"
+namespace_id = "1001"
+  [ratelimits.simple]
+  limit = 100
+  period = 60
+
+[[ratelimits]]
+name = "AUTH_RATE_LIMITER"
+namespace_id = "1002"
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "CATEGORY_RATE_LIMITER"
+namespace_id = "1003"
+  [ratelimits.simple]
+  limit = 100
+  period = 60
+
+# ---------- Feature branches ----------
+# Bindings and vars are NOT inherited by environments, so everything is redeclared here.
+[env.preview]
+workers_dev = true   # each branch Worker gets https://<name>.<subdomain>.workers.dev
+preview_urls = false
+routes = []          # never claim production's efatura.pedroosilva.dev/api/* route
+
+# No fallback URL on purpose: the pipeline must pass the branch ApiUrl with --var,
+# otherwise the Worker answers 500 instead of silently proxying to production.
+
+# Separate namespaces so branch traffic doesn't consume production's counters
+[[env.preview.ratelimits]]
+name = "API_RATE_LIMITER"
+namespace_id = "2001"
+  [env.preview.ratelimits.simple]
+  limit = 100
+  period = 60
+
+[[env.preview.ratelimits]]
+name = "AUTH_RATE_LIMITER"
+namespace_id = "2002"
+  [env.preview.ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[env.preview.ratelimits]]
+name = "CATEGORY_RATE_LIMITER"
+namespace_id = "2003"
+  [env.preview.ratelimits.simple]
+  limit = 100
+  period = 60
