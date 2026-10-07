@@ -11,29 +11,21 @@ interface Env {
     CATEGORY_RATE_LIMITER: RateLimiter;
 }
 
-// Request headers forwarded to API Gateway. "origin" and the preflight headers
-// are required for API Gateway to add CORS headers to its responses.
-const PROXY_HEADERS = [
-    "authorization",
-    "content-type",
-    "accept",
-    "cookie",
-    "origin",
-    "access-control-request-method",
-    "access-control-request-headers"
-];
+// Headers that must not be passed through to API Gateway
+const STRIP_HEADERS = ["host", "cf-connecting-ip", "cf-ipcountry", "cf-ray", "cf-visitor", "cf-worker", "x-real-ip"];
 
 const AUTH_SESSION_PATHS = ["/api/auth/me", "/api/auth/login", "/api/auth/logout"];
 const CATEGORY_PATH_PREFIX = "/api/category/";
 
 function proxyHeaders(request: Request): Headers {
-    const headers = new Headers();
+    const headers = new Headers(request.headers);
 
-    for (const [name, value] of request.headers) {
-        if (PROXY_HEADERS.includes(name.toLowerCase())) {
-            headers.set(name, value);
-        }
+    for (const name of STRIP_HEADERS) {
+        headers.delete(name);
     }
+
+    // Keep the real client IP visible to AWS (access logs, $context.identity.sourceIp is Cloudflare's IP)
+    headers.set("x-forwarded-for", getClientIp(request));
 
     return headers;
 }
