@@ -58,7 +58,7 @@ jobs:
 
       - name: Read API URL
         id: api
-        run: echo "url=$(jq -r '.EfaturaAmigoBeStack-${DEPLOY_ENV}.ApiUrl' cdk-outputs.json)" >> "$GITHUB_OUTPUT"
+        run: echo "url=$(jq -r --arg stack "$STACK_NAME" '.[$stack].ApiUrl' cdk-outputs.json)" >> "$GITHUB_OUTPUT"
 
       - name: Deploy API Worker
         uses: cloudflare/wrangler-action@v3
