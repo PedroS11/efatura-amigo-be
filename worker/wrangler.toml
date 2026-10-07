@@ -72,5 +72,5 @@ namespace_id = "2002"
 name = "CATEGORY_RATE_LIMITER"
 namespace_id = "2003"
   [env.preview.ratelimits.simple]
-  limit = 100
+  limit = 1
   period = 60
