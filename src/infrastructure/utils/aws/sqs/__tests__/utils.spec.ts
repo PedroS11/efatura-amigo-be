@@ -6,7 +6,7 @@ vi.mock("@aws-sdk/client-sqs");
 // The client is cached in module state, so each test re-imports a fresh copy
 const loadUtils = async () => {
   vi.resetModules();
-  return import("../utils");
+  return import("../utils.js");
 };
 
 describe("getSQSClient", () => {
