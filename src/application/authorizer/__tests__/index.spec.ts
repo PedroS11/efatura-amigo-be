@@ -84,7 +84,7 @@ describe("handler", () => {
       name: "test",
       email: "a@a.com",
       id: "123",
-      expiresAt: Date.now() - 1000
+      expiresAt: Math.floor(Date.now() / 1000) - 1000
     });
 
     const response = await handler(event);

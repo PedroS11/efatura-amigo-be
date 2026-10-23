@@ -38,7 +38,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
       sub: response.sub,
       name: response.name,
       email: response.email,
-      expiresAt: Date.now() + SEVEN_DAYS_IN_SECONDS * 1000,
+      expiresAt: Date.now() / 1000 + SEVEN_DAYS_IN_SECONDS,
       id: sessionId
     });
 

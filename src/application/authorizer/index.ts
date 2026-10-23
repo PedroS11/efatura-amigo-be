@@ -38,7 +38,7 @@ export const handler = async (
       };
     }
 
-    if (session.expiresAt <= Date.now()) {
+    if (session.expiresAt <= Math.floor(Date.now() / 1000)) {
       return {
         isAuthorized: false,
         context: undefined

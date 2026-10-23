@@ -8,7 +8,7 @@ import {
 } from "../../../infrastructure/googleAuth/verifyGoogleBearerToken";
 import { saveSession } from "../../../infrastructure/sessionsTable";
 import { expectedHttpHeaders } from "../../../infrastructure/utils/__tests__/__fixtures__/expectedHttpHeaders";
-import { generateCookie, SEVEN_DAYS_IN_SECONDS } from "../../../infrastructure/utils/cookies";
+import { generateCookie } from "../../../infrastructure/utils/cookies";
 import { logError } from "../../../infrastructure/utils/logger";
 import { handler } from "../index";
 
@@ -85,7 +85,7 @@ describe("handler", () => {
       sub: verifiedUser.sub,
       name: verifiedUser.name,
       email: verifiedUser.email,
-      expiresAt: Date.now() + SEVEN_DAYS_IN_SECONDS * 1000,
+      expiresAt: 1767830400,
       id: "mock-session-id"
     });
     expect(response).toEqual({
@@ -98,7 +98,7 @@ describe("handler", () => {
     expect(generateCookieMock).toHaveBeenCalledOnce();
     expect(saveSessionMock).toHaveBeenCalledWith({
       email: "a@a.com",
-      expiresAt: 1767830400000,
+      expiresAt: 1767830400,
       id: "mock-session-id",
       name: "test",
       sub: "__GOOGLE_SUB__"

@@ -3,7 +3,7 @@ export const COOKIE_SESSON_KEY = "__Host-session";
 
 export const SEVEN_DAYS_IN_SECONDS = 604800;
 
-export const generateCookie = (sessionId: string, maxAge: number = SEVEN_DAYS_IN_SECONDS): string =>
+export const generateCookie = (sessionId: string): string =>
   cookie.stringifySetCookie({
     name: COOKIE_SESSON_KEY,
     value: sessionId,
@@ -11,7 +11,7 @@ export const generateCookie = (sessionId: string, maxAge: number = SEVEN_DAYS_IN
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge
+    maxAge: SEVEN_DAYS_IN_SECONDS
   });
 
 export const generateDeleteCookie = (): string =>
