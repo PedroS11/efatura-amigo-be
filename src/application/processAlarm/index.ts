@@ -13,8 +13,8 @@ export const handler = async (event: SQSEvent) => {
     const alarm = JSON.parse(record.body) as CloudWatchAlarmNotification;
     const alertName = getAlarmName(alarm);
 
-    if (alarm.NewStateValue === "ALARM" || alarm.NewStateValue === "OK") {
-      await sendMessage(`Alarm ${alertName} was triggered. Reason: ${alarm.NewStateReason}`);
+    if (alarm.NewStateValue === "ALARM") {
+      await sendMessage(`Alarm ${alertName} is in ALARM. Reason: ${alarm.NewStateReason}`);
     }
   }
 };

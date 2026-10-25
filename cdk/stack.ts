@@ -71,7 +71,8 @@ export class Stack extends cdk.Stack {
         name: "id"
       },
       billing: Billing.onDemand(),
-      removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
+      removalPolicy: isMain() ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      timeToLiveAttribute: "expiresAt"
     });
 
     /**
@@ -171,7 +172,6 @@ export class Stack extends cdk.Stack {
     );
 
     updateAlgoliaDLQAlarm.addAlarmAction(new SnsAction(alarmsTopic));
-    updateAlgoliaDLQAlarm.addOkAction(new SnsAction(alarmsTopic));
 
     /**
      * Resync lambda

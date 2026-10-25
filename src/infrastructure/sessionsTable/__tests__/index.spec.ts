@@ -20,7 +20,7 @@ describe("sessionsTable", () => {
     sub: "__GOOGLE_SUB__",
     name: "test",
     email: "a@a.com",
-    expiresAt: 1767830400000
+    expiresAt: 1767830400
   };
 
   beforeEach(() => {
