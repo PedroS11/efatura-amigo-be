@@ -12,6 +12,10 @@ describe("handler", () => {
   let logErrorMock: MockInstance;
   let getSessionByIdMock: MockInstance;
 
+  const FROZEN_INSTANT = "2026-01-01T00:00:00.000Z";
+  const FROZEN_TIME_MS = new Date(FROZEN_INSTANT).getTime();
+  const FROZEN_TIME_SEC = Math.floor(FROZEN_TIME_MS / 1000);
+
   const event = {
     headers: {
       cookie: "__Host-session=123; Max-Age=604800; Path=/; HttpOnly; Secure; SameSite=Lax"
@@ -23,7 +27,7 @@ describe("handler", () => {
     logErrorMock = vi.mocked(logError);
 
     vi.useFakeTimers({
-      now: new Date("2026-01-01T00:00:00.000Z").getTime()
+      now: FROZEN_TIME_MS
     });
   });
 
@@ -79,12 +83,13 @@ describe("handler", () => {
   });
 
   it("should deny requests when session expired ", async () => {
+    const expiredTimestamp = FROZEN_TIME_SEC - 1;
     getSessionByIdMock.mockResolvedValue({
       sub: "__GOOGLE_SUB__",
       name: "test",
       email: "a@a.com",
       id: "123",
-      expiresAt: Math.floor(Date.now() / 1000) - 1000
+      expiresAt: expiredTimestamp
     });
 
     const response = await handler(event);
@@ -113,12 +118,13 @@ describe("handler", () => {
   });
 
   it("should authorize valid cookies for the configured user", async () => {
+    const futureTimestamp = FROZEN_TIME_SEC + 1;
     getSessionByIdMock.mockResolvedValue({
       sub: "__GOOGLE_SUB__",
       name: "test",
       email: "a@a.com",
       id: "123",
-      expiresAt: Date.now() + 1000
+      expiresAt: futureTimestamp
     });
 
     const response = await handler(event);

@@ -9,6 +9,7 @@ import { saveSession } from "../../infrastructure/sessionsTable";
 import { generateCookie, SEVEN_DAYS_IN_SECONDS } from "../../infrastructure/utils/cookies";
 import { createHttpResponse } from "../../infrastructure/utils/createHttpResponse";
 import { logError, logMessage } from "../../infrastructure/utils/logger";
+import { calculateExpiresAtInSecs } from "../../infrastructure/utils/timeUtils";
 
 interface LoginPayload {
   credential: string;
@@ -38,7 +39,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxySt
       sub: response.sub,
       name: response.name,
       email: response.email,
-      expiresAt: Date.now() / 1000 + SEVEN_DAYS_IN_SECONDS,
+      expiresAt: calculateExpiresAtInSecs(SEVEN_DAYS_IN_SECONDS),
       id: sessionId
     });
 

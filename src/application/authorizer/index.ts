@@ -4,6 +4,7 @@ import type { VerifiedGoogleUser } from "../../infrastructure/googleAuth/types";
 import { getSessionById } from "../../infrastructure/sessionsTable";
 import { COOKIE_SESSON_KEY } from "../../infrastructure/utils/cookies";
 import { logError, logMessage } from "../../infrastructure/utils/logger";
+import { calculateExpiresAtInSecs } from "../../infrastructure/utils/timeUtils";
 
 export const handler = async (
   event: APIGatewayRequestAuthorizerEvent
@@ -38,7 +39,7 @@ export const handler = async (
       };
     }
 
-    if (session.expiresAt <= Math.floor(Date.now() / 1000)) {
+    if (session.expiresAt <= calculateExpiresAtInSecs()) {
       return {
         isAuthorized: false,
         context: undefined
