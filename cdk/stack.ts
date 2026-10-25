@@ -172,7 +172,6 @@ export class Stack extends cdk.Stack {
     );
 
     updateAlgoliaDLQAlarm.addAlarmAction(new SnsAction(alarmsTopic));
-    updateAlgoliaDLQAlarm.addOkAction(new SnsAction(alarmsTopic));
 
     /**
      * Resync lambda
