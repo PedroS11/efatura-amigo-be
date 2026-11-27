@@ -1,23 +1,23 @@
+import type { DescribeTableCommandOutput } from "@aws-sdk/client-dynamodb";
 import type { MockInstance } from "vitest";
-
 import { describeTable } from "../../utils/aws/dynamo/describeTable";
 import { fullScanTable } from "../../utils/aws/dynamo/fullScanTable";
 import { getItem } from "../../utils/aws/dynamo/getItem";
-import { putItem } from "../../utils/aws/dynamo/putItem";
-import { getCompaniesTableMetadata, getCompany, saveCompany, scanTable } from "../index";
-import { Categories, type Company } from "../types";
+import { updateItem } from "../../utils/aws/dynamo/updateItem";
+import { getCompaniesTableMetadata, getCompany, scanTable, updateCompany } from "../index";
+import type { Company } from "../types";
 import { getCompanyFixture } from "./__fixtures__/company";
 
 vi.mock("../../utils/aws/dynamo/getItem");
-vi.mock("../../utils/aws/dynamo/putItem");
+vi.mock("../../utils/aws/dynamo/updateItem");
 vi.mock("../../utils/aws/dynamo/describeTable");
 vi.mock("../../utils/aws/dynamo/fullScanTable");
 
 describe("companiesTable", () => {
-  let getItemMock: MockInstance;
-  let putItemMock: MockInstance;
-  let describeTableMock: MockInstance;
-  let fullScanTableMock: MockInstance;
+  let getItemMock: MockInstance<typeof getItem>;
+  let updateItemMock: MockInstance<typeof updateItem>;
+  let describeTableMock: MockInstance<typeof describeTable>;
+  let fullScanTableMock: MockInstance<typeof fullScanTable>;
   let companyFixture: Company;
 
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe("companiesTable", () => {
 
     companyFixture = getCompanyFixture();
     getItemMock = vi.mocked(getItem);
-    putItemMock = vi.mocked(putItem);
+    updateItemMock = vi.mocked(updateItem);
     describeTableMock = vi.mocked(describeTable);
     fullScanTableMock = vi.mocked(fullScanTable);
   });
@@ -62,28 +62,6 @@ describe("companiesTable", () => {
     });
   });
 
-  describe("saveCompany", () => {
-    it("should save company information", async () => {
-      const company: Company = {
-        name: "Company name",
-        nif: 123456789,
-        updatedAt: 949410000000,
-        caeRev3: "88910",
-        category: Categories.Educacao
-      };
-
-      await saveCompany(company);
-
-      expect(putItemMock).toHaveBeenCalledWith("__COMPANIES_TABLE__", {
-        nif: 123456789,
-        name: "Company name",
-        category: Categories.Educacao,
-        caeRev3: "88910",
-        updatedAt: 949410000000
-      });
-    });
-  });
-
   describe("scanTable", () => {
     it("should scan the table with the provided filters", async () => {
       const companies = [companyFixture];
@@ -105,10 +83,11 @@ describe("companiesTable", () => {
 
   describe("getCompaniesTableMetadata", () => {
     it("should return table metadata", async () => {
-      const metadata = {
+      const metadata: DescribeTableCommandOutput = {
         Table: {
           ItemCount: 42
-        }
+        },
+        $metadata: {}
       };
       describeTableMock.mockResolvedValue(metadata);
 
@@ -116,6 +95,30 @@ describe("companiesTable", () => {
 
       expect(result).toEqual(metadata);
       expect(describeTableMock).toHaveBeenCalledWith("__COMPANIES_TABLE__");
+    });
+  });
+
+  describe("updateCompany", () => {
+    it("should update company", async () => {
+      await updateCompany(companyFixture);
+
+      expect(updateItemMock).toHaveBeenNthCalledWith(1, {
+        ExpressionAttributeNames: {
+          "#category": "category",
+          "#name": "name",
+          "#updatedAt": "updatedAt"
+        },
+        ExpressionAttributeValues: {
+          ":category": 2,
+          ":name": "Company name",
+          ":updatedAt": 949410000000
+        },
+        Key: {
+          nif: 123456789
+        },
+        TableName: "__COMPANIES_TABLE__",
+        UpdateExpression: "SET #name = :name, #category = :category, #updatedAt = :updatedAt"
+      });
     });
   });
 });
