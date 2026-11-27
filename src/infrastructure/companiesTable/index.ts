@@ -35,14 +35,14 @@ export const updateCompany = async (company: Company): Promise<void> => {
       if (value !== undefined) {
         acum.values![`:${key}`] = value;
         acum.names![`#${key}`] = key;
-        acum.updateExpression += `#${key} = :${value}`;
+        acum.updateExpression.push(`#${key} = :${key}`);
       }
       return acum;
     },
-    { values: {}, names: {}, updateExpression: "" } as {
+    { values: {}, names: {}, updateExpression: [] } as {
       values: UpdateCommandInput["ExpressionAttributeValues"];
       names: UpdateCommandInput["ExpressionAttributeNames"];
-      updateExpression: UpdateCommandInput["UpdateExpression"];
+      updateExpression: string[];
     }
   );
 
@@ -50,7 +50,7 @@ export const updateCompany = async (company: Company): Promise<void> => {
     Key: {
       nif: company.nif
     },
-    UpdateExpression: params.updateExpression,
+    UpdateExpression: `SET ${params.updateExpression.join(", ")}`,
     ExpressionAttributeNames: params.names,
     ExpressionAttributeValues: params.values,
     TableName: COMPANIES_TABLE
