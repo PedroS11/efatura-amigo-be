@@ -32,6 +32,9 @@ export const getCompaniesTableMetadata = async () => await describeTable(COMPANI
 export const updateCompany = async (company: Company): Promise<void> => {
   const params = Object.entries(company).reduce(
     (acum, [key, value]) => {
+      if (key === "nif") {
+        return acum;
+      }
       if (value !== undefined) {
         acum.values![`:${key}`] = value;
         acum.names![`#${key}`] = key;
