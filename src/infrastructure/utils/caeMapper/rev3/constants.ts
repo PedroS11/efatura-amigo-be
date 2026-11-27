@@ -1,4 +1,4 @@
-import { Categories } from "../../companiesTable/types";
+import { Categories } from "../../../companiesTable/types";
 
 export const EXACT_CAE_REV3_MAP: Record<string, Categories> = {
   // Saude

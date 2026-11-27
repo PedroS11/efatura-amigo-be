@@ -1,16 +1,16 @@
 import { Categories } from "../../../companiesTable/types";
-import { mapCaeToCategory } from "../index";
+import { mapCaeRev3ToCategory } from "../index";
 
 describe("caeMapper", () => {
   it("should return a category when it fully maps to CAE", () => {
-    expect(mapCaeToCategory("47730")).toEqual(Categories.Saude);
+    expect(mapCaeRev3ToCategory("47730")).toEqual(Categories.Saude);
   });
 
   it("should return a category when it partially maps to CAE", () => {
-    expect(mapCaeToCategory("56303")).toEqual(Categories["Alimentacao/Hotelaria"]);
+    expect(mapCaeRev3ToCategory("56303")).toEqual(Categories["Alimentacao/Hotelaria"]);
   });
 
   it("should return undefined if no condition is matched", () => {
-    expect(mapCaeToCategory("12303")).toEqual(undefined);
+    expect(mapCaeRev3ToCategory("12303")).toEqual(undefined);
   });
 });
