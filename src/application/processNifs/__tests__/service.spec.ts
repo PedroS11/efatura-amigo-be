@@ -1,9 +1,9 @@
 import type { MockInstance } from "vitest";
 
 import { updateCompany } from "../../../infrastructure/companiesTable";
-import { searchNif } from "../../../infrastructure/nif-pt";
+import { searchNifPtCompany } from "../../../infrastructure/nif-pt";
 import { getSearchNifPtResponseFixture } from "../../../infrastructure/nif-pt/__tests__/__fixtures__/searchNifPtResponse";
-import type { SearchNifResponse } from "../../../infrastructure/nif-pt/types";
+import type { SearchNifPtCompanyResponse } from "../../../infrastructure/nif-pt/types";
 import { searchSicaeCompany } from "../../../infrastructure/sicae";
 import { logError, logMessage } from "../../../infrastructure/utils/logger";
 import { processNifWithNifPt, processNifWithSicae } from "../service";
@@ -25,13 +25,13 @@ describe("service", () => {
   afterEach(vi.resetAllMocks);
 
   describe("processNifWithNifPt", () => {
-    let searchNifMock: MockInstance<typeof searchNif>;
+    let searchNifMock: MockInstance<typeof searchNifPtCompany>;
     let logMessageMock: MockInstance<typeof logMessage>;
     let updateCompanyMock: MockInstance<typeof updateCompany>;
     let logErrorMock: MockInstance<typeof logError>;
 
     beforeEach(() => {
-      searchNifMock = vi.mocked(searchNif);
+      searchNifMock = vi.mocked(searchNifPtCompany);
       logMessageMock = vi.mocked(logMessage);
       updateCompanyMock = vi.mocked(updateCompany);
       logErrorMock = vi.mocked(logError);
@@ -43,7 +43,7 @@ describe("service", () => {
       searchNifMock.mockResolvedValue({
         error: true,
         message: "No credits left"
-      } as SearchNifResponse);
+      } as SearchNifPtCompanyResponse);
       const response = await processNifWithNifPt(nif);
 
       expect(response).toBeFalsy();
@@ -57,7 +57,7 @@ describe("service", () => {
       searchNifMock.mockResolvedValue({
         error: false,
         message: `Could not find any record for nif ${nif}`
-      } as SearchNifResponse);
+      } as SearchNifPtCompanyResponse);
       const response = await processNifWithNifPt(nif);
 
       expect(response).toBeTruthy();
@@ -82,7 +82,7 @@ describe("service", () => {
       searchNifMock.mockResolvedValue({
         error: false,
         company
-      } as SearchNifResponse);
+      } as SearchNifPtCompanyResponse);
       const response = await processNifWithNifPt(nif);
 
       expect(response).toBeTruthy();
@@ -98,7 +98,7 @@ describe("service", () => {
       searchNifMock.mockResolvedValue({
         error: false,
         company
-      } as SearchNifResponse);
+      } as SearchNifPtCompanyResponse);
       const response = await processNifWithNifPt(nif);
 
       expect(response).toBeTruthy();
@@ -123,7 +123,7 @@ describe("service", () => {
       searchNifMock.mockResolvedValue({
         error: false,
         company
-      } as SearchNifResponse);
+      } as SearchNifPtCompanyResponse);
       const response = await processNifWithNifPt(nif);
 
       expect(response).toBeTruthy();

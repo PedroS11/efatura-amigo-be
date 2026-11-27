@@ -2,10 +2,10 @@ import type { AxiosResponse } from "axios";
 import { isAxiosError } from "axios";
 
 import { logError, logMessage } from "../utils/logger";
-import { getAxiosInstance, parseSearchNifResponse } from "./service";
-import type { Credit, GetCreditsResponse, SearchNifPtResponse, SearchNifResponse } from "./types";
+import { getAxiosInstance, parseSearchNifPtResponse } from "./service";
+import type { Credit, GetCreditsResponse, SearchNifPtCompanyResponse, SearchNifPtResponse } from "./types";
 
-export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
+export const searchNifPtCompany = async (nif: number): Promise<SearchNifPtCompanyResponse> => {
   try {
     const response: AxiosResponse<SearchNifPtResponse> = await getAxiosInstance().get("http://www.nif.pt/", {
       params: {
@@ -19,7 +19,7 @@ export const searchNif = async (nif: number): Promise<SearchNifResponse> => {
 
     logMessage("NIF.PT response", nifPtResponse);
 
-    const parsedResponse: SearchNifResponse | undefined = parseSearchNifResponse(nifPtResponse, nif);
+    const parsedResponse: SearchNifPtCompanyResponse | undefined = parseSearchNifPtResponse(nifPtResponse, nif);
 
     if (parsedResponse) {
       return parsedResponse;

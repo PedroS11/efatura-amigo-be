@@ -1,6 +1,6 @@
 import { updateCompany } from "../../infrastructure/companiesTable";
 import type { Company } from "../../infrastructure/companiesTable/types";
-import { searchNif } from "../../infrastructure/nif-pt";
+import { searchNifPtCompany } from "../../infrastructure/nif-pt";
 import { searchSicaeCompany } from "../../infrastructure/sicae";
 import { mapCaeRev3ToCategory, mapCaeRev4ToCategory } from "../../infrastructure/utils/caeMapper";
 import { logError, logMessage } from "../../infrastructure/utils/logger";
@@ -8,7 +8,7 @@ import { logError, logMessage } from "../../infrastructure/utils/logger";
 export const processNifWithNifPt = async (nif: number): Promise<boolean> => {
   logMessage("Processing NIF with NIF.pt", nif);
 
-  const response = await searchNif(nif);
+  const response = await searchNifPtCompany(nif);
 
   if (response.error) {
     logError(`Error searching NIF with NIF.pt: ${nif}`, response);

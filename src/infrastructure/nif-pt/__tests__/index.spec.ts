@@ -2,8 +2,8 @@ import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import { AxiosError } from "axios";
 import type { MockInstance } from "vitest";
 import { logError } from "../../utils/logger";
-import { getCredits, searchNif } from "../index";
-import { getAxiosInstance, parseSearchNifResponse } from "../service";
+import { getCredits, searchNifPtCompany } from "../index";
+import { getAxiosInstance, parseSearchNifPtResponse } from "../service";
 import type { Credit, SearchNifPtResponse } from "../types";
 import {
   getNoCreditsResponseFixture,
@@ -27,12 +27,12 @@ describe("NifPt", () => {
       get: axiosGetMock
     } as unknown as AxiosInstance);
     logErrorMock = vi.mocked(logError);
-    parseSearchNifResponseMock = vi.mocked(parseSearchNifResponse);
+    parseSearchNifResponseMock = vi.mocked(parseSearchNifPtResponse);
   });
 
   afterEach(vi.resetAllMocks);
 
-  describe("searchNif", () => {
+  describe("searchNifPtCompany", () => {
     it("should return a valid company if it exists", async () => {
       const searchNifResponse: SearchNifPtResponse = getSearchNifPtResponseFixture();
 
@@ -45,7 +45,7 @@ describe("NifPt", () => {
         data: searchNifResponse
       });
 
-      const response = await searchNif(515198374);
+      const response = await searchNifPtCompany(515198374);
 
       expect(response).toEqual({
         error: false,
@@ -73,7 +73,7 @@ describe("NifPt", () => {
         data: searchNifResponse
       });
 
-      const response = await searchNif(515198374);
+      const response = await searchNifPtCompany(515198374);
 
       expect(response).toEqual({
         company: undefined,
@@ -102,7 +102,7 @@ describe("NifPt", () => {
         data: searchNifResponse
       });
 
-      const response = await searchNif(515198374);
+      const response = await searchNifPtCompany(515198374);
 
       expect(response).toEqual({
         company: undefined,
@@ -125,7 +125,7 @@ describe("NifPt", () => {
         data: searchNifResponse
       });
 
-      await expect(searchNif(515198374)).rejects.toThrowError(
+      await expect(searchNifPtCompany(515198374)).rejects.toThrowError(
         'NIF.pt returned unexpected error {"result":"error","message":"Key is not valid.","nif_validation":false,"is_nif":true,"credits":{"used":"free","left":{"month":963,"day":96,"hour":6,"minute":0,"paid":0}}}'
       );
 
@@ -155,7 +155,7 @@ describe("NifPt", () => {
 
       axiosGetMock.mockRejectedValue(error);
 
-      await expect(searchNif(515198374)).rejects.toThrow(error.message);
+      await expect(searchNifPtCompany(515198374)).rejects.toThrow(error.message);
       expect(logErrorMock).not.toHaveBeenCalled();
     });
 
@@ -164,7 +164,7 @@ describe("NifPt", () => {
 
       axiosGetMock.mockRejectedValue(error);
 
-      await expect(searchNif(515198374)).rejects.toThrow(error.message);
+      await expect(searchNifPtCompany(515198374)).rejects.toThrow(error.message);
       expect(logErrorMock).toHaveBeenCalledWith("Unexpected error calling NIF.PT", {
         errorMessage: "Unexpected error occured",
         nif: 515198374

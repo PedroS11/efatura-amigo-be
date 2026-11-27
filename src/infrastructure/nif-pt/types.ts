@@ -74,7 +74,7 @@ export interface GetCreditsResponse {
   credits: Credit;
 }
 
-export interface SearchNifResponse {
+export interface SearchNifPtCompanyResponse {
   error: boolean;
   company?: NifPTCompany;
   message?: string;

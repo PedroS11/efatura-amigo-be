@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from "axios";
 import { axiosLoggerInterceptor } from "../utils/axiosLoggerInterceptor";
-import type { SearchNifPtResponse, SearchNifResponse } from "./types";
+import type { SearchNifPtCompanyResponse, SearchNifPtResponse } from "./types";
 
 let axiosInstance: AxiosInstance;
 
@@ -16,7 +16,10 @@ const isNoRecordFoundError = (response: SearchNifPtResponse) => response?.messag
 
 const isCreditsExceededError = (response: SearchNifPtResponse) => response?.message?.includes("credits");
 
-export const parseSearchNifResponse = (response: SearchNifPtResponse, nif: number): SearchNifResponse | undefined => {
+export const parseSearchNifPtResponse = (
+  response: SearchNifPtResponse,
+  nif: number
+): SearchNifPtCompanyResponse | undefined => {
   if (response.result === "success") {
     return {
       error: false,
