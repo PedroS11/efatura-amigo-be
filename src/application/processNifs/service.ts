@@ -1,7 +1,7 @@
 import { updateCompany } from "../../infrastructure/companiesTable";
 import type { Company } from "../../infrastructure/companiesTable/types";
 import { searchNif } from "../../infrastructure/nif-pt";
-import { getSicaeCompany } from "../../infrastructure/sicae";
+import { searchSicaeCompany } from "../../infrastructure/sicae";
 import { mapCaeRev3ToCategory, mapCaeRev4ToCategory } from "../../infrastructure/utils/caeMapper";
 import { logError, logMessage } from "../../infrastructure/utils/logger";
 
@@ -65,7 +65,7 @@ export const processNifWithSicae = async (nif: number): Promise<boolean> => {
   try {
     logMessage("Processing NIF with SICAE", nif);
 
-    const company = await getSicaeCompany(nif);
+    const company = await searchSicaeCompany(nif);
     if (company?.caePrincipal?.codigo) {
       const category = mapCaeRev4ToCategory(company.caePrincipal.codigo);
 

@@ -1,12 +1,13 @@
 import { getCredits } from "../../infrastructure/nif-pt";
 import { sendMessage } from "../../infrastructure/telegramBot";
 import { deleteBatch, getUnprocessedCompanies } from "../../infrastructure/unprocessedCompaniesTable";
+import { MAX_UNPROCESSED_COMPANIES } from "../../infrastructure/unprocessedCompaniesTable/types";
 import { MAX_ITEMS_PER_BATCH } from "../../infrastructure/utils/aws/dynamo/utils";
 import { logMessage } from "../../infrastructure/utils/logger";
 import { processNifWithNifPt, processNifWithSicae } from "./service";
 
 export const handler = async (): Promise<void> => {
-  const rows = await getUnprocessedCompanies(5);
+  const rows = await getUnprocessedCompanies(MAX_UNPROCESSED_COMPANIES);
   if (rows.length === 0) {
     logMessage("No rows to process");
     return;
@@ -29,7 +30,9 @@ export const handler = async (): Promise<void> => {
       );
       nifsToRetry.push(nif);
 
-      // await sendMessage(`Error thrown processing nif ${nif}, error: ${(error as Error).message}`);
+      await sendMessage(
+        `Error thrown processing nif ${nif} with SICAE, error: ${(error as Error).message}, retrying with NIF.pt`
+      );
     }
   }
 
@@ -49,7 +52,8 @@ export const handler = async (): Promise<void> => {
           if (wasProcessed) {
             nifsToDelete.push(nif);
           } else {
-            await sendMessage(`Failed to process nif ${nif}`);
+            logMessage(`Failed to process nif ${nif} with NIF.pt`);
+            await sendMessage(`Failed to process nif ${nif} with NIF.pt`);
           }
         } catch (error) {
           logMessage(`Error thrown processing nif ${nif} with NIF.pt, error: ${(error as Error).message}`);

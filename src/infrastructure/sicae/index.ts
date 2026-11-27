@@ -88,7 +88,7 @@ const searchByNif = async (nif: number): Promise<string> => {
   return await postRes.text();
 };
 
-export async function getSicaeCompany(nif: number): Promise<EmpresaSicae | undefined> {
+export async function searchSicaeCompany(nif: number): Promise<EmpresaSicae | undefined> {
   try {
     const html = await searchByNif(nif);
     const results = parseResults(html);
