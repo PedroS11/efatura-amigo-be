@@ -1,6 +1,7 @@
 import { Categories } from "../../../companiesTable/types";
+import type { CAEMapper } from "../index";
 
-export const EXACT_CAE_REV4_MAP: Record<string, Categories> = {
+export const EXACT_CAE_REV4_MAP: CAEMapper = {
   // Saúde
   "47730": Categories.Saude,
   "47740": Categories.Saude, // ophthalmic/optical retail
@@ -68,7 +69,7 @@ export const EXACT_CAE_REV4_MAP: Record<string, Categories> = {
   "81100": Categories.Outros // Atividades combinadas de apoio aos edifícios
 };
 
-export const PREFIX_CAE_REV4_MAP: Record<string, Categories> = {
+export const PREFIX_CAE_REV4_MAP: CAEMapper = {
   "9621": Categories.Cabeleireiro, // Salões de cabeleireiro e barbeiros
   "9622": Categories.Cabeleireiro, // Institutos de beleza
   "9531": Categories["Reparacao Automovel"],

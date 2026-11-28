@@ -1,6 +1,7 @@
 import { Categories } from "../../../companiesTable/types";
+import type { CAEMapper } from "../index";
 
-export const EXACT_CAE_REV3_MAP: Record<string, Categories> = {
+export const EXACT_CAE_REV3_MAP: CAEMapper = {
   // Saude
   "47730": Categories.Saude,
   "47740": Categories.Saude,
@@ -58,7 +59,7 @@ export const EXACT_CAE_REV3_MAP: Record<string, Categories> = {
   "81100": Categories.Outros // Atividades combinadas de apoio aos edifícios
 };
 
-export const PREFIX_CAE_REV3_MAP: Record<string, Categories> = {
+export const PREFIX_CAE_REV3_MAP: CAEMapper = {
   "9602": Categories.Cabeleireiro,
   "750": Categories["Animais de Estimacao"],
   "471": Categories.Outros, // Supermarkets
