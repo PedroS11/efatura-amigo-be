@@ -2,7 +2,14 @@ import type { MockInstance } from "vitest";
 import { sendMessage } from "../../telegramBot";
 import { logError } from "../../utils/logger";
 import { searchSicaeCompany } from "../index";
-import { FORM_HTML, VALID_RESULT_HTML } from "./__fixtures__/htmlFixtures";
+import {
+  EMPTY_TABLE_HTML,
+  FORM_HTML,
+  MISSING_CAE_HTML,
+  MISSING_NAME_HTML,
+  MULTIPLE_ROWS_HTML,
+  VALID_RESULT_HTML
+} from "./__fixtures__/htmlFixtures";
 
 vi.mock("../../utils/logger");
 vi.mock("../../telegramBot");
@@ -88,27 +95,9 @@ describe("searchSicaeCompany", () => {
   });
 
   it("returns only the first company when multiple rows are returned", async () => {
-    const multipleRowsHtml = `
-      <table id="ctl00_MainContent_ConsultaDataGrid">
-        <tr class="gridHeader"><th>Header</th></tr>
-        <tr>
-          <td>111111111</td>
-          <td>First Company</td>
-          <td><div title="Main 1">10000</div></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>222222222</td>
-          <td>Second Company</td>
-          <td><div title="Main 2">20000</div></td>
-          <td></td>
-        </tr>
-      </table>
-    `;
-
     fetchMock
       .mockResolvedValueOnce(createMockResponse(FORM_HTML))
-      .mockResolvedValueOnce(createMockResponse(multipleRowsHtml));
+      .mockResolvedValueOnce(createMockResponse(MULTIPLE_ROWS_HTML));
 
     const result = await searchSicaeCompany(111111111);
 
@@ -121,15 +110,9 @@ describe("searchSicaeCompany", () => {
   });
 
   it("returns undefined without logging when no results are found", async () => {
-    const emptyTableHtml = `
-      <table id="ctl00_MainContent_ConsultaDataGrid">
-        <tr class="gridHeader"><th>Header</th></tr>
-      </table>
-    `;
-
     fetchMock
       .mockResolvedValueOnce(createMockResponse(FORM_HTML))
-      .mockResolvedValueOnce(createMockResponse(emptyTableHtml));
+      .mockResolvedValueOnce(createMockResponse(EMPTY_TABLE_HTML));
 
     const result = await searchSicaeCompany(999999999);
 
@@ -139,20 +122,9 @@ describe("searchSicaeCompany", () => {
   });
 
   it("logs and sends a Telegram alert when company name is missing", async () => {
-    const missingNameHtml = `
-      <table id="ctl00_MainContent_ConsultaDataGrid">
-        <tr>
-          <td>514852046</td>
-          <td>   </td>
-          <td><div title="Main">62020</div></td>
-          <td></td>
-        </tr>
-      </table>
-    `;
-
     fetchMock
       .mockResolvedValueOnce(createMockResponse(FORM_HTML))
-      .mockResolvedValueOnce(createMockResponse(missingNameHtml));
+      .mockResolvedValueOnce(createMockResponse(MISSING_NAME_HTML));
 
     const result = await searchSicaeCompany(514852046);
 
@@ -173,20 +145,9 @@ describe("searchSicaeCompany", () => {
   });
 
   it("logs and sends a Telegram alert when caePrincipal is missing", async () => {
-    const missingCaeHtml = `
-      <table id="ctl00_MainContent_ConsultaDataGrid">
-        <tr>
-          <td>514852046</td>
-          <td>Empresa Sem CAE</td>
-          <td></td>
-          <td></td>
-        </tr>
-      </table>
-    `;
-
     fetchMock
       .mockResolvedValueOnce(createMockResponse(FORM_HTML))
-      .mockResolvedValueOnce(createMockResponse(missingCaeHtml));
+      .mockResolvedValueOnce(createMockResponse(MISSING_CAE_HTML));
 
     const result = await searchSicaeCompany(514852046);
 
