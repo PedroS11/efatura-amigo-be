@@ -3,7 +3,7 @@ import { sendMessage } from "../../telegramBot";
 import { logError } from "../../utils/logger";
 import { searchSicaeCompany } from "../index";
 import {
-  EMPTY_TABLE_HTML,
+  COMPANY_NOT_FOUND_HTML,
   FORM_HTML,
   MISSING_CAE_HTML,
   MISSING_NAME_HTML,
@@ -112,7 +112,7 @@ describe("searchSicaeCompany", () => {
   it("returns undefined without logging when no results are found", async () => {
     fetchMock
       .mockResolvedValueOnce(createMockResponse(FORM_HTML))
-      .mockResolvedValueOnce(createMockResponse(EMPTY_TABLE_HTML));
+      .mockResolvedValueOnce(createMockResponse(COMPANY_NOT_FOUND_HTML));
 
     const result = await searchSicaeCompany(999999999);
 

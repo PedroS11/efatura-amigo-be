@@ -1,6 +1,6 @@
 import type { MockInstance } from "vitest";
 
-import { updateCompany } from "../../../infrastructure/companiesTable";
+import { getCompany, updateCompany } from "../../../infrastructure/companiesTable";
 import { searchNifPtCompany } from "../../../infrastructure/nif-pt";
 import { getSearchNifPtResponseFixture } from "../../../infrastructure/nif-pt/__tests__/__fixtures__/searchNifPtResponse";
 import type { SearchNifPtCompanyResponse } from "../../../infrastructure/nif-pt/types";
@@ -15,8 +15,15 @@ vi.mock("../../../infrastructure/sicae");
 
 describe("service", () => {
   const nif = 1234556789;
+  let logMessageMock: MockInstance<typeof logMessage>;
+  let logErrorMock: MockInstance<typeof logError>;
+  let updateCompanyMock: MockInstance<typeof updateCompany>;
 
   beforeEach(() => {
+    logMessageMock = vi.mocked(logMessage);
+    logErrorMock = vi.mocked(logError);
+    updateCompanyMock = vi.mocked(updateCompany);
+
     vi.useFakeTimers({
       now: 1786835051652
     });
@@ -26,15 +33,11 @@ describe("service", () => {
 
   describe("processNifWithNifPt", () => {
     let searchNifMock: MockInstance<typeof searchNifPtCompany>;
-    let logMessageMock: MockInstance<typeof logMessage>;
-    let updateCompanyMock: MockInstance<typeof updateCompany>;
-    let logErrorMock: MockInstance<typeof logError>;
+    let getCompanyMock: MockInstance<typeof getCompany>;
 
     beforeEach(() => {
       searchNifMock = vi.mocked(searchNifPtCompany);
-      logMessageMock = vi.mocked(logMessage);
-      updateCompanyMock = vi.mocked(updateCompany);
-      logErrorMock = vi.mocked(logError);
+      getCompanyMock = vi.mocked(getCompany);
     });
 
     afterEach(vi.resetAllMocks);
@@ -44,25 +47,28 @@ describe("service", () => {
         error: true,
         message: "No credits left"
       } as SearchNifPtCompanyResponse);
+
       const response = await processNifWithNifPt(nif);
 
       expect(response).toBeFalsy();
+      expect(logMessageMock).toHaveBeenNthCalledWith(1, "Processing NIF with NIF.pt", 1234556789);
       expect(logErrorMock).toHaveBeenCalledWith("Error searching NIF with NIF.pt: 1234556789", {
         error: true,
         message: "No credits left"
       });
     });
 
-    it("should save a NOT_FOUND entry and return true if company not found", async () => {
+    it("should save a NOT_FOUND entry and return true if company not found on NIF.pt and in Dynamo", async () => {
       searchNifMock.mockResolvedValue({
         error: false,
         message: `Could not find any record for nif ${nif}`
       } as SearchNifPtCompanyResponse);
+
       const response = await processNifWithNifPt(nif);
 
       expect(response).toBeTruthy();
       expect(logMessageMock).toHaveBeenNthCalledWith(1, "Processing NIF with NIF.pt", 1234556789);
-      expect(logMessageMock).toHaveBeenNthCalledWith(2, "Company 1234556789 not found", {
+      expect(logMessageMock).toHaveBeenNthCalledWith(2, "Company 1234556789 not found on NIF.pt", {
         error: false,
         message: "Could not find any record for nif 1234556789"
       });
@@ -73,6 +79,39 @@ describe("service", () => {
         nif: 1234556789,
         updatedAt: 1786835051652
       });
+    });
+
+    it("should return true if company not found on NIF.pt but exists in Dynamo", async () => {
+      getCompanyMock.mockResolvedValue({
+        caeRev4: "49330",
+        category: 11,
+        name: "Company name",
+        nif: 1234556789,
+        updatedAt: 1786835051652
+      });
+
+      searchNifMock.mockResolvedValue({
+        error: false,
+        message: `Could not find any record for nif ${nif}`
+      } as SearchNifPtCompanyResponse);
+
+      const response = await processNifWithNifPt(nif);
+
+      expect(response).toBeTruthy();
+      expect(logMessageMock).toHaveBeenNthCalledWith(1, "Processing NIF with NIF.pt", 1234556789);
+      expect(logMessageMock).toHaveBeenNthCalledWith(2, "Company 1234556789 not found on NIF.pt", {
+        error: false,
+        message: "Could not find any record for nif 1234556789"
+      });
+      expect(logMessageMock).toHaveBeenNthCalledWith(3, "Company 1234556789 already exists in the Dynamo", {
+        caeRev4: "49330",
+        category: 11,
+        name: "Company name",
+        nif: 1234556789,
+        updatedAt: 1786835051652
+      });
+
+      expect(updateCompanyMock).not.toHaveBeenCalled();
     });
 
     it("should return true if cae not found", async () => {
@@ -156,26 +195,42 @@ describe("service", () => {
       const response = await processNifWithSicae(nif);
 
       expect(response).toBeFalsy();
+      expect(logMessageMock).toHaveBeenNthCalledWith(1, "Processing NIF with SICAE", 1234556789);
       expect(searchSicaeCompanyMock).toHaveBeenNthCalledWith(1, nif);
+      expect(logMessageMock).toHaveBeenNthCalledWith(2, "Company not found on SICAE", {
+        nif: 1234556789
+      });
       expect(updateCompanyMock).not.toHaveBeenCalled();
     });
 
-    it("should return false if cae rev4 wasn't mapped to category", async () => {
+    it("should log an error, update dynamo and return false if cae rev4 wasn't mapped to category", async () => {
       searchSicaeCompanyMock.mockResolvedValue({
-        nome: "NOT_FOUND",
+        nome: "A Company",
         nipc: nif.toString(),
         caesSecundarios: [],
-        caePrincipal: undefined
+        caePrincipal: {
+          codigo: "00",
+          descricao: "AA"
+        }
       });
 
       const response = await processNifWithSicae(nif);
 
       expect(response).toBeFalsy();
       expect(searchSicaeCompanyMock).toHaveBeenNthCalledWith(1, nif);
-      expect(updateCompanyMock).not.toHaveBeenCalled();
+      expect(logMessageMock).toHaveBeenNthCalledWith(2, "No match cae rev4 to category", {
+        cae: "00",
+        nif: 1234556789
+      });
+      expect(updateCompanyMock).toHaveBeenNthCalledWith(1, {
+        caeRev4: "00",
+        name: "A Company",
+        nif: 1234556789,
+        updatedAt: 1786835051652
+      });
     });
 
-    it("should true false if a category was found for the cae", async () => {
+    it("should return true if a category was found for the cae", async () => {
       searchSicaeCompanyMock.mockResolvedValue({
         nome: "Company name",
         nipc: nif.toString(),
@@ -198,11 +253,5 @@ describe("service", () => {
         updatedAt: 1786835051652
       });
     });
-  });
-});
-
-describe.skip("t", () => {
-  it("aa", async () => {
-    await processNifWithSicae(516600800);
   });
 });

@@ -50,12 +50,6 @@ export const MULTIPLE_ROWS_HTML = `
   </table>
 `;
 
-export const EMPTY_TABLE_HTML = `
-  <table id="ctl00_MainContent_ConsultaDataGrid">
-    <tr class="gridHeader"><th>Header</th></tr>
-  </table>
-`;
-
 export const MISSING_NAME_HTML = `
   <table id="ctl00_MainContent_ConsultaDataGrid">
     <tr>
@@ -76,4 +70,34 @@ export const MISSING_CAE_HTML = `
       <td></td>
     </tr>
   </table>
+`;
+
+export const COMPANY_NOT_FOUND_HTML = `
+  <table id="ctl00_MainContent_ConsultaDataGrid">
+    <tbody>
+        <tr class="gridHeader">
+            <td>NIPC</td>
+            <td>Denominação Social/Firma</td>
+            <td>CAE Principal</td>
+            <td>CAEs Secundários</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="upperFirma">
+                <div title="Não existem dados para o critério de pesquisa indicado.">
+                    Não existem dados para o critério de pesquisa indicado.
+                </div>
+            </td>
+            <td>
+                <div style="cursor: pointer" title=""></div>
+            </td>
+            <td class="centerCae">
+                <div title=""></div>
+                <div title=""></div>
+                <div title=""></div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
 `;

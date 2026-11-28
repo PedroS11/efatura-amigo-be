@@ -97,7 +97,10 @@ export async function searchSicaeCompany(nif: number): Promise<SicaeCompany | un
     // I just need the first result if exists
     if (results.length) {
       const company = results[0];
-      if (!company?.nome || !company?.caePrincipal?.codigo) {
+      // Company not found error message on SICAE
+      if (company.nome.includes("Não existem dados")) {
+        return;
+      } else if (!company?.nome || !company?.caePrincipal?.codigo) {
         logError(`Error parsing results from ${nif}`, company);
 
         throw new Error(`Error parsing results from ${nif}`);
