@@ -22,5 +22,6 @@ export interface Company {
   name: string;
   category?: Categories;
   caeRev3?: string;
+  caeRev4?: string;
   updatedAt: number;
 }
