@@ -11,7 +11,7 @@ interface Cae {
   descricao: string;
 }
 
-interface EmpresaSicae {
+interface SicaeCompany {
   nipc: string;
   nome: string;
   caePrincipal: Cae | undefined;
@@ -19,12 +19,12 @@ interface EmpresaSicae {
 }
 
 const parseCae = ($: cheerio.CheerioAPI, div: Element): Cae => ({
-  // os secundários vêm com vírgula no fim ("49330,"), por isso limpa-se tudo o que não é dígito
+  // Secondary CAES are return with a comma ("49330,"), so strip every non digit character
   codigo: $(div).text().replace(/\D/g, ""),
   descricao: $(div).attr("title") ?? ""
 });
 
-function parseResults(html: string): EmpresaSicae[] {
+function parseResults(html: string): SicaeCompany[] {
   const $ = cheerio.load(html);
 
   return $("#ctl00_MainContent_ConsultaDataGrid tr")
@@ -88,7 +88,7 @@ const searchByNif = async (nif: number): Promise<string> => {
   return await postRes.text();
 };
 
-export async function searchSicaeCompany(nif: number): Promise<EmpresaSicae | undefined> {
+export async function searchSicaeCompany(nif: number): Promise<SicaeCompany | undefined> {
   try {
     const html = await searchByNif(nif);
     const results = parseResults(html);
@@ -114,5 +114,3 @@ export async function searchSicaeCompany(nif: number): Promise<EmpresaSicae | un
     return;
   }
 }
-
-// consultarCae("514852046").then(console.log).catch(console.error);
